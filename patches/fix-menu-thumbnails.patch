@@ -1,0 +1,10 @@
+--- a/vendor/tastyigniter/ti-theme-orange/src/Livewire/MenuItemList.php
++++ b/vendor/tastyigniter/ti-theme-orange/src/Livewire/MenuItemList.php
+@@ -28,7 +28,7 @@ final class MenuItemList extends Component
+
+     public string $sortOrder = 'menu_priority asc';
+
+-    public bool $showThumb = false;
++    public bool $showThumb = true;
+
+     public int $menuThumbWidth = 95;

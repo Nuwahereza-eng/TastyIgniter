@@ -11,6 +11,154 @@
     --text-light: #7F8C8D;
 }
 
+
+/* =====================================================
+   RECTANGULAR BUTTON STYLES - Clean Modern Design
+   ===================================================== */
+
+/* Override all pill/oval buttons to rectangular */
+.btn,
+button,
+input[type="submit"],
+input[type="button"],
+.btn-primary,
+.btn-secondary,
+.btn-success,
+.btn-danger,
+.btn-warning,
+.btn-info,
+.btn-light,
+.btn-dark,
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-success,
+.btn-outline-danger,
+.btn-lg,
+.btn-sm,
+[class*="add-to-cart"],
+[class*="cart"] .btn,
+.menu-card .btn,
+.menu-item-card .btn {
+    border-radius: 6px !important;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0.3px;
+    transition: all 0.2s ease;
+}
+
+/* Primary button - clean rectangle */
+.btn-primary,
+.btn-success,
+button[type="submit"],
+.add-to-cart,
+.btn-add-cart,
+[class*="add-to-cart"],
+[class*="cart"] .btn {
+    background: var(--ti-orange) !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 12px 24px;
+    font-weight: 600;
+}
+
+.btn-primary:hover,
+.btn-success:hover,
+button[type="submit"]:hover,
+.add-to-cart:hover,
+.btn-add-cart:hover,
+[class*="add-to-cart"]:hover,
+[class*="cart"] .btn:hover {
+    background: #e04000 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(255, 73, 0, 0.3) !important;
+}
+
+/* Outline buttons - rectangular */
+.btn-outline-primary,
+.btn-outline-secondary {
+    border-radius: 6px !important;
+    border-width: 2px !important;
+}
+
+/* Small buttons */
+.btn-sm {
+    padding: 8px 16px !important;
+    border-radius: 4px !important;
+    font-size: 0.875rem;
+}
+
+/* Large buttons */
+.btn-lg {
+    padding: 14px 32px !important;
+    border-radius: 8px !important;
+    font-size: 1.1rem;
+}
+
+/* Keep lift animations for cards */
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+.menu-card:hover,
+.menu-item-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Card styling - rectangular */
+.card {
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e5e5;
+}
+
+/* Menu cards - rectangular */
+.menu-card,
+.menu-item-card,
+[class*="menu"] .card {
+    border-radius: 8px !important;
+}
+
+/* Input fields - rectangular */
+input,
+textarea,
+select,
+.form-control,
+.form-select {
+    border-radius: 6px !important;
+}
+
+/* Search bar - rectangular */
+.search-bar,
+.search-input,
+input[type="search"],
+.form-control[type="search"] {
+    border-radius: 6px !important;
+}
+
+/* Badges - rectangular with slight rounding */
+.badge,
+.menu-item-badge {
+    border-radius: 4px !important;
+}
+
+/* Modal - rectangular */
+.modal-content {
+    border-radius: 8px !important;
+}
+
+/* Dropdown - rectangular */
+.dropdown-menu {
+    border-radius: 6px !important;
+}
+
+/* Alert - rectangular */
+.alert {
+    border-radius: 6px !important;
+}
+
+
 /* Custom Scrollbar with ti-orange */
 ::-webkit-scrollbar {
     width: 10px;
@@ -67,8 +215,6 @@ button[type="submit"]:hover,
     background: #e04000 !important;
     background-color: #e04000 !important;
     border-color: #e04000 !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(255, 73, 0, 0.4) !important;
 }
 
 /* Outline buttons */
@@ -126,7 +272,7 @@ button[type="submit"]:focus {
 }
 
 .card:hover {
-    transform: translateY(-5px);
+    transform: none;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
 }
 
@@ -177,7 +323,7 @@ button[type="submit"]:focus {
 
 .menu-card:hover,
 .menu-item-card:hover {
-    transform: translateY(-8px);
+    transform: none;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
 }
 
@@ -248,7 +394,7 @@ button[type="submit"]:focus {
     margin-top: 0.5rem;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     border: none;
-    border-radius: 50px;
+    border-radius: 6px;
     padding: 0.75rem 1.5rem;
     color: white;
     font-weight: 600;
@@ -257,7 +403,7 @@ button[type="submit"]:focus {
 
 .menu-card .btn:hover,
 .menu-item-card .btn:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
 }
 
@@ -280,7 +426,7 @@ button[type="submit"]:focus {
 }
 
 .menu-card:hover .menu-thumb-wrapper {
-    transform: scale(1.02);
+    transform: scale(1.1);
 }
 
 .menu-thumb-wrapper img {
@@ -307,7 +453,7 @@ button[type="submit"]:focus {
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     border: none;
-    border-radius: 50px;
+    border-radius: 6px;
     padding: 12px 30px;
     font-weight: 600;
     text-transform: uppercase;
@@ -317,14 +463,14 @@ button[type="submit"]:focus {
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
 }
 
 .btn-success {
     background: var(--success-color);
     border: none;
-    border-radius: 50px;
+    border-radius: 6px;
     padding: 12px 30px;
     font-weight: 600;
 }
@@ -526,7 +672,7 @@ button .d-flex {
 
 /* Search Bar Enhancement */
 .search-bar {
-    border-radius: 50px;
+    border-radius: 6px;
     border: 2px solid var(--uganda-yellow);
     padding: 1rem 2rem;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -809,7 +955,7 @@ header .navbar-nav .nav-link,
     margin: 0 0.25rem;
     position: relative;
     transition: all 0.3s ease !important;
-    border-radius: 25px;
+    border-radius: 6px;
     border: 2px solid transparent !important;
     background: transparent !important;
 }
@@ -826,7 +972,7 @@ header .navbar-nav .nav-link:hover,
     color: white !important;
     background: #FF4900 !important;
     border-color: #FF4900 !important;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: 0 4px 15px rgba(255, 73, 0, 0.4) !important;
 }
 
@@ -1104,4 +1250,142 @@ main[role="main"] {
     max-width: 100% !important;
     padding: 0.4rem 0.6rem !important;
     font-size: 0.8rem !important;
+}
+/* =====================================================
+   CART/BASKET - Reduced Orange, Cleaner Look
+   ===================================================== */
+
+/* Cart box container - white background, minimal styling */
+#cart-box,
+.cart-box,
+[id*="cart-box"] {
+    background: #fff !important;
+    border: 1px solid #e5e5e5 !important;
+}
+
+/* Cart title - dark text, not orange */
+#cart-box h5,
+.cart-box h5,
+#cart-items h5 {
+    color: #333 !important;
+    font-weight: 600;
+}
+
+/* Cart item buttons (plus/minus) - gray default, orange on hover/click */
+.cart-items .btn-outline-secondary,
+#cart-items .btn-outline-secondary,
+.cart-item .btn-outline-secondary {
+    border-color: #ccc !important;
+    color: #666 !important;
+    background: transparent !important;
+}
+
+.cart-items .btn-outline-secondary:hover,
+.cart-items .btn-outline-secondary:active,
+.cart-items .btn-outline-secondary:focus,
+#cart-items .btn-outline-secondary:hover,
+#cart-items .btn-outline-secondary:active,
+#cart-items .btn-outline-secondary:focus {
+    background: var(--ti-orange) !important;
+    border-color: var(--ti-orange) !important;
+    color: #fff !important;
+}
+
+/* Cart item names - dark text */
+.cart-items p,
+.cart-items .fw-bolder,
+#cart-items p {
+    color: #333 !important;
+}
+
+/* Cart prices - dark, not orange */
+.cart-items .price,
+#cart-items .price,
+#cart-box .price {
+    color: #333 !important;
+    font-weight: 600;
+}
+
+/* Cart totals - clean styling */
+#cart-totals,
+.cart-totals {
+    border-top: 1px solid #e5e5e5 !important;
+    background: transparent !important;
+}
+
+#cart-totals .fw-bold,
+.cart-totals .fw-bold {
+    color: #333 !important;
+}
+
+/* Only the final checkout button should be orange */
+#cart-buttons .btn-primary,
+#cart-box .btn-primary,
+.cart-box .btn-primary {
+    background: var(--ti-orange) !important;
+    border: none !important;
+}
+
+/* Coupon input - subtle styling */
+#cart-box input,
+.cart-box input,
+#cart-coupon input {
+    border: 1px solid #ddd !important;
+    background: #fff !important;
+}
+
+/* Remove button - gray, not red or orange */
+.cart-items .btn-close,
+.cart-items [class*="remove"],
+.cart-items .text-danger {
+    color: #999 !important;
+}
+
+.cart-items .btn-close:hover,
+.cart-items [class*="remove"]:hover {
+    color: #666 !important;
+}
+
+/* Subtotal and total labels - gray text */
+#cart-totals span,
+.cart-totals span {
+    color: #666 !important;
+}
+
+/* Grand total - bold black */
+#cart-totals .fs-5,
+#cart-totals strong,
+.cart-totals strong {
+    color: #000 !important;
+}
+
+
+/* Cart item rows - no orange background */
+.cart-items li,
+.cart-items > ul > li,
+#cart-items li,
+#cart-box .cart-items li {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Cart item text button - no orange */
+.cart-items .btn.shadow-none,
+.cart-items button.text-start,
+#cart-items .btn.shadow-none {
+    color: #333 !important;
+    background: transparent !important;
+}
+
+.cart-items .btn.shadow-none:hover,
+#cart-items .btn.shadow-none:hover {
+    color: #333 !important;
+    background: transparent !important;
+}
+
+/* Comment/note pill - gray not orange */
+.cart-items .rounded-pill,
+.cart-items .bg-light {
+    background: #f5f5f5 !important;
+    color: #666 !important;
 }
