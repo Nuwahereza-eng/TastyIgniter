@@ -7,17 +7,21 @@ use Igniter\Flame\Geolite\Exceptions\GeoliteException;
 use Igniter\Flame\Geolite\Place;
 use Igniter\Flame\Geolite\Provider\NominatimProvider;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class CustomNominatimProvider extends NominatimProvider
 {
     /**
      * Override placesAutocomplete to cast place_id to string and add User-Agent
+     * with improved timeout handling for Uganda
      */
     public function placesAutocomplete(GeoQueryInterface $query): Collection
     {
         $endpoint = array_get($this->config, 'endpoints.places');
-        $url = sprintf($endpoint.'search?q=%s&format=json&addressdetails=1&limit=%d',
+        
+        // Add countrycodes=UG to restrict to Uganda for faster results
+        $url = sprintf($endpoint.'search?q=%s&format=json&addressdetails=1&limit=%d&countrycodes=UG',
             rawurlencode($query->getText()),
             $query->getLimit(),
         );
@@ -27,44 +31,51 @@ class CustomNominatimProvider extends NominatimProvider
 
             return collect($result)->map(fn($item) => (new Place)
                 ->placeId((string)$item->place_id) // Cast to string
-                ->title($item->name)
-                ->description($item->display_name)
+                ->title($item->name ?? $item->display_name ?? 'Unknown')
+                ->description($item->display_name ?? '')
                 ->provider('nominatim')
-                ->withData('osmType', $item->osm_type)
-                ->withData('osmId', $item->osm_id)
-                ->withData('class', $item->category ?? null)
-                ->withData('latitude', (float)($item->lat ?? 0)) // Cast to float
-                ->withData('longitude', (float)($item->lon ?? 0))); // Cast to float
+                ->withData('osmType', $item->osm_type ?? null)
+                ->withData('osmId', $item->osm_id ?? null)
+                ->withData('class', $item->category ?? $item->class ?? null)
+                ->withData('latitude', (float)($item->lat ?? 0))
+                ->withData('longitude', (float)($item->lon ?? 0)));
         } catch (Throwable $throwable) {
-            $this->log(sprintf(
-                'Provider "%s" could not fetch place suggestions, "%s".',
-                $this->getName(), $throwable->getMessage(),
+            // Log the error but return empty collection instead of throwing
+            Log::warning(sprintf(
+                'Nominatim geocoding failed: %s. Query: %s',
+                $throwable->getMessage(),
+                $query->getText()
             ));
 
-            throw $throwable;
+            // Return empty collection instead of crashing
+            return collect([]);
         }
     }
 
     /**
      * Override the requestPlacesUrl method to include User-Agent header
+     * with increased timeout for slower connections
      */
     protected function requestPlacesUrl(string $url, GeoQueryInterface $query): array
     {
-        if ($region = $query->getData('countrycodes', array_get($this->config, 'region'))) {
-            $url = sprintf('%s&countrycodes=%s', $url, $region);
+        // Uganda country code already added in placesAutocomplete
+        
+        $options = [
+            'headers' => [
+                'User-Agent' => 'UgaEats-TastyIgniter/1.0 (contact@ugaeats.com)',
+                'Referer' => config('app.url', 'http://127.0.0.1:8000'),
+                'Accept-Language' => 'en-UG,en;q=0.9',
+            ],
+            'timeout' => 30, // Increased timeout
+            'connect_timeout' => 15, // Connection timeout
+        ];
+
+        try {
+            $response = $this->getHttpClient()->get($url, $options);
+            return $this->parseResponse($response);
+        } catch (Throwable $e) {
+            Log::error('Nominatim request failed: ' . $e->getMessage());
+            return [];
         }
-
-        // Fix: Add User-Agent and other headers like the other request methods
-        $options['headers']['User-Agent'] = $query->getData('userAgent', request()->userAgent());
-        $options['headers']['Referer'] = $query->getData('referer', request()->headers->get('referer'));
-        $options['timeout'] = $query->getData('timeout', 15);
-
-        if (empty($options['headers']['User-Agent'])) {
-            throw new GeoliteException('The User-Agent must be set to use the Nominatim provider.');
-        }
-
-        $response = $this->getHttpClient()->get($url, $options);
-
-        return $this->parseResponse($response);
     }
 }

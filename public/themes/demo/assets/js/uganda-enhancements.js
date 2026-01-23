@@ -13,6 +13,126 @@
     // Initialize on DOM ready
     document.addEventListener('DOMContentLoaded', function() {
         
+        // =====================================================
+        // NAVBAR SCROLL EFFECT - Changes style when scrolling
+        // =====================================================
+        const navbar = document.querySelector('.navbar');
+        
+        function handleNavbarScroll() {
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        }
+        
+        if (navbar) {
+            window.addEventListener('scroll', handleNavbarScroll);
+            handleNavbarScroll(); // Check initial state
+        }
+        
+        // =====================================================
+        // HERO SLIDER AUTO-PLAY ENHANCEMENT (5 seconds)
+        // =====================================================
+        // Find carousel by multiple selectors including the home-slider
+        const heroCarousel = document.querySelector('[id^="slider-"], .carousel, #heroCarousel, [data-bs-ride="carousel"], .hero-slider');
+        
+        if (heroCarousel) {
+            // Set the interval attribute directly on the element
+            heroCarousel.setAttribute('data-bs-interval', '5000');
+            
+            if (typeof bootstrap !== 'undefined' && bootstrap.Carousel) {
+                // Dispose any existing instance first
+                const existingCarousel = bootstrap.Carousel.getInstance(heroCarousel);
+                if (existingCarousel) {
+                    existingCarousel.dispose();
+                }
+                
+                // Create new carousel with 5 second interval
+                const carousel = new bootstrap.Carousel(heroCarousel, {
+                    interval: 5000, // 5 seconds
+                    wrap: true,
+                    pause: 'hover',
+                    ride: 'carousel'
+                });
+                
+                // Force auto-play
+                carousel.cycle();
+                
+                console.log('Hero carousel initialized with 5 second interval:', heroCarousel.id);
+            } else {
+                // Fallback: Manual auto-slide if Bootstrap is not available
+                const slides = heroCarousel.querySelectorAll('.carousel-item');
+                let currentSlide = 0;
+                
+                function nextSlide() {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                }
+                
+                if (slides.length > 1) {
+                    setInterval(nextSlide, 5000); // 5 seconds
+                    console.log('Manual carousel initialized with 5 second interval');
+                }
+            }
+        }
+        
+        // Enhance menu item cards to ensure images display
+        function enhanceMenuCards() {
+            // Find all menu cards
+            const menuCards = document.querySelectorAll(
+                '.menu-card, .menu-item-card, [class*="menu"][class*="card"], .card'
+            );
+            
+            menuCards.forEach(card => {
+                // Ensure images have proper styling
+                const img = card.querySelector('img');
+                if (img) {
+                    img.style.width = '100%';
+                    img.style.height = '220px';
+                    img.style.objectFit = 'cover';
+                    img.style.display = 'block';
+                    
+                    // Add error handler for broken images
+                    img.onerror = function() {
+                        this.style.display = 'flex';
+                        this.style.alignItems = 'center';
+                        this.style.justifyContent = 'center';
+                        this.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                        this.alt = '🍽️ Menu Item';
+                    };
+                }
+                
+                // Add hover effect class
+                card.classList.add('menu-enhanced');
+            });
+        }
+        
+        // Run enhancement on page load
+        enhanceMenuCards();
+        
+        // Re-run when Livewire updates (for dynamic content)
+        if (window.Livewire) {
+            window.Livewire.hook('message.processed', (message, component) => {
+                setTimeout(enhanceMenuCards, 100);
+            });
+        }
+        
+        // Also watch for DOM changes
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.addedNodes.length) {
+                    enhanceMenuCards();
+                }
+            });
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
         // Add Uganda flag to phone inputs
         const phoneInputs = document.querySelectorAll('input[type="tel"]');
         phoneInputs.forEach(input => {

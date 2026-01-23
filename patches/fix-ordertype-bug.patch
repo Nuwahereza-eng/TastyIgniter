@@ -1,0 +1,12 @@
+--- a/vendor/tastyigniter/ti-theme-orange/src/Livewire/Concerns/SearchesNearby.php
++++ b/vendor/tastyigniter/ti-theme-orange/src/Livewire/Concerns/SearchesNearby.php
+@@ -166,7 +166,8 @@ trait SearchesNearby
+ 
+     public function updatedOrderType(): void
+     {
+-        if ($this->orderType && $this->orderType === LocationModel::DELIVERY && $this->searchAutocompleteEnabled) {
++        // Check if orderType property exists before using it (bug fix for LocalSearch component)
++        if (property_exists($this, 'orderType') && $this->orderType && $this->orderType === LocationModel::DELIVERY && $this->searchAutocompleteEnabled) {
+             $this->dispatch('updateDeliveryLocationMap',
+                 lat: $this->searchPoint[0] ?? null,
+                 lng: $this->searchPoint[1] ?? null,

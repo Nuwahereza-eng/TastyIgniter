@@ -9,9 +9,10 @@ return [
     |
     | The `chain` provider is special, in that it will run all configured
     | providers in the sequence listed, should the previous provider fail.
+    | Using 'chain' to try Google first (if API key exists), then Nominatim.
     |
     */
-    'default' => 'nominatim',
+    'default' => env('GOOGLE_MAPS_API_KEY') ? 'google' : 'nominatim',
 
     /*
     |---------------------------------------------------------------------------
@@ -36,21 +37,25 @@ return [
         ],
         'nominatim' => [
             'endpoints' => [
-                'geocode' => 'https://nominatim.openstreetmap.org/search?q=%s&format=json&addressdetails=1&limit=%d',
+                // Add countrycodes=UG to limit results to Uganda for faster responses
+                'geocode' => 'https://nominatim.openstreetmap.org/search?q=%s&format=json&addressdetails=1&limit=%d&countrycodes=UG',
                 'reverse' => 'https://nominatim.openstreetmap.org/reverse?format=json&lat=%F&lon=%F&addressdetails=1&zoom=%d',
                 'distance' => 'https://routing.openstreetmap.de/routed-car/route/v1/driving/%F,%F;%F,%F',
                 'places' => 'https://nominatim.openstreetmap.org/',
             ],
             'locale' => 'en-UG',
             'region' => 'UG', // Uganda country code
-            'userAgent' => 'TastyIgniter-Uganda/1.0 (+http://localhost:8001)',
-            'referer' => 'http://localhost:8001',
+            'userAgent' => 'UgaEats-TastyIgniter/1.0 (contact@ugaeats.com)',
+            'referer' => env('APP_URL', 'http://127.0.0.1:8000'),
+            // Increase timeout for slower connections
+            'timeout' => 30,
+            'connectTimeout' => 15,
         ],
     ],
 
     'cache' => [
         'store' => null,
-        'duration' => 43200, // 30 days
+        'duration' => 86400, // 24 hours - cache results to reduce API calls
     ],
 
     'precision' => 8,

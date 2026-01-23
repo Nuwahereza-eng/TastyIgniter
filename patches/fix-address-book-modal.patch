@@ -1,0 +1,41 @@
+--- a/vendor/tastyigniter/ti-theme-orange/resources/views/includes/account/address-book-form.blade.php
++++ b/vendor/tastyigniter/ti-theme-orange/resources/views/includes/account/address-book-form.blade.php
+@@ -144,22 +144,23 @@
+ 
+ @script
+ <script>
+     $(document).render(function () {
+-        $('#addressBookFormModal').modal('show');
+-        $('#addressBookFormModal').on('hidden.bs.modal', function () {
+-            $wire.$set('addressId', null);
++        // Only show modal if not already shown
++        var modal = $('#addressBookFormModal');
++        if (!modal.hasClass('show')) {
++            modal.modal('show');
++        }
++        
++        // Handle modal close - only set addressId if it's not already null
++        modal.off('hidden.bs.modal').on('hidden.bs.modal', function () {
++            if ($wire.addressId !== null || $wire.showModal) {
++                $wire.$set('addressId', null);
++                $wire.$set('showModal', false);
++            }
+         });
+ 
+         Livewire.hook('morph.removing', ({ el, component }) => {
+             if ($(el).is('#addressBookFormModal')) {
+                 $('#addressBookFormModal').modal('hide');
+             }
+         })
+-
+-        Livewire.hook('morph.updated', ({ el, component }) => {
+-            if ($(el).is('#addressBookFormModal')) {
+-                $('#addressBookFormModal').modal('dispose');
+-                $('#addressBookFormModal').modal('show');
+-            }
+-        })
++
++        // Removed morph.updated hook that was causing infinite loop
+     });
+ </script>
+ @endscript
