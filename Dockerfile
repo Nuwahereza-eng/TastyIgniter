@@ -1,4 +1,4 @@
-FROM php:8.3-apache
+FROM php:8.3-fpm
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -11,18 +11,11 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     zip \
     unzip \
-    default-mysql-client \
+    nginx \
+    supervisor \
     && docker-php-ext-configure intl \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Fix MPM conflict - remove all MPM configs and keep only prefork
-RUN rm -f /etc/apache2/mods-enabled/mpm_*.conf /etc/apache2/mods-enabled/mpm_*.load \
-    && ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/ \
-    && ln -sf /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/
-
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -46,19 +39,47 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage \
     && chmod -R 775 /var/www/html/bootstrap/cache
 
-# Configure Apache document root
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+# Configure Nginx
+RUN echo 'server { \n\
+    listen 80; \n\
+    server_name _; \n\
+    root /var/www/html/public; \n\
+    index index.php; \n\
+    \n\
+    location / { \n\
+        try_files $uri $uri/ /index.php?$query_string; \n\
+    } \n\
+    \n\
+    location ~ \.php$ { \n\
+        fastcgi_pass 127.0.0.1:9000; \n\
+        fastcgi_index index.php; \n\
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; \n\
+        include fastcgi_params; \n\
+    } \n\
+    \n\
+    location ~ /\.ht { \n\
+        deny all; \n\
+    } \n\
+}' > /etc/nginx/sites-available/default
 
-# Add .htaccess support
-RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+# Configure Supervisor to run both nginx and php-fpm
+RUN echo '[supervisord] \n\
+nodaemon=true \n\
+\n\
+[program:php-fpm] \n\
+command=/usr/local/sbin/php-fpm \n\
+autostart=true \n\
+autorestart=true \n\
+\n\
+[program:nginx] \n\
+command=/usr/sbin/nginx -g "daemon off;" \n\
+autostart=true \n\
+autorestart=true' > /etc/supervisor/conf.d/supervisord.conf
 
 # Copy and set entrypoint
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Expose port
 EXPOSE 80
 
 CMD ["/usr/local/bin/docker-entrypoint.sh"]
