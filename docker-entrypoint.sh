@@ -10,6 +10,11 @@ mkdir -p /var/www/html/bootstrap/cache
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Fix Apache MPM conflict - disable prefork, enable event
+a2dismod mpm_prefork 2>/dev/null || true
+a2dismod mpm_worker 2>/dev/null || true
+a2enmod mpm_event 2>/dev/null || true
+
 # Update Apache to use Railway's PORT
 if [ ! -z "$PORT" ]; then
     sed -i "s/Listen 80/Listen $PORT/g" /etc/apache2/ports.conf
@@ -17,15 +22,10 @@ if [ ! -z "$PORT" ]; then
     sed -i "s/<VirtualHost \*:80>/<VirtualHost *:$PORT>/g" /etc/apache2/sites-available/000-default.conf
 fi
 
-# Generate app key if not set
-if [ -z "$APP_KEY" ]; then
-    php artisan key:generate --force || true
-fi
-
 # Clear and cache config
-php artisan config:clear || true
-php artisan cache:clear || true
-php artisan view:clear || true
+php artisan config:clear 2>/dev/null || true
+php artisan cache:clear 2>/dev/null || true
+php artisan view:clear 2>/dev/null || true
 
 # Start Apache
 exec apache2-foreground
