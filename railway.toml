@@ -1,8 +1,10 @@
 [build]
 builder = "dockerfile"
-dockerfilePath = "Dockerfile"
+dockerfilePath = "./Dockerfile"
+watchPatterns = ["**/*"]
 
 [deploy]
+numReplicas = 1
 healthcheckPath = "/"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
