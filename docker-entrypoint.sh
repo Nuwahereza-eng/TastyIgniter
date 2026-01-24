@@ -10,11 +10,6 @@ mkdir -p /var/www/html/bootstrap/cache
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Fix Apache MPM conflict - disable prefork, enable event
-a2dismod mpm_prefork 2>/dev/null || true
-a2dismod mpm_worker 2>/dev/null || true
-a2enmod mpm_event 2>/dev/null || true
-
 # Update Apache to use Railway's PORT
 if [ ! -z "$PORT" ]; then
     sed -i "s/Listen 80/Listen $PORT/g" /etc/apache2/ports.conf
