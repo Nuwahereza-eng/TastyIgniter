@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ChatbotController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,3 +16,6 @@
 //Route::get('/', function () {
 //    return view('welcome');
 //});
+
+// AI Chatbot route
+Route::post('/api/chatbot', [ChatbotController::class, 'chat'])->name('chatbot.chat');

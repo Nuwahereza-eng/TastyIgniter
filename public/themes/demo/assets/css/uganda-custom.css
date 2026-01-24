@@ -552,11 +552,35 @@ button .d-flex {
     font-size: 1.5rem;
 }
 
-/* Enhanced Footer */
+/* Enhanced Footer with Background Image */
 .footer {
-    background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+    position: relative;
+    background: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1920&q=80') no-repeat center center;
+    background-size: cover;
     color: white;
     padding: 3rem 0 1rem;
+}
+
+/* Dark overlay for readability */
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 0;
+}
+
+/* Ensure footer content is above overlay */
+.footer > *,
+.footer .container,
+.footer .row,
+.footer .col,
+.footer [class*="col-"] {
+    position: relative;
+    z-index: 1;
 }
 
 .footer a {
@@ -795,10 +819,10 @@ html {
     width: 100%;
     height: 70vh;
     object-fit: cover;
-    filter: brightness(0.7);
+    filter: brightness(0.9);
 }
 
-/* Hero Slider Overlay */
+/* Hero Slider Overlay - lighter for brighter images */
 .carousel-item::before {
     content: '';
     position: absolute;
@@ -808,9 +832,9 @@ html {
     bottom: 0;
     background: linear-gradient(
         135deg,
-        rgba(0, 0, 0, 0.6) 0%,
-        rgba(255, 107, 53, 0.3) 50%,
-        rgba(0, 78, 137, 0.4) 100%
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(255, 107, 53, 0.15) 50%,
+        rgba(0, 78, 137, 0.2) 100%
     );
     z-index: 1;
 }
@@ -917,7 +941,9 @@ html {
    HEADER WITH BACKGROUND - Overlays the hero
    ===================================================== */
 
-.header {
+/* Home page header - transparent/dark overlay on hero */
+.home-page .header,
+body[class*="home"] .header {
     position: absolute;
     top: 0;
     left: 0;
@@ -926,7 +952,8 @@ html {
     background: transparent !important;
 }
 
-.navbar {
+.home-page .navbar,
+body[class*="home"] .navbar {
     background: rgba(0, 0, 0, 0.3) !important;
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
@@ -934,9 +961,29 @@ html {
     transition: all 0.3s ease;
 }
 
+/* Non-home pages header - solid orange gradient (lighter orange tones) */
+body:not(.home-page) .header {
+    position: relative;
+    z-index: 1000;
+    background: linear-gradient(135deg, #FF8C42 0%, #FF7033 50%, #FF5722 100%) !important;
+}
+
+body:not(.home-page) .navbar {
+    background: transparent !important;
+    box-shadow: none;
+    transition: all 0.3s ease;
+}
+
+/* Ensure logo is visible on orange header */
+body:not(.home-page) .navbar-brand,
+body:not(.home-page) .navbar-brand img {
+    position: relative;
+    z-index: 10;
+}
+
 /* Navbar scrolled state (add via JS) */
 .navbar.scrolled {
-    background: linear-gradient(to right, var(--primary-color), var(--secondary-color)) !important;
+    background: linear-gradient(135deg, #FF8C42 0%, #FF7033 50%, #FF5722 100%) !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
@@ -1029,12 +1076,62 @@ header .navbar-nav .nav-link.active {
     transition: transform 0.3s ease;
 }
 
-.navbar-brand img {
+.navbar-brand img,
+.navbar-brand .img-logo {
     transition: all 0.3s ease;
+    max-height: 50px;
+    width: auto;
 }
 
 .navbar-brand:hover img {
     filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+}
+
+/* Ensure logo is visible on all pages */
+.navbar-brand {
+    display: flex !important;
+    align-items: center;
+}
+
+.navbar .navbar-brand,
+.header .navbar-brand {
+    position: relative;
+    z-index: 100;
+}
+
+/* White logo styling on non-home pages (no background needed since logo is white) */
+body:not(.home-page) .navbar-brand {
+    background: transparent;
+    padding: 8px 15px;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+body:not(.home-page) .navbar-brand:hover {
+    box-shadow: none;
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+/* White logo specific styling */
+body:not(.home-page) .navbar-brand .white-logo {
+    height: 50px;
+    width: auto;
+    max-height: 50px;
+}
+
+/* Text logo styling if used */
+.navbar-brand .text-logo {
+    color: white !important;
+    font-weight: 700;
+    font-size: 1.5rem;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Text logo on non-home pages needs different color */
+body:not(.home-page) .navbar-brand .text-logo {
+    color: white !important;
+    text-shadow: none;
 }
 
 /* =====================================================
@@ -1388,4 +1485,925 @@ main[role="main"] {
 .cart-items .bg-light {
     background: #f5f5f5 !important;
     color: #666 !important;
+}
+
+/* ========================================
+   LOCATION SEARCH EXPERIENCE IMPROVEMENTS
+   ======================================== */
+
+/* Main Search Container */
+#local-search-container {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Enhanced Search Box */
+#local-search-form .input-group {
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+#local-search-form .input-group:focus-within {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 6px 25px rgba(255, 107, 53, 0.2);
+}
+
+#local-search-form .form-control {
+    font-size: 1.1rem;
+    padding: 0.75rem 1rem;
+    border: none !important;
+}
+
+#local-search-form .form-control::placeholder {
+    color: #999;
+}
+
+/* GPS/Location Button - UNIFORM ORANGE with search button */
+#local-search-form [data-control="user-position"] {
+    background: var(--primary-color) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    margin: 4px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+#local-search-form [data-control="user-position"]:hover {
+    background: #e55a2b !important;
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+}
+
+#local-search-form [data-control="user-position"] i {
+    font-size: 1.2rem;
+}
+
+/* Search Button */
+#local-search-form [data-control="search-local"],
+#local-search-form button[type="submit"] {
+    background: var(--primary-color) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    margin: 4px;
+    padding: 0.75rem 2rem !important;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+#local-search-form [data-control="search-local"]:hover,
+#local-search-form button[type="submit"]:hover {
+    background: #e55a2b !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+/* Autocomplete Suggestions Dropdown */
+.autocomplete-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #e0e0e0 !important;
+    border-top: none !important;
+    border-radius: 0 0 12px 12px !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.autocomplete-suggestions .list-group-item {
+    padding: 1rem 1.25rem;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.autocomplete-suggestions .list-group-item:hover {
+    background: linear-gradient(135deg, #fff5f2 0%, #fff 100%);
+    padding-left: 1.5rem;
+}
+
+.autocomplete-suggestions .list-group-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 12px 12px;
+}
+
+.autocomplete-suggestions .list-group-item .fw-bold {
+    color: #333;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.autocomplete-suggestions .list-group-item > div:not(.fw-bold) {
+    color: #666;
+    font-size: 0.875rem;
+}
+
+/* Add location icon before suggestions */
+.autocomplete-suggestions .list-group-item::before {
+    content: "\f3c5";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    color: var(--primary-color);
+    margin-right: 0.75rem;
+    font-size: 1rem;
+}
+
+/* Powered by attribution */
+.autocomplete-suggestions + .p-1 {
+    background: #f8f9fa;
+    border-radius: 0 0 12px 12px !important;
+    border: 1px solid #e0e0e0 !important;
+    border-top: none !important;
+}
+
+/* Saved Addresses Section */
+.list-group-flush.bg-white.border.rounded {
+    border-radius: 12px !important;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.list-group-flush .list-group-item-action {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f0f0f0 !important;
+}
+
+.list-group-flush .list-group-item-action:hover {
+    background: #fff5f2;
+    padding-left: 1.5rem;
+}
+
+.list-group-flush .list-group-item-action .fa-location-dot {
+    color: var(--primary-color) !important;
+}
+
+/* ========================================
+   LOCATION LIST PAGE IMPROVEMENTS
+   ======================================== */
+
+/* Sidebar Filters */
+.col-sm-3 .bg-white.border.rounded {
+    border-radius: 12px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e8e8e8 !important;
+}
+
+.col-sm-3 .accordion-button {
+    font-size: 1rem;
+    color: #333;
+}
+
+/* Filter checkboxes/radio styling */
+.col-sm-3 .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Location Search Input on List Page */
+.col-sm-9 .input-group.bg-white {
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.col-sm-9 .input-group.bg-white:focus-within {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 4px 20px rgba(255, 107, 53, 0.15);
+}
+
+/* Location List Page Search Button - Orange */
+.col-sm-9 .input-group .btn-secondary,
+.col-sm-9 .input-group .btn.btn-secondary {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease;
+}
+
+.col-sm-9 .input-group .btn-secondary:hover,
+.col-sm-9 .input-group .btn.btn-secondary:hover {
+    background: #e55a2b !important;
+    border-color: #e55a2b !important;
+    transform: scale(1.05);
+}
+
+/* Location Cards */
+.local-group .card {
+    border-radius: 16px !important;
+    border: 1px solid #e8e8e8 !important;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.local-group .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.local-group .card .img-fluid {
+    border-radius: 12px;
+    object-fit: cover;
+    height: 80px;
+    width: 100%;
+}
+
+.local-group .card h2 {
+    color: #222 !important;
+    font-weight: 700;
+    transition: color 0.2s ease;
+}
+
+.local-group .card:hover h2 {
+    color: var(--primary-color) !important;
+}
+
+/* Distance badge */
+.local-group .card .fa-map-marker {
+    color: var(--primary-color);
+}
+
+/* Open/Closed Status */
+.local-group .card .text-success,
+.local-group .card:has(.text-success) {
+    position: relative;
+}
+
+/* Address Picker Modal */
+#addressPickerModal .modal-content {
+    border-radius: 16px !important;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+#addressPickerModal .modal-body {
+    padding: 2rem;
+}
+
+#addressPickerModal .input-group {
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 12px !important;
+}
+
+#addressPickerModal .input-group:focus-within {
+    border-color: var(--primary-color) !important;
+}
+
+#addressPickerModal .modal-footer {
+    padding: 1rem 2rem 2rem;
+}
+
+#addressPickerModal .btn-primary {
+    border-radius: 10px !important;
+    padding: 0.875rem 2rem !important;
+    font-weight: 600;
+}
+
+/* Loading State Animation */
+#local-search-form [wire\:loading] {
+    opacity: 0.7;
+}
+
+/* Search label above input */
+.search-label + #local-search-form,
+.text-center + #local-search-container {
+    margin-top: 1rem;
+}
+
+/* Hero section search title - MAKE IT CLEARLY VISIBLE */
+#local-search-container .text-center h2.mb-3,
+.text-center h2.mb-3,
+#local-search-form ~ h2,
+div > .text-center > h2 {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    color: #fff !important;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 0, 0, 0.4) !important;
+    letter-spacing: 0.5px;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Also style the parent container text */
+.local-search .text-center h2,
+[wire\:snapshot] .text-center h2 {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    color: #fff !important;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* No results message */
+.panel-local {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+}
+
+/* Override for local header card - NOT center aligned */
+.panel-local.local-header-card {
+    text-align: left !important;
+}
+
+.panel-local p {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* Pagination */
+.pagination-bar {
+    margin-top: 2rem;
+}
+
+.pagination-bar .page-link {
+    border-radius: 8px !important;
+    margin: 0 4px;
+    border: 1px solid #e0e0e0;
+    color: #333;
+}
+
+.pagination-bar .page-item.active .page-link {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    #local-search-form .input-group {
+        flex-wrap: nowrap;
+    }
+    
+    #local-search-form [data-control="search-local"] {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.9rem;
+    }
+    
+    .local-group .card {
+        padding: 1rem !important;
+    }
+    
+    .local-group .card .img-fluid {
+        height: 60px;
+    }
+    
+    .col-sm-3 {
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Mobile: make search title smaller but still visible */
+    .text-center h2.mb-3,
+    div > .text-center > h2 {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* ========================================
+   LOCATION QUICK ACTION BUTTONS
+   ======================================== */
+
+/* Use Current Location & Saved Address Buttons */
+#use-current-location-btn,
+#saved-address-btn,
+#login-for-address-btn,
+#local-search-container .btn-outline-light {
+    background: #fff !important;
+    border: 2px solid #fff !important;
+    color: #333 !important;
+    border-radius: 12px !important;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-width: 200px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+#use-current-location-btn i,
+#saved-address-btn i,
+#login-for-address-btn i {
+    color: var(--primary-color) !important;
+}
+
+#use-current-location-btn:hover,
+#saved-address-btn:hover,
+#login-for-address-btn:hover,
+#local-search-container .btn-outline-light:hover {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: #fff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+}
+
+#use-current-location-btn:hover i,
+#saved-address-btn:hover i,
+#login-for-address-btn:hover i {
+    color: #fff !important;
+}
+
+/* Dropdown container needs proper positioning */
+#local-search-container .dropdown {
+    position: relative;
+}
+
+/* Dropdown menu styling - MAKE IT VISIBLE */
+#local-search-container .dropdown-menu,
+.dropdown-menu.show {
+    background: #fff !important;
+    background-color: #fff !important;
+    border-radius: 12px !important;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25) !important;
+    padding: 0.5rem !important;
+    margin-top: 0.5rem !important;
+    z-index: 9999 !important;
+    opacity: 1 !important;
+    visibility: visible;
+}
+
+#local-search-container .dropdown-menu li,
+#local-search-container .dropdown-item,
+.dropdown-menu .dropdown-item {
+    background: #fff !important;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: #333 !important;
+    transition: all 0.2s ease;
+    display: flex !important;
+}
+
+#local-search-container .dropdown-item:hover,
+.dropdown-menu .dropdown-item:hover {
+    background: #fff5f2 !important;
+    color: var(--primary-color) !important;
+}
+
+#local-search-container .dropdown-item .fa-location-dot,
+.dropdown-item .fa-location-dot {
+    color: var(--primary-color) !important;
+}
+
+/* Override link styles for buttons */
+#local-search-container a.btn {
+    text-decoration: none !important;
+}
+
+#local-search-container a.btn:hover {
+    color: #fff !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 576px) {
+    #use-current-location-btn,
+    #saved-address-btn,
+    #login-for-address-btn {
+        min-width: 100%;
+    }
+}
+
+/* =====================================================
+   PAGES WITHOUT HERO - Add padding for header
+   ===================================================== */
+
+/* Reservation page - back button covered by header fix */
+/* Add padding-top to container pages that don't have a hero */
+body:not(.home-page) main > #page-wrapper > .container:first-child {
+    padding-top: 100px !important;
+}
+
+/* Specific fix for reservation page */
+body main > #page-wrapper > .container.pt-4:first-child {
+    padding-top: 100px !important;
+}
+
+/* Ensure back button is visible and not covered */
+.card .mb-3 a[href*="locations"] {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    color: var(--primary-color) !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.card .mb-3 a[href*="locations"]:hover {
+    background: var(--primary-color);
+    color: #fff !important;
+}
+
+.card .mb-3 a[href*="locations"] i {
+    margin-right: 8px;
+}
+
+/* =====================================================
+   LOCATION CARD LOGO SIZE FIX
+   ===================================================== */
+   
+/* Make location logos smaller to fit in cards */
+.local-group .card .boxes .col-sm-3 {
+    max-width: 100px !important;
+    flex: 0 0 100px !important;
+}
+
+.local-group .card .boxes .col-sm-3 img,
+.local-group .card .boxes img.img-fluid {
+    width: 80px !important;
+    height: 80px !important;
+    max-width: 80px !important;
+    max-height: 80px !important;
+    object-fit: contain !important;
+    border-radius: 8px !important;
+    background: #f8f9fa !important;
+}
+
+/* Mobile adjustments for location logos */
+@media (max-width: 576px) {
+    .local-group .card .boxes .col-sm-3 {
+        max-width: 70px !important;
+        flex: 0 0 70px !important;
+        margin-bottom: 10px !important;
+    }
+    
+    .local-group .card .boxes .col-sm-3 img,
+    .local-group .card .boxes img.img-fluid {
+        width: 60px !important;
+        height: 60px !important;
+        max-width: 60px !important;
+        max-height: 60px !important;
+    }
+}
+
+/* =====================================================
+   CHATBOT SEND BUTTON FIX
+   ===================================================== */
+
+#chatbot-send,
+button#chatbot-send,
+.chatbot-input-form #chatbot-send,
+.chatbot-input-form button[type="submit"] {
+    width: 45px !important;
+    height: 45px !important;
+    min-width: 45px !important;
+    max-width: 45px !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    border: 2px solid #FF4500 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 18px !important;
+    color: #FF4500 !important;
+    line-height: 1 !important;
+}
+
+#chatbot-send:hover,
+button#chatbot-send:hover {
+    background: #FF4500 !important;
+    background-color: #FF4500 !important;
+    color: #ffffff !important;
+}
+
+/* =====================================================
+   LOCATION SEARCH CARD STYLING
+   ===================================================== */
+
+.location-search-card {
+    border: 2px solid #f0f0f0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.location-search-card:hover {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 4px 12px rgba(255, 87, 34, 0.15);
+}
+
+.location-icon-wrapper {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #FF8C42 0%, #FF5722 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.location-icon-wrapper i {
+    color: white;
+    font-size: 18px;
+}
+
+.location-text {
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.change-location-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #FF8C42 0%, #FF5722 100%);
+    color: white !important;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.change-location-btn:hover {
+    background: linear-gradient(135deg, #FF5722 0%, #E64A19 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+    color: white !important;
+}
+
+.change-location-btn i {
+    font-size: 0.8rem;
+}
+
+/* Mobile adjustments */
+@media (max-width: 576px) {
+    .location-search-card {
+        flex-wrap: wrap;
+    }
+    
+    .location-icon-wrapper {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .location-text {
+        font-size: 0.9rem;
+    }
+    
+    .change-location-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        margin-top: 10px;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* =====================================================
+   LOCAL HEADER CARD (Menu Page Location Info)
+   ===================================================== */
+
+.local-header-card,
+.panel-local.local-header-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+    border-radius: 16px !important;
+    padding: 25px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+    border: 2px solid #e0e0e0 !important;
+    transition: all 0.3s ease;
+    width: 100% !important;
+    display: block !important;
+}
+
+.local-header-card:hover,
+.panel-local.local-header-card:hover {
+    box-shadow: 0 8px 30px rgba(255, 87, 34, 0.15) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.local-header-content {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+}
+
+.local-thumb-wrapper {
+    flex-shrink: 0 !important;
+    margin-right: 20px !important;
+}
+
+.local-header-thumb {
+    width: 100px !important;
+    height: 100px !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    border: 3px solid #fff !important;
+}
+
+.local-header-info {
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+.local-name {
+    font-weight: 700 !important;
+    color: #1a1a1a;
+    font-size: 1.75rem !important;
+    margin-bottom: 12px !important;
+}
+
+.local-status-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white !important;
+}
+
+.status-badge * {
+    color: white !important;
+}
+
+.status-badge.status-open {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: #ffffff !important;
+}
+
+.status-badge.status-open i {
+    font-size: 8px;
+    color: #ffffff !important;
+}
+
+.status-badge.status-opening {
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    color: #ffffff !important;
+}
+
+.status-badge.status-closed {
+    background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+    color: #ffffff !important;
+}
+
+.status-badge.status-delivery {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    color: #ffffff !important;
+}
+
+.info-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #FF8C42 0%, #FF5722 100%);
+    color: white !important;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+}
+
+.info-link:hover {
+    background: linear-gradient(135deg, #FF5722 0%, #E64A19 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+    color: white !important;
+}
+
+.local-address {
+    color: #666;
+    font-size: 0.95rem;
+    margin-top: 12px;
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.local-address i {
+    color: var(--primary-color);
+}
+
+.local-rating {
+    padding: 10px 0;
+}
+
+.review-link {
+    color: var(--primary-color) !important;
+    font-weight: 600;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+}
+
+.review-link:hover {
+    text-decoration: underline !important;
+}
+
+/* Mobile adjustments for local header */
+@media (max-width: 768px) {
+    .local-header-content {
+        flex-direction: column !important;
+        text-align: center;
+    }
+    
+    .local-thumb-wrapper {
+        margin-bottom: 15px;
+        margin-right: 0 !important;
+    }
+    
+    .local-header-thumb {
+        width: 80px !important;
+        height: 80px !important;
+    }
+    
+    .local-name {
+        font-size: 1.4rem !important;
+    }
+    
+    .local-status-badges {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .local-address {
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+/* =====================================================
+   FOOTER SOCIAL ICONS
+   ===================================================== */
+.social-icons {
+    margin: 0;
+    padding: 0;
+}
+
+.social-icons .list-inline-item {
+    margin-right: 0 !important;
+}
+
+.social-icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border: 2px solid transparent;
+}
+
+.social-icon-link:hover {
+    background-color: #ffffff;
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(255, 102, 0, 0.5);
+    border-color: var(--ti-primary);
+}
+
+.social-icon-img {
+    width: 36px !important;
+    height: 36px !important;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.social-icon-link:hover .social-icon-img {
+    transform: scale(1.15);
+}
+
+/* Footer styling improvements */
+.footer-title {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.social-bottom {
+    padding: 0.5rem 0;
 }

@@ -1,0 +1,51 @@
+--- a/vendor/tastyigniter/ti-theme-orange/resources/views/livewire/local-search.blade.php
++++ b/vendor/tastyigniter/ti-theme-orange/resources/views/livewire/local-search.blade.php
+@@ -11,7 +11,7 @@
+             <span class="search-label sr-only">@lang('igniter.local::default.label_search_query')</span>
+         </div>
+         <div id="local-search-container">
+-            <div id="local-search-form" wire:ignore.self>
++            <div id="local-search-form" wire:ignore.self class="position-relative">
+                 <x-igniter-orange::forms.form id="location-search" wire:submit="onSearchNearby">
+                     <div class="input-group input-group-lg bg-white rounded border p-1 mb-3 mb-lg-0">
+                         <button
+@@ -19,6 +19,7 @@
+                             data-control="user-position"
+                             class="btn rounded border-0 shadow-none"
+                             wire:loading.class="disabled"
++                            title="Use my current location"
+                         ><i class="fa fa-location-arrow fs-4 align-bottom"></i> </button>
+                         <input
+                             @if($searchAutocompleteEnabled)
+@@ -29,20 +30,22 @@
+                             type="text"
+                             id="search-query"
+                             class="bg-white form-control shadow-none border-none"
+-                            placeholder="@lang('igniter.local::default.label_search_query')"
++                            placeholder="Enter your delivery address..."
+                             autocomplete="off"
+                         />
+                         <button
+                             type="submit"
+                             class="btn btn-primary btn-lg fw-bold ms-lg-2 rounded"
+                             data-control="search-local"
+                             wire:loading.class="disabled"
+-                        >@lang('igniter.local::default.button_search_location')</button>
++                        >
++                            <span wire:loading.remove>@lang('igniter.local::default.button_search_location')</span>
++                            <span wire:loading><i class="fa fa-spinner fa-spin"></i> Searching...</span>
++                        </button>
+                     </div>
+                 </x-igniter-orange::forms.form>
+-            </div>
+-            
+-            @if($isSearching && $searchAutocompleteEnabled)
+-                @include('igniter-orange::includes.local.autocomplete-suggestions')
+-            @endif
++                
++                @if($isSearching && $searchAutocompleteEnabled)
++                    @include('igniter-orange::includes.local.autocomplete-suggestions')
++                @endif
++            </div>
+
+             <x-igniter-orange::forms.error

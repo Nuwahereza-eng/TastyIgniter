@@ -1,0 +1,55 @@
+--- a/vendor/tastyigniter/ti-theme-orange/src/Http/Controllers/Logout.php
++++ b/vendor/tastyigniter/ti-theme-orange/src/Http/Controllers/Logout.php
+@@ -16,6 +16,7 @@ class Logout extends Controller
+             resolve(LogoutCustomer::class)->handle();
+         });
+
+-        return Redirect::back();
++        // Redirect to home page instead of staying on current page
++        return Redirect::to('/');
+     }
+ }
+
+--- a/vendor/tastyigniter/ti-theme-orange/resources/views/_pages/checkout/checkout.blade.php
++++ b/vendor/tastyigniter/ti-theme-orange/resources/views/_pages/checkout/checkout.blade.php
+@@ -7,6 +7,12 @@ permalink: /checkout
+ '[igniter-orange::fulfillment-modal]':
+     hideDeliveryAddress: true
+ ---
++@php
++    // Require login to checkout - redirect guests to login page
++    if (!Auth::check()) {
++        flash()->warning('Please login or register to complete your order.');
++        return redirect()->to(page_url('account.login'));
++    }
++@endphp
+ <div class="container">
+     <div class="col-lg-10 mx-auto">
+         <livewire:igniter-orange::checkout />
+
+--- a/vendor/tastyigniter/ti-theme-orange/resources/views/includes/cartbox/buttons.blade.php
++++ b/vendor/tastyigniter/ti-theme-orange/resources/views/includes/cartbox/buttons.blade.php
+@@ -1,6 +1,19 @@
+ @php $locationIsClosed = (!$cart->count() || $this->locationIsClosed() || $this->hasMinimumOrder()); @endphp
+-<button
+-    @class(['checkout-btn btn btn-primary w-100 btn-lg', 'btn-secondary disabled' => $locationIsClosed])
+-    wire:loading.class="disabled"
+-    wire:click="onProceedToCheckout({{ $this->getLocationId() }})"
+->{{ $this->buttonLabel($checkout ?? null) }}</button>
++@if(Auth::check())
++    <button
++        @class(['checkout-btn btn btn-primary w-100 btn-lg', 'btn-secondary disabled' => $locationIsClosed])
++        wire:loading.class="disabled"
++        wire:click="onProceedToCheckout({{ $this->getLocationId() }})"
++    >{{ $this->buttonLabel($checkout ?? null) }}</button>
++@else
++    <div class="text-center">
++        <p class="text-muted mb-2">Please login or register to checkout</p>
++        <a href="{{ page_url('account.login') }}" class="btn btn-primary w-100 btn-lg">
++            <i class="fa fa-sign-in-alt me-2"></i>Login to Checkout
++        </a>
++        <p class="mt-2 mb-0">
++            <small>Don't have an account? <a href="{{ page_url('account.register') }}">Register here</a></small>
++        </p>
++    </div>
++@endif

@@ -1,0 +1,42 @@
+--- a/vendor/tastyigniter/ti-theme-orange/src/Livewire/Concerns/SearchesNearby.php
++++ b/vendor/tastyigniter/ti-theme-orange/src/Livewire/Concerns/SearchesNearby.php
+@@ -37,6 +37,8 @@ trait SearchesNearby
+ 
+     public string $menusPage = 'local.menus';
+ 
++    public string $locationsPage = 'locations';
++
+     public ?string $deliveryAddress = null;
+ 
+@@ -99,14 +101,10 @@ trait SearchesNearby
+     {
+         try {
+             $userLocation = $this->geocodeUserPosition();
+ 
+             Location::updateUserPosition($userLocation);
+             Location::putSession('searchQuery', $this->searchQuery);
+ 
+-            $nearByLocation = $this->findNearByLocation($userLocation);
+-
+-            request()->route()->setParameter('location', $nearByLocation->permalink_slug);
+-
+-            return $this->redirect(restaurant_url($this->menusPage));
++            return $this->redirect(page_url($this->locationsPage));
+         } catch (Exception $ex) {
+             throw ValidationException::withMessages([$this->searchField => $ex->getMessage()]);
+         }
+@@ -127,12 +125,11 @@ trait SearchesNearby
+         $this->searchQuery = null;
+ 
+         if (!isset($this->location)) {
+-            $nearByLocation = $this->findNearByLocation($userLocation);
+-
+-            request()->route()->setParameter('location', $nearByLocation->permalink_slug);
++            Location::updateUserPosition($userLocation);
++            Location::putSession('searchQuery', $searchQuery);
+ 
+-            return $this->redirect(restaurant_url($this->menusPage));
++            return $this->redirect(page_url($this->locationsPage));
+         }
+ 
+         if ($area = $this->location->current()->searchDeliveryArea($userLocation->getCoordinates())) {
