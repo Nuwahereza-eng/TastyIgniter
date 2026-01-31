@@ -39,14 +39,17 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage \
     && chmod -R 775 /var/www/html/bootstrap/cache
 
-# Configure Nginx
+# Configure Nginx - write directly to conf.d for reliability
 RUN echo 'server { \n\
-    listen 80; \n\
+    listen 80 default_server; \n\
     server_name _; \n\
     root /var/www/html/public; \n\
     index index.php index.html; \n\
     \n\
     client_max_body_size 100M; \n\
+    \n\
+    error_log /var/log/nginx/error.log debug; \n\
+    access_log /var/log/nginx/access.log; \n\
     \n\
     location / { \n\
         try_files $uri $uri/ /index.php?$query_string; \n\
@@ -64,9 +67,8 @@ RUN echo 'server { \n\
     location ~ /\.ht { \n\
         deny all; \n\
     } \n\
-}' > /etc/nginx/sites-available/default \
-    && ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default \
-    && rm -f /etc/nginx/sites-enabled/default.bak
+}' > /etc/nginx/conf.d/default.conf \
+    && rm -f /etc/nginx/sites-enabled/default
 
 # Configure Supervisor to run both nginx and php-fpm
 RUN echo '[supervisord] \n\
