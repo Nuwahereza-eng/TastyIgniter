@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+# Don't use set -e - we want to continue even if some commands fail
 
 echo "=== Starting TastyIgniter ==="
 
@@ -21,11 +21,8 @@ PORT=${PORT:-80}
 echo "PORT is: $PORT"
 sed -i "s/listen 80/listen $PORT/g" /etc/nginx/conf.d/default.conf 2>/dev/null || true
 
-# Remove any corrupted cache files
+# Only remove config cache (not services/packages which are needed)
 rm -f /var/www/html/bootstrap/cache/config.php
-rm -f /var/www/html/bootstrap/cache/routes-v7.php
-rm -f /var/www/html/bootstrap/cache/services.php
-rm -f /var/www/html/bootstrap/cache/packages.php
 
 echo "=== Starting Supervisor ==="
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
