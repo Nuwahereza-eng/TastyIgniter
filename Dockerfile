@@ -26,8 +26,11 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . .
 
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
+# Install dependencies (run scripts for package discovery)
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Run package discovery explicitly
+RUN php artisan package:discover --ansi || true
 
 # Create storage directories
 RUN mkdir -p storage/framework/{sessions,views,cache} \
