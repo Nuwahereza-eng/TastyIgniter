@@ -86,10 +86,7 @@ php artisan cache:clear 2>&1 || echo "cache:clear failed"
 php artisan view:clear 2>&1 || echo "view:clear failed"
 php artisan route:clear 2>&1 || echo "route:clear failed"
 
-# Create storage link
-php artisan storage:link 2>&1 || echo "storage:link failed"
-
-# Copy theme assets to public
+# Copy theme assets to public (skip artisan storage:link as it can fail)
 echo "=== Publishing theme assets ==="
 if [ -d "/var/www/html/themes/ugaeats-orange/assets" ]; then
     mkdir -p /var/www/html/public/themes/ugaeats-orange
