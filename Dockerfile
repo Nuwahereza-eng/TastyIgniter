@@ -26,8 +26,19 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . .
 
-# Install dependencies (skip scripts - cache files are already committed)
-RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
+# Create a temporary .env for build
+RUN echo "APP_KEY=base64:4wfy4flNjxJ6XsuOKe8na9/CYim/NMM1kMq54k8E+rM=" > .env && \
+    echo "APP_ENV=production" >> .env && \
+    echo "DB_CONNECTION=mysql" >> .env
+
+# Install dependencies WITH scripts to generate cache files
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Generate package discovery cache
+RUN php artisan package:discover --ansi
+
+# Remove .env (will be created at runtime)
+RUN rm -f .env
 
 # Create storage directories
 RUN mkdir -p storage/framework/{sessions,views,cache} \
