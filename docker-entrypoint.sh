@@ -8,6 +8,10 @@ mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
 mkdir -p /var/www/html/storage/logs
 mkdir -p /var/www/html/bootstrap/cache
 
+# Remove maintenance mode file if it exists
+rm -f /var/www/html/storage/framework/down
+echo "Maintenance mode disabled"
+
 # Set permissions
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
@@ -37,6 +41,9 @@ echo "Clearing Laravel caches..."
 php artisan config:clear 2>/dev/null || true
 php artisan cache:clear 2>/dev/null || true
 php artisan view:clear 2>/dev/null || true
+
+# Ensure app is up (not in maintenance mode)
+php artisan up 2>/dev/null || true
 
 echo "Starting Supervisor..."
 # Start Supervisor (which starts nginx and php-fpm)
