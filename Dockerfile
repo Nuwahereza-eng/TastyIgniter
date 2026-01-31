@@ -26,8 +26,8 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . .
 
-# Create a temporary .env for build
-RUN echo "APP_KEY=base64:4wfy4flNjxJ6XsuOKe8na9/CYim/NMM1kMq54k8E+rM=" > .env && \
+# Create a temporary .env for build (placeholder key for composer scripts)
+RUN echo "APP_KEY=base64:dGVtcG9yYXJ5LWJ1aWxkLWtleS1vbmx5LWRvLW5vdC11c2U=" > .env && \
     echo "APP_ENV=production" >> .env && \
     echo "DB_CONNECTION=mysql" >> .env
 
