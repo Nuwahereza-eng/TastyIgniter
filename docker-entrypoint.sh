@@ -3,113 +3,29 @@ set -e
 
 echo "=== Starting TastyIgniter ==="
 
-# Create storage directories if they don't exist
+# Create storage directories
 mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
 mkdir -p /var/www/html/storage/logs
 mkdir -p /var/www/html/storage/app/public
 mkdir -p /var/www/html/bootstrap/cache
 
-# Create storage link for assets (only if target exists)
-echo "Creating storage link..."
-if [ -d "/var/www/html/storage/app/public" ]; then
-    rm -f /var/www/html/public/storage
-    ln -sf /var/www/html/storage/app/public /var/www/html/public/storage 2>/dev/null || true
-    echo "Storage link created"
-else
-    echo "Skipping storage link - directory doesn't exist"
-fi
-
-# Remove maintenance mode file if it exists
+# Remove maintenance mode file
 rm -f /var/www/html/storage/framework/down
-echo "Maintenance mode file removed"
 
 # Set permissions
-chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
+chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
 
-# Default port to 80 if not set
+# Configure Nginx port
 PORT=${PORT:-80}
 echo "PORT is: $PORT"
+sed -i "s/listen 80/listen $PORT/g" /etc/nginx/conf.d/default.conf 2>/dev/null || true
 
-# Update Nginx to use Railway's PORT (conf.d location)
-sed -i "s/listen 80/listen $PORT/g" /etc/nginx/conf.d/default.conf
-sed -i "s/listen  80/listen $PORT/g" /etc/nginx/conf.d/default.conf
-echo "Nginx configured to listen on port $PORT"
-
-# Verify nginx config
-echo "Testing nginx configuration..."
-nginx -t 2>&1 || echo "Nginx config test warning"
-
-# Show environment variables for debugging
-echo "=== Environment Variables ==="
-echo "DB_HOST: ${DB_HOST:-not set}"
-echo "DB_PORT: ${DB_PORT:-not set}"
-echo "DB_DATABASE: ${DB_DATABASE:-not set}"
-echo "DB_USERNAME: ${DB_USERNAME:-not set}"
-echo "APP_KEY is set: $([ -n "$APP_KEY" ] && echo 'yes' || echo 'no')"
-echo "APP_URL: ${APP_URL:-not set}"
-
-# Test database connection and disable maintenance mode
-echo "=== Testing Database Connection ==="
-php -r "
-try {
-    \$host = \$_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: 'localhost';
-    \$port = \$_ENV['DB_PORT'] ?? getenv('DB_PORT') ?: '3306';
-    \$db = \$_ENV['DB_DATABASE'] ?? getenv('DB_DATABASE') ?: 'tastyigniter';
-    \$user = \$_ENV['DB_USERNAME'] ?? getenv('DB_USERNAME') ?: 'root';
-    \$pass = \$_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD') ?: '';
-    
-    echo \"Connecting to: \$host:\$port/\$db as \$user\n\";
-    
-    \$pdo = new PDO(
-        \"mysql:host=\$host;port=\$port;dbname=\$db\",
-        \$user,
-        \$pass
-    );
-    echo \"Database connection OK\n\";
-    
-    \$pdo->exec(\"UPDATE ti_settings SET value = '0' WHERE item = 'maintenance_mode'\");
-    echo \"Maintenance mode disabled in database\n\";
-} catch(Exception \$e) {
-    echo 'Database error: '.\$e->getMessage().\"\n\";
-}
-" || true
-
-# Clear Laravel caches
-echo "=== Clearing Laravel caches ==="
-cd /var/www/html
-
-# Remove any cached config files that may be corrupted
+# Remove any corrupted cache files
 rm -f /var/www/html/bootstrap/cache/config.php
 rm -f /var/www/html/bootstrap/cache/routes-v7.php
 rm -f /var/www/html/bootstrap/cache/services.php
 rm -f /var/www/html/bootstrap/cache/packages.php
-echo "Removed cached files"
-
-php artisan config:clear 2>&1 || echo "config:clear failed"
-php artisan cache:clear 2>&1 || echo "cache:clear failed"  
-php artisan view:clear 2>&1 || echo "view:clear failed"
-php artisan route:clear 2>&1 || echo "route:clear failed"
-
-# Copy theme assets to public (skip artisan storage:link as it can fail)
-echo "=== Publishing theme assets ==="
-if [ -d "/var/www/html/themes/ugaeats-orange/assets" ]; then
-    mkdir -p /var/www/html/public/themes/ugaeats-orange
-    cp -r /var/www/html/themes/ugaeats-orange/assets/* /var/www/html/public/themes/ugaeats-orange/ 2>/dev/null || true
-    echo "ugaeats-orange assets copied"
-fi
-if [ -d "/var/www/html/themes/demo/assets" ]; then
-    mkdir -p /var/www/html/public/themes/demo
-    cp -r /var/www/html/themes/demo/assets/* /var/www/html/public/themes/demo/ 2>/dev/null || true
-    echo "demo assets copied"
-fi
-
-# Ensure app is up (not in maintenance mode)
-php artisan up 2>&1 || echo "artisan up failed"
-
-# DO NOT cache config - it fails without .env file and environment vars need to be read at runtime
-echo "=== Skipping config:cache (using runtime env vars) ==="
 
 echo "=== Starting Supervisor ==="
-# Start Supervisor (which starts nginx and php-fpm)
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
