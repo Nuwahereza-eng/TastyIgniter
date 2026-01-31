@@ -20,14 +20,14 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 PORT=${PORT:-80}
 echo "PORT is: $PORT"
 
-# Update Nginx to use Railway's PORT
-sed -i "s/listen 80/listen $PORT/g" /etc/nginx/sites-available/default
-sed -i "s/listen  80/listen $PORT/g" /etc/nginx/sites-available/default
+# Update Nginx to use Railway's PORT (conf.d location)
+sed -i "s/listen 80/listen $PORT/g" /etc/nginx/conf.d/default.conf
+sed -i "s/listen  80/listen $PORT/g" /etc/nginx/conf.d/default.conf
 echo "Nginx configured to listen on port $PORT"
 
 # Verify nginx config
 echo "Testing nginx configuration..."
-nginx -t || echo "Nginx config test warning"
+nginx -t 2>&1 || echo "Nginx config test warning"
 
 # Show environment variables for debugging
 echo "=== Environment Variables ==="
