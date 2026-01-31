@@ -37,8 +37,11 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 # Generate package discovery cache
 RUN php artisan package:discover --ansi
 
-# Remove .env (will be created at runtime)
-RUN rm -f .env
+# Remove .env and clear all caches (they'll be regenerated at runtime)
+RUN rm -f .env && \
+    rm -rf storage/framework/views/*.php && \
+    rm -rf storage/temp/* && \
+    rm -rf storage/igniter/combiner/*
 
 # Create storage directories
 RUN mkdir -p storage/framework/{sessions,views,cache} \
