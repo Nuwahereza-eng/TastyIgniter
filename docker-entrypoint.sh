@@ -12,18 +12,24 @@ mkdir -p /var/www/html/bootstrap/cache
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Update Nginx to use Railway's PORT
+# Default port to 80 if not set
+PORT=${PORT:-80}
 echo "PORT is: $PORT"
-if [ ! -z "$PORT" ]; then
-    sed -i "s/listen 80/listen $PORT/g" /etc/nginx/sites-available/default
-    echo "Nginx configured to listen on port $PORT"
-fi
+
+# Update Nginx to use Railway's PORT
+sed -i "s/listen 80/listen $PORT/g" /etc/nginx/sites-available/default
+sed -i "s/listen  80/listen $PORT/g" /etc/nginx/sites-available/default
+echo "Nginx configured to listen on port $PORT"
+
+# Verify nginx config
+echo "Testing nginx configuration..."
+nginx -t || echo "Nginx config test warning"
 
 # Test database connection
 echo "Testing database connection..."
-echo "DB_HOST: $DB_HOST"
-echo "DB_PORT: $DB_PORT"
-echo "DB_DATABASE: $DB_DATABASE"
+echo "DB_HOST: ${DB_HOST:-not set}"
+echo "DB_PORT: ${DB_PORT:-not set}"
+echo "DB_DATABASE: ${DB_DATABASE:-not set}"
 php -r "try { new PDO('mysql:host='.\$_ENV['DB_HOST'].';port='.\$_ENV['DB_PORT'].';dbname='.\$_ENV['DB_DATABASE'], \$_ENV['DB_USERNAME'], \$_ENV['DB_PASSWORD']); echo 'Database connection OK\n'; } catch(Exception \$e) { echo 'Database error: '.\$e->getMessage().'\n'; }" || true
 
 # Clear Laravel caches

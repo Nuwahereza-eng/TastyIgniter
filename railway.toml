@@ -5,7 +5,7 @@ watchPatterns = ["**/*"]
 
 [deploy]
 numReplicas = 1
-healthcheckPath = "/"
+healthcheckPath = "/health.php"
 healthcheckTimeout = 300
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
