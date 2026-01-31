@@ -7,7 +7,7 @@ cat > /var/www/html/.env << EOF
 APP_NAME=TastyIgniter
 APP_ENV=${APP_ENV:-production}
 APP_KEY=${APP_KEY}
-APP_DEBUG=${APP_DEBUG:-false}
+APP_DEBUG=${APP_DEBUG:-true}
 APP_URL=${APP_URL:-https://localhost}
 
 LOG_CHANNEL=stack
