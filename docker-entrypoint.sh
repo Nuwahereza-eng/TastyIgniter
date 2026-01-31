@@ -55,6 +55,12 @@ php artisan config:clear 2>&1 || echo "config:clear done"
 php artisan cache:clear 2>&1 || echo "cache:clear done"
 php artisan view:clear 2>&1 || echo "view:clear done"
 
+# Run any pending migrations
+php artisan migrate --force 2>&1 || echo "migrate done"
+
+# Build theme assets/combiner bundles
+php artisan igniter:util set theme demo 2>&1 || echo "theme set done"
+
 # Clear compiled views and file cache that may have stale paths
 rm -rf /var/www/html/storage/framework/views/*.php 2>/dev/null || true
 rm -rf /var/www/html/storage/framework/cache/data/* 2>/dev/null || true
