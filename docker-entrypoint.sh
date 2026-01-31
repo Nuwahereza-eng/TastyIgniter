@@ -29,36 +29,56 @@ echo "Nginx configured to listen on port $PORT"
 echo "Testing nginx configuration..."
 nginx -t || echo "Nginx config test warning"
 
-# Test database connection and disable maintenance mode
-echo "Testing database connection..."
+# Show environment variables for debugging
+echo "=== Environment Variables ==="
 echo "DB_HOST: ${DB_HOST:-not set}"
 echo "DB_PORT: ${DB_PORT:-not set}"
 echo "DB_DATABASE: ${DB_DATABASE:-not set}"
+echo "DB_USERNAME: ${DB_USERNAME:-not set}"
+echo "APP_KEY is set: $([ -n "$APP_KEY" ] && echo 'yes' || echo 'no')"
+echo "APP_URL: ${APP_URL:-not set}"
 
-# Disable TastyIgniter maintenance mode in database
+# Test database connection and disable maintenance mode
+echo "=== Testing Database Connection ==="
 php -r "
 try {
+    \$host = \$_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: 'localhost';
+    \$port = \$_ENV['DB_PORT'] ?? getenv('DB_PORT') ?: '3306';
+    \$db = \$_ENV['DB_DATABASE'] ?? getenv('DB_DATABASE') ?: 'tastyigniter';
+    \$user = \$_ENV['DB_USERNAME'] ?? getenv('DB_USERNAME') ?: 'root';
+    \$pass = \$_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD') ?: '';
+    
+    echo \"Connecting to: \$host:\$port/\$db as \$user\n\";
+    
     \$pdo = new PDO(
-        'mysql:host='.\$_ENV['DB_HOST'].';port='.\$_ENV['DB_PORT'].';dbname='.\$_ENV['DB_DATABASE'],
-        \$_ENV['DB_USERNAME'],
-        \$_ENV['DB_PASSWORD']
+        \"mysql:host=\$host;port=\$port;dbname=\$db\",
+        \$user,
+        \$pass
     );
+    echo \"Database connection OK\n\";
+    
     \$pdo->exec(\"UPDATE ti_settings SET value = '0' WHERE item = 'maintenance_mode'\");
-    echo 'Maintenance mode disabled in database\n';
+    echo \"Maintenance mode disabled in database\n\";
 } catch(Exception \$e) {
-    echo 'Database error: '.\$e->getMessage().'\n';
+    echo 'Database error: '.\$e->getMessage().\"\n\";
 }
 " || true
 
 # Clear Laravel caches
-echo "Clearing Laravel caches..."
-php artisan config:clear 2>/dev/null || true
-php artisan cache:clear 2>/dev/null || true
-php artisan view:clear 2>/dev/null || true
+echo "=== Clearing Laravel caches ==="
+cd /var/www/html
+php artisan config:clear 2>&1 || echo "config:clear failed"
+php artisan cache:clear 2>&1 || echo "cache:clear failed"  
+php artisan view:clear 2>&1 || echo "view:clear failed"
+php artisan route:clear 2>&1 || echo "route:clear failed"
 
 # Ensure app is up (not in maintenance mode)
-php artisan up 2>/dev/null || true
+php artisan up 2>&1 || echo "artisan up failed"
 
-echo "Starting Supervisor..."
+# Generate config cache for production
+echo "=== Optimizing for production ==="
+php artisan config:cache 2>&1 || echo "config:cache failed (this is ok)"
+
+echo "=== Starting Supervisor ==="
 # Start Supervisor (which starts nginx and php-fpm)
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
