@@ -246,6 +246,7 @@ php artisan db:seed
 - Frontend: http://localhost:8080
 - Admin Panel: http://localhost:8080/admin
 - API: http://localhost:8080/api
+- order: /orders
 
 ---
 
