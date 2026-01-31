@@ -1,0 +1,709 @@
+/* =====================================================
+   UGAEATS ADVANCED FEATURES CSS
+   Group Orders, Scheduled Orders, Subscriptions, Order Tracking
+   ===================================================== */
+
+/* =====================================================
+   COMMON FEATURE STYLES
+   ===================================================== */
+.feature-page {
+    padding: 40px 0;
+    min-height: 60vh;
+}
+
+.feature-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.feature-header h1 {
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.feature-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.feature-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+/* =====================================================
+   GROUP ORDERS
+   ===================================================== */
+.group-order-banner {
+    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 40px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.group-order-banner::before {
+    content: '👥';
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 100px;
+    opacity: 0.2;
+}
+
+.group-order-banner h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.group-order-banner p {
+    opacity: 0.9;
+    font-size: 1.1rem;
+    max-width: 500px;
+}
+
+.group-code-display {
+    background: #f8f9fa;
+    border: 2px dashed #FF4900;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.group-code {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #FF4900;
+    letter-spacing: 4px;
+    font-family: monospace;
+}
+
+.group-code-label {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.group-member {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.group-member-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF4900, #FF6B35);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-right: 15px;
+}
+
+.group-member-info h5 {
+    margin: 0;
+    font-size: 1rem;
+    color: #333;
+}
+
+.group-member-info span {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.group-member-status {
+    margin-left: auto;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.group-member-status.ordering {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.group-member-status.ready {
+    background: #d4edda;
+    color: #155724;
+}
+
+.group-member-status.host {
+    background: #FF4900;
+    color: white;
+}
+
+/* =====================================================
+   SCHEDULED ORDERS
+   ===================================================== */
+.schedule-calendar {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.schedule-day {
+    padding: 15px;
+    text-align: center;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.schedule-day:hover {
+    background: #fff5f0;
+    border-color: #FF4900;
+}
+
+.schedule-day.selected {
+    background: #FF4900;
+    color: white;
+}
+
+.schedule-day .day-name {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+.schedule-day .day-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.schedule-day .day-month {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.time-slot {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px;
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.time-slot:hover {
+    border-color: #FF4900;
+    background: #fff5f0;
+}
+
+.time-slot.selected {
+    background: #FF4900;
+    color: white;
+    border-color: #FF4900;
+}
+
+.time-slot.unavailable {
+    opacity: 0.5;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+.scheduled-order-summary {
+    background: #28a745;
+    color: white;
+    border-radius: 12px;
+    padding: 25px;
+}
+
+.scheduled-order-summary h4 {
+    margin-bottom: 15px;
+}
+
+.schedule-detail {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.schedule-detail svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    opacity: 0.8;
+}
+
+/* =====================================================
+   SUBSCRIPTION PLANS
+   ===================================================== */
+.subscription-plans {
+    margin-top: 30px;
+}
+
+.subscription-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    position: relative;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    height: 100%;
+}
+
+.subscription-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+.subscription-card.featured {
+    border-color: #FF4900;
+    transform: scale(1.02);
+}
+
+.subscription-card.featured:hover {
+    transform: scale(1.02) translateY(-5px);
+}
+
+.subscription-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #6c757d;
+    color: white;
+    padding: 5px 20px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.subscription-plan h5 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.subscription-card.popular {
+    border-color: #FF4900;
+}
+
+.subscription-card.popular::before {
+    content: 'Most Popular';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #FF4900;
+    color: white;
+    padding: 5px 20px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.subscription-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+.subscription-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.subscription-price {
+    margin: 20px 0;
+}
+
+.subscription-price .amount {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #FF4900;
+}
+
+.subscription-price .currency {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.subscription-price .period {
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.subscription-features {
+    list-style: none;
+    padding: 0;
+    margin: 25px 0;
+    text-align: left;
+}
+
+.subscription-features li {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    white-space: nowrap;
+}
+
+.subscription-features li:last-child {
+    border-bottom: none;
+}
+
+.subscription-features li i {
+    margin-right: 10px;
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+}
+
+.subscription-cta {
+    width: 100%;
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.subscription-cta.primary {
+    background: #FF4900;
+    color: white;
+}
+
+.subscription-cta.primary:hover {
+    background: #e04000;
+    transform: scale(1.02);
+}
+
+.subscription-cta.secondary {
+    background: #f5f5f5;
+    color: #333;
+}
+
+.subscription-cta.secondary:hover {
+    background: #eee;
+}
+
+/* =====================================================
+   ORDER TRACKING
+   ===================================================== */
+.tracking-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.tracking-header {
+    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+    padding: 30px;
+    text-align: center;
+}
+
+.tracking-header h2 {
+    margin-bottom: 5px;
+}
+
+.tracking-order-id {
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+.tracking-body {
+    background: white;
+    border-radius: 0 0 16px 16px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.tracking-eta {
+    text-align: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+.tracking-eta-time {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #FF4900;
+}
+
+.tracking-eta-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.tracking-timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.tracking-timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #e5e5e5;
+}
+
+.tracking-step {
+    position: relative;
+    padding: 20px 0;
+    padding-left: 30px;
+}
+
+.tracking-step::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 25px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #e5e5e5;
+    border: 3px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.tracking-step.completed::before {
+    background: #28a745;
+}
+
+.tracking-step.active::before {
+    background: #FF4900;
+    animation: pulse-tracking 2s infinite;
+}
+
+@keyframes pulse-tracking {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 73, 0, 0.5); }
+    50% { box-shadow: 0 0 0 10px rgba(255, 73, 0, 0); }
+}
+
+.tracking-step.pending::before {
+    background: #e5e5e5;
+}
+
+.tracking-step-title {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.tracking-step-time {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.tracking-step-desc {
+    font-size: 0.9rem;
+    color: #888;
+    margin-top: 5px;
+}
+
+.tracking-map {
+    height: 250px;
+    background: #f0f0f0;
+    border-radius: 12px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    position: relative;
+    overflow: hidden;
+}
+
+.tracking-map iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 12px;
+}
+
+.driver-info {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+.driver-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF4900, #FF6B35);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-right: 15px;
+}
+
+.driver-details h5 {
+    margin: 0;
+    color: #333;
+}
+
+.driver-details span {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.driver-rating {
+    color: #ffc107;
+    margin-top: 3px;
+}
+
+.driver-contact {
+    margin-left: auto;
+    display: flex;
+    gap: 10px;
+}
+
+.driver-contact-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.driver-contact-btn.call {
+    background: #28a745;
+    color: white;
+}
+
+.driver-contact-btn.message {
+    background: #17a2b8;
+    color: white;
+}
+
+.driver-contact-btn:hover {
+    transform: scale(1.1);
+}
+
+/* =====================================================
+   FEATURE NAVIGATION TABS
+   ===================================================== */
+.feature-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.feature-tab {
+    padding: 12px 25px;
+    border-radius: 25px;
+    border: 2px solid #e5e5e5;
+    background: white;
+    color: #666;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.feature-tab:hover {
+    border-color: #FF4900;
+    color: #FF4900;
+}
+
+.feature-tab.active {
+    background: #FF4900;
+    border-color: #FF4900;
+    color: white;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 768px) {
+    .group-order-banner {
+        padding: 25px;
+    }
+    
+    .group-order-banner::before {
+        display: none;
+    }
+    
+    .subscription-plans {
+        grid-template-columns: 1fr;
+    }
+    
+    .tracking-header {
+        padding: 20px;
+    }
+    
+    .tracking-eta-time {
+        font-size: 2rem;
+    }
+    
+    .driver-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .driver-avatar {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    
+    .driver-contact {
+        margin-left: 0;
+        margin-top: 15px;
+    }
+}

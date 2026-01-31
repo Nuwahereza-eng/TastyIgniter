@@ -1,0 +1,18 @@
+--- a/vendor/tastyigniter/ti-ext-cart/src/Classes/OrderManager.php
++++ b/vendor/tastyigniter/ti-ext-cart/src/Classes/OrderManager.php
+@@ -163,8 +163,13 @@ class OrderManager
+ 
+         /** @var UserLocation $userLocation */
+         $userLocation = $collection->first();
+-        if (!$userLocation->getStreetNumber() || !$userLocation->getStreetName()) {
+-            throw new ApplicationException(lang('igniter.local::default.alert_missing_street_address'));
++        
++        // Uganda addresses often don't have street numbers - be more lenient
++        // Only require street name OR that we have valid coordinates
++        $hasStreetInfo = $userLocation->getStreetName() || $userLocation->getStreetNumber();
++        $hasValidCoordinates = $userLocation->getCoordinates() && $userLocation->getCoordinates()->getLatitude() != 0;
++        if (!$hasStreetInfo && !$hasValidCoordinates) {
++            throw new ApplicationException(lang('igniter.local::default.alert_missing_street_address'));  
+         }
+ 
+         $this->location->updateUserPosition($userLocation);

@@ -9,10 +9,11 @@ return [
     |
     | The `chain` provider is special, in that it will run all configured
     | providers in the sequence listed, should the previous provider fail.
-    | Using 'chain' to try Google first (if API key exists), then Nominatim.
+    | Using nominatim until Google Geocoding API is enabled in Cloud Console.
+    | Set GEOCODER_PROVIDER=google in .env once you enable the Google Geocoding API.
     |
     */
-    'default' => env('GOOGLE_MAPS_API_KEY') ? 'google' : 'nominatim',
+    'default' => env('GEOCODER_PROVIDER', 'nominatim'),
 
     /*
     |---------------------------------------------------------------------------
