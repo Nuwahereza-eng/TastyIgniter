@@ -26,19 +26,8 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . .
 
-# Set minimal env vars for build-time artisan commands
-ENV APP_KEY=base64:buildtimekeynotreal1234567890123456=
-ENV APP_ENV=production
-ENV DB_CONNECTION=mysql
-
-# Install dependencies (run scripts for package discovery)
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-# Run package discovery explicitly  
-RUN php artisan package:discover --ansi 2>&1 || echo "package:discover had issues"
-
-# Clear any build-time caches that might have wrong values
-RUN rm -f bootstrap/cache/config.php
+# Install dependencies (skip scripts - cache files are already committed)
+RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
 
 # Create storage directories
 RUN mkdir -p storage/framework/{sessions,views,cache} \
