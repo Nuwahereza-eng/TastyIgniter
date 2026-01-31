@@ -48,6 +48,11 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || 
 cd /var/www/html
 php artisan config:clear 2>&1 || echo "config:clear done"
 php artisan cache:clear 2>&1 || echo "cache:clear done"
+php artisan view:clear 2>&1 || echo "view:clear done"
+
+# Clear compiled views that may have stale paths
+rm -rf /var/www/html/storage/framework/views/*.php 2>/dev/null || true
+echo "Cleared view cache"
 
 # Configure Nginx port
 PORT=${PORT:-80}
