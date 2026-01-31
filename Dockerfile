@@ -40,6 +40,7 @@ RUN php artisan package:discover --ansi
 # Remove .env and clear all caches (they'll be regenerated at runtime)
 RUN rm -f .env && \
     rm -rf storage/framework/views/*.php && \
+    rm -rf storage/framework/cache/data/* && \
     rm -rf storage/temp/* && \
     rm -rf storage/igniter/combiner/*
 

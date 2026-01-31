@@ -55,9 +55,10 @@ php artisan config:clear 2>&1 || echo "config:clear done"
 php artisan cache:clear 2>&1 || echo "cache:clear done"
 php artisan view:clear 2>&1 || echo "view:clear done"
 
-# Clear compiled views that may have stale paths
+# Clear compiled views and file cache that may have stale paths
 rm -rf /var/www/html/storage/framework/views/*.php 2>/dev/null || true
-echo "Cleared view cache"
+rm -rf /var/www/html/storage/framework/cache/data/* 2>/dev/null || true
+echo "Cleared all caches"
 
 # Configure Nginx port
 PORT=${PORT:-80}
