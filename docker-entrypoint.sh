@@ -42,6 +42,11 @@ rm -f /var/www/html/storage/framework/down
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
 
+# Clear config cache to use fresh .env values
+cd /var/www/html
+php artisan config:clear 2>&1 || echo "config:clear done"
+php artisan cache:clear 2>&1 || echo "cache:clear done"
+
 # Configure Nginx port
 PORT=${PORT:-80}
 echo "PORT is: $PORT"
