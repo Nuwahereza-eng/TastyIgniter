@@ -44,13 +44,17 @@ RUN echo 'server { \n\
     listen 80; \n\
     server_name _; \n\
     root /var/www/html/public; \n\
-    index index.php; \n\
+    index index.php index.html; \n\
+    \n\
+    client_max_body_size 100M; \n\
     \n\
     location / { \n\
         try_files $uri $uri/ /index.php?$query_string; \n\
     } \n\
     \n\
     location ~ \.php$ { \n\
+        try_files $uri =404; \n\
+        fastcgi_split_path_info ^(.+\.php)(/.+)$; \n\
         fastcgi_pass 127.0.0.1:9000; \n\
         fastcgi_index index.php; \n\
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; \n\
@@ -60,7 +64,9 @@ RUN echo 'server { \n\
     location ~ /\.ht { \n\
         deny all; \n\
     } \n\
-}' > /etc/nginx/sites-available/default
+}' > /etc/nginx/sites-available/default \
+    && ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default \
+    && rm -f /etc/nginx/sites-enabled/default.bak
 
 # Configure Supervisor to run both nginx and php-fpm
 RUN echo '[supervisord] \n\
