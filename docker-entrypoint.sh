@@ -1,7 +1,33 @@
 #!/bin/bash
-# Don't use set -e - we want to continue even if some commands fail
-
 echo "=== Starting TastyIgniter ==="
+
+# Create .env file from environment variables
+echo "Creating .env file..."
+cat > /var/www/html/.env << EOF
+APP_NAME=TastyIgniter
+APP_ENV=${APP_ENV:-production}
+APP_KEY=${APP_KEY}
+APP_DEBUG=${APP_DEBUG:-false}
+APP_URL=${APP_URL:-https://localhost}
+
+LOG_CHANNEL=stack
+LOG_LEVEL=debug
+
+DB_CONNECTION=mysql
+DB_HOST=${DB_HOST:-localhost}
+DB_PORT=${DB_PORT:-3306}
+DB_DATABASE=${DB_DATABASE:-tastyigniter}
+DB_USERNAME=${DB_USERNAME:-root}
+DB_PASSWORD=${DB_PASSWORD:-}
+
+BROADCAST_DRIVER=log
+CACHE_DRIVER=file
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+EOF
+echo ".env file created"
 
 # Create storage directories
 mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
@@ -20,12 +46,6 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || 
 PORT=${PORT:-80}
 echo "PORT is: $PORT"
 sed -i "s/listen 80/listen $PORT/g" /etc/nginx/conf.d/default.conf 2>/dev/null || true
-
-# Only remove config.php cache (it has build-time values)
-# Keep services.php and packages.php - they're needed for Laravel to boot
-echo "=== Laravel cache setup ==="
-cd /var/www/html
-rm -f bootstrap/cache/config.php
 
 echo "=== Starting Supervisor ==="
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
