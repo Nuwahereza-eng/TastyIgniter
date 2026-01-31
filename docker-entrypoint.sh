@@ -33,6 +33,8 @@ echo ".env file created"
 mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
 mkdir -p /var/www/html/storage/logs
 mkdir -p /var/www/html/storage/app/public
+mkdir -p /var/www/html/storage/temp
+mkdir -p /var/www/html/storage/igniter/{combiner,uploads,media}
 mkdir -p /var/www/html/bootstrap/cache
 
 # Remove maintenance mode file
