@@ -67,6 +67,14 @@ try {
 # Clear Laravel caches
 echo "=== Clearing Laravel caches ==="
 cd /var/www/html
+
+# Remove any cached config files that may be corrupted
+rm -f /var/www/html/bootstrap/cache/config.php
+rm -f /var/www/html/bootstrap/cache/routes-v7.php
+rm -f /var/www/html/bootstrap/cache/services.php
+rm -f /var/www/html/bootstrap/cache/packages.php
+echo "Removed cached files"
+
 php artisan config:clear 2>&1 || echo "config:clear failed"
 php artisan cache:clear 2>&1 || echo "cache:clear failed"  
 php artisan view:clear 2>&1 || echo "view:clear failed"
@@ -75,9 +83,8 @@ php artisan route:clear 2>&1 || echo "route:clear failed"
 # Ensure app is up (not in maintenance mode)
 php artisan up 2>&1 || echo "artisan up failed"
 
-# Generate config cache for production
-echo "=== Optimizing for production ==="
-php artisan config:cache 2>&1 || echo "config:cache failed (this is ok)"
+# DO NOT cache config - it fails without .env file and environment vars need to be read at runtime
+echo "=== Skipping config:cache (using runtime env vars) ==="
 
 echo "=== Starting Supervisor ==="
 # Start Supervisor (which starts nginx and php-fpm)
