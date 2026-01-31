@@ -37,12 +37,17 @@ mkdir -p /var/www/html/storage/temp
 mkdir -p /var/www/html/storage/igniter/{combiner,uploads,media}
 mkdir -p /var/www/html/bootstrap/cache
 
+# Clear any stale temp/combiner files from build
+rm -rf /var/www/html/storage/temp/* 2>/dev/null || true
+rm -rf /var/www/html/storage/igniter/combiner/* 2>/dev/null || true
+
 # Remove maintenance mode file
 rm -f /var/www/html/storage/framework/down
 
-# Set permissions
+# Set permissions - make everything writable
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
-chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
+chmod -R 777 /var/www/html/storage 2>/dev/null || true
+chmod -R 775 /var/www/html/bootstrap/cache 2>/dev/null || true
 
 # Clear config cache to use fresh .env values
 cd /var/www/html
