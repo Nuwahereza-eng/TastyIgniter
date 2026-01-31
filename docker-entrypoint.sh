@@ -21,20 +21,11 @@ PORT=${PORT:-80}
 echo "PORT is: $PORT"
 sed -i "s/listen 80/listen $PORT/g" /etc/nginx/conf.d/default.conf 2>/dev/null || true
 
-# Clear ALL cached files and regenerate at runtime with correct env
-echo "=== Clearing and regenerating Laravel cache ==="
+# Only remove config.php cache (it has build-time values)
+# Keep services.php and packages.php - they're needed for Laravel to boot
+echo "=== Laravel cache setup ==="
 cd /var/www/html
 rm -f bootstrap/cache/config.php
-rm -f bootstrap/cache/services.php
-rm -f bootstrap/cache/packages.php
-
-# Regenerate package manifest with runtime environment
-php artisan package:discover --ansi 2>&1 || echo "package:discover warning"
-
-# Clear caches
-php artisan config:clear 2>&1 || echo "config:clear warning"
-php artisan cache:clear 2>&1 || echo "cache:clear warning"
-php artisan view:clear 2>&1 || echo "view:clear warning"
 
 echo "=== Starting Supervisor ==="
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
