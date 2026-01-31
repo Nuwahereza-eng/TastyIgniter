@@ -6,13 +6,18 @@ echo "=== Starting TastyIgniter ==="
 # Create storage directories if they don't exist
 mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
 mkdir -p /var/www/html/storage/logs
+mkdir -p /var/www/html/storage/app/public
 mkdir -p /var/www/html/bootstrap/cache
 
-# Create storage link for assets
+# Create storage link for assets (only if target exists)
 echo "Creating storage link..."
-rm -f /var/www/html/public/storage
-ln -sf /var/www/html/storage/app/public /var/www/html/public/storage
-echo "Storage link created"
+if [ -d "/var/www/html/storage/app/public" ]; then
+    rm -f /var/www/html/public/storage
+    ln -sf /var/www/html/storage/app/public /var/www/html/public/storage 2>/dev/null || true
+    echo "Storage link created"
+else
+    echo "Skipping storage link - directory doesn't exist"
+fi
 
 # Remove maintenance mode file if it exists
 rm -f /var/www/html/storage/framework/down
