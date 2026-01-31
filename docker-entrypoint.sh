@@ -8,6 +8,12 @@ mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
 mkdir -p /var/www/html/storage/logs
 mkdir -p /var/www/html/bootstrap/cache
 
+# Create storage link for assets
+echo "Creating storage link..."
+rm -f /var/www/html/public/storage
+ln -sf /var/www/html/storage/app/public /var/www/html/public/storage
+echo "Storage link created"
+
 # Remove maintenance mode file if it exists
 rm -f /var/www/html/storage/framework/down
 echo "Maintenance mode file removed"
@@ -79,6 +85,22 @@ php artisan config:clear 2>&1 || echo "config:clear failed"
 php artisan cache:clear 2>&1 || echo "cache:clear failed"  
 php artisan view:clear 2>&1 || echo "view:clear failed"
 php artisan route:clear 2>&1 || echo "route:clear failed"
+
+# Create storage link
+php artisan storage:link 2>&1 || echo "storage:link failed"
+
+# Copy theme assets to public
+echo "=== Publishing theme assets ==="
+if [ -d "/var/www/html/themes/ugaeats-orange/assets" ]; then
+    mkdir -p /var/www/html/public/themes/ugaeats-orange
+    cp -r /var/www/html/themes/ugaeats-orange/assets/* /var/www/html/public/themes/ugaeats-orange/ 2>/dev/null || true
+    echo "ugaeats-orange assets copied"
+fi
+if [ -d "/var/www/html/themes/demo/assets" ]; then
+    mkdir -p /var/www/html/public/themes/demo
+    cp -r /var/www/html/themes/demo/assets/* /var/www/html/public/themes/demo/ 2>/dev/null || true
+    echo "demo assets copied"
+fi
 
 # Ensure app is up (not in maintenance mode)
 php artisan up 2>&1 || echo "artisan up failed"
