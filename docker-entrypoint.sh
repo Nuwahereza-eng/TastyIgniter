@@ -10,7 +10,7 @@ mkdir -p /var/www/html/bootstrap/cache
 
 # Remove maintenance mode file if it exists
 rm -f /var/www/html/storage/framework/down
-echo "Maintenance mode disabled"
+echo "Maintenance mode file removed"
 
 # Set permissions
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
@@ -29,12 +29,26 @@ echo "Nginx configured to listen on port $PORT"
 echo "Testing nginx configuration..."
 nginx -t || echo "Nginx config test warning"
 
-# Test database connection
+# Test database connection and disable maintenance mode
 echo "Testing database connection..."
 echo "DB_HOST: ${DB_HOST:-not set}"
 echo "DB_PORT: ${DB_PORT:-not set}"
 echo "DB_DATABASE: ${DB_DATABASE:-not set}"
-php -r "try { new PDO('mysql:host='.\$_ENV['DB_HOST'].';port='.\$_ENV['DB_PORT'].';dbname='.\$_ENV['DB_DATABASE'], \$_ENV['DB_USERNAME'], \$_ENV['DB_PASSWORD']); echo 'Database connection OK\n'; } catch(Exception \$e) { echo 'Database error: '.\$e->getMessage().'\n'; }" || true
+
+# Disable TastyIgniter maintenance mode in database
+php -r "
+try {
+    \$pdo = new PDO(
+        'mysql:host='.\$_ENV['DB_HOST'].';port='.\$_ENV['DB_PORT'].';dbname='.\$_ENV['DB_DATABASE'],
+        \$_ENV['DB_USERNAME'],
+        \$_ENV['DB_PASSWORD']
+    );
+    \$pdo->exec(\"UPDATE ti_settings SET value = '0' WHERE item = 'maintenance_mode'\");
+    echo 'Maintenance mode disabled in database\n';
+} catch(Exception \$e) {
+    echo 'Database error: '.\$e->getMessage().'\n';
+}
+" || true
 
 # Clear Laravel caches
 echo "Clearing Laravel caches..."
