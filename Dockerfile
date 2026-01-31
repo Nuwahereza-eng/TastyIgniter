@@ -43,6 +43,9 @@ RUN rm -f .env
 # Create storage directories
 RUN mkdir -p storage/framework/{sessions,views,cache} \
     && mkdir -p storage/logs \
+    && mkdir -p storage/temp \
+    && mkdir -p storage/igniter/{combiner,uploads,media} \
+    && mkdir -p storage/app/public \
     && mkdir -p bootstrap/cache
 
 # Set permissions
