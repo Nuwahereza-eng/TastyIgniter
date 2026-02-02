@@ -1,0 +1,1117 @@
+:root {
+    --uganda-yellow: #FCDC04;
+    --uganda-red: #D90000;
+    --uganda-black: #000000;
+    --primary-color: #FF4900;
+    --ti-orange: #FF4900;
+    --secondary-color: #004E89;
+    --accent-color: #FCDC04;
+    --success-color: #06D6A0;
+    --text-dark: #2C3E50;
+    --text-light: #7F8C8D;
+}
+
+/* Custom Scrollbar with ti-orange */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--ti-orange);
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #e04000;
+}
+
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ti-orange) #f1f1f1;
+}
+
+/* =====================================================
+   BUTTONS - Ti-Orange Theme
+   ===================================================== */
+
+/* Primary buttons with ti-orange */
+.btn-primary,
+.btn-success,
+button[type="submit"],
+.add-to-cart,
+.btn-add-cart,
+[class*="add-to-cart"],
+[class*="cart"] .btn {
+    background: var(--ti-orange) !important;
+    background-color: var(--ti-orange) !important;
+    border-color: var(--ti-orange) !important;
+    color: white !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-primary:hover,
+.btn-success:hover,
+button[type="submit"]:hover,
+.add-to-cart:hover,
+.btn-add-cart:hover,
+[class*="add-to-cart"]:hover,
+[class*="cart"] .btn:hover {
+    background: #e04000 !important;
+    background-color: #e04000 !important;
+    border-color: #e04000 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 73, 0, 0.4) !important;
+}
+
+/* Outline buttons */
+.btn-outline-primary {
+    color: var(--ti-orange) !important;
+    border-color: var(--ti-orange) !important;
+}
+
+.btn-outline-primary:hover {
+    background: var(--ti-orange) !important;
+    color: white !important;
+}
+
+/* Focus states */
+.btn-primary:focus,
+.btn-success:focus,
+button[type="submit"]:focus {
+    box-shadow: 0 0 0 3px rgba(255, 73, 0, 0.3) !important;
+}
+
+/* Uganda Flag Colors Accent */
+.uganda-theme {
+    border-top: 4px solid var(--uganda-black);
+    border-bottom: 4px solid var(--uganda-yellow);
+}
+
+.uganda-accent {
+    background: linear-gradient(135deg, var(--uganda-black) 0%, var(--uganda-red) 50%, var(--uganda-yellow) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Enhanced Header */
+.navbar {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color)) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: white !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced Cards */
+.card {
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Menu Item Cards */
+.menu-item {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    background: white;
+    margin-bottom: 2rem;
+}
+
+.menu-item-image {
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.menu-item:hover .menu-item-image {
+    transform: scale(1.05);
+}
+
+.menu-item-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--uganda-yellow);
+    color: var(--uganda-black);
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* TastyIgniter Menu Card Styles - Ensure Images Display */
+.menu-card,
+.menu-item-card,
+[class*="menu"] .card {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.menu-card:hover,
+.menu-item-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+/* Menu Item Image Container */
+.menu-card img,
+.menu-item-card img,
+.menu-card .card-img-top,
+.menu-item-card .card-img-top,
+[class*="menu"] img {
+    width: 100% !important;
+    height: 220px !important;
+    object-fit: cover !important;
+    display: block !important;
+    transition: transform 0.4s ease;
+}
+
+.menu-card:hover img,
+.menu-item-card:hover img {
+    transform: scale(1.1);
+}
+
+/* Menu Card Body */
+.menu-card .card-body,
+.menu-item-card .card-body {
+    padding: 1.5rem;
+}
+
+/* Menu Item Title */
+.menu-card .card-title,
+.menu-item-card .card-title,
+.menu-card h3,
+.menu-item-card h3,
+.menu-card h4,
+.menu-item-card h4 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--uganda-black);
+    margin-bottom: 0.5rem;
+}
+
+/* Menu Item Description */
+.menu-card .card-text,
+.menu-item-card .card-text,
+.menu-card p,
+.menu-item-card p {
+    color: #7F8C8D;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+/* Menu Item Price */
+.menu-card .price,
+.menu-item-card .price,
+.menu-card [class*="price"],
+.menu-item-card [class*="price"] {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    display: block;
+    margin: 1rem 0;
+}
+
+/* Add to Cart Button in Menu Cards */
+.menu-card .btn,
+.menu-item-card .btn {
+    width: 100%;
+    margin-top: 0.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    border-radius: 50px;
+    padding: 0.75rem 1.5rem;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.menu-card .btn:hover,
+.menu-item-card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+/* Thumbnail wrapper - ensure it displays */
+.menu-thumb,
+.menu-thumbnail,
+.menu-thumb-wrapper,
+[class*="thumb-wrapper"],
+[class*="image-wrapper"] {
+    position: relative;
+    width: 100% !important;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+    display: block !important;
+}
+
+/* Specific menu thumb wrapper styling */
+.menu-thumb-wrapper {
+    transition: transform 0.3s ease;
+}
+
+.menu-card:hover .menu-thumb-wrapper {
+    transform: scale(1.02);
+}
+
+.menu-thumb-wrapper img {
+    transition: transform 0.4s ease;
+}
+
+.menu-card:hover .menu-thumb-wrapper img {
+    transform: scale(1.1);
+}
+
+/* Fallback for missing images */
+.menu-thumb:empty::before,
+.menu-thumbnail:empty::before {
+    content: '🍽️';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    opacity: 0.3;
+}
+
+/* Enhanced Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    border-radius: 50px;
+    padding: 12px 30px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+.btn-success {
+    background: var(--success-color);
+    border: none;
+    border-radius: 50px;
+    padding: 12px 30px;
+    font-weight: 600;
+}
+
+/* Currency Display - UGX Styling */
+.price,
+.currency {
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 1.3rem;
+}
+
+/* REMOVED: .price::before with USh - currency is already displayed by the system */
+
+/* Button text and price spacing fix - Add to Order button */
+.btn-primary .d-flex,
+.btn .d-flex,
+button .d-flex {
+    gap: 0.5rem !important;
+    align-items: center;
+}
+
+.btn-primary span,
+.btn span {
+    white-space: nowrap;
+}
+
+/* FIX: Make buttons fit within their containers (cards) */
+.card .btn,
+.card .btn-primary,
+.card button,
+.menu-card .btn,
+.menu-item .btn,
+[class*="menu"] .btn {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0.6rem 0.8rem !important;
+    font-size: 0.85rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.4rem !important;
+    flex-wrap: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    box-sizing: border-box !important;
+}
+
+/* Price inside button - compact */
+.card .btn .price,
+.card .btn-primary .price,
+.btn span.price,
+.btn-primary span.price,
+.btn .text-muted {
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: 0.85rem !important;
+}
+
+/* Button text should truncate if too long */
+.btn > span:first-child,
+.btn-primary > span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60%;
+}
+
+/* Uganda Telecom Indicators */
+.phone-number {
+    position: relative;
+    padding-left: 45px;
+}
+
+.phone-number::before {
+    content: "🇺🇬";
+    position: absolute;
+    left: 0;
+    font-size: 1.5rem;
+}
+
+/* Enhanced Footer */
+.footer {
+    background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+    color: white;
+    padding: 3rem 0 1rem;
+}
+
+.footer a {
+    color: var(--uganda-yellow);
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: white;
+    text-decoration: none;
+}
+
+/* Location Badges */
+.location-badge {
+    background: var(--uganda-yellow);
+    color: var(--uganda-black);
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    display: inline-block;
+    margin: 0.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile Money Icons */
+.payment-method {
+    display: inline-flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.payment-method:hover {
+    transform: scale(1.05);
+}
+
+.payment-method.mtn {
+    border-left: 4px solid #FFCC00;
+}
+
+.payment-method.airtel {
+    border-left: 4px solid #ED1C24;
+}
+
+.payment-method.flutterwave {
+    border-left: 4px solid #F5A623;
+}
+
+/* Delivery Zone Styling */
+.delivery-zone {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Hero Section Enhancement */
+.hero-section {
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(0, 78, 137, 0.9)),
+                url('/images/uganda-food-bg.jpg') center/cover;
+    padding: 5rem 0;
+    color: white;
+    text-align: center;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+    margin-bottom: 1.5rem;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    font-weight: 300;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Animated Loading */
+.loading-spinner {
+    border: 4px solid var(--uganda-yellow);
+    border-top: 4px solid var(--uganda-red);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Category Badges */
+.category-badge {
+    background: linear-gradient(135deg, var(--uganda-red), var(--uganda-yellow));
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    display: inline-block;
+    margin: 0.25rem;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+/* Search Bar Enhancement */
+.search-bar {
+    border-radius: 50px;
+    border: 2px solid var(--uganda-yellow);
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.search-bar:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+    outline: none;
+}
+
+/* Time/Operating Hours Display */
+.operating-hours {
+    background: var(--success-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+}
+
+.operating-hours::before {
+    content: "🕐";
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+
+/* Review Stars */
+.stars {
+    color: var(--uganda-yellow);
+    font-size: 1.2rem;
+}
+
+/* Testimonial Cards */
+.testimonial {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid var(--uganda-yellow);
+    margin-bottom: 2rem;
+}
+
+/* Special Offers Banner */
+.special-offer {
+    background: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    margin: 2rem 0;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.special-offer h3 {
+    font-size: 2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .menu-item-image {
+        height: 200px;
+    }
+}
+
+/* Smooth Scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--uganda-red), var(--uganda-yellow));
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+/* =====================================================
+   HERO SLIDER SECTION - Auto-changing background photos
+   ===================================================== */
+
+/* Hero Slider Container */
+.carousel.slide {
+    position: relative;
+}
+
+.carousel-inner {
+    border-radius: 0;
+}
+
+.carousel-item {
+    transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 70vh;
+    object-fit: cover;
+    filter: brightness(0.7);
+}
+
+/* Hero Slider Overlay */
+.carousel-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.6) 0%,
+        rgba(255, 107, 53, 0.3) 50%,
+        rgba(0, 78, 137, 0.4) 100%
+    );
+    z-index: 1;
+}
+
+/* Hero Captions */
+.carousel-caption {
+    bottom: 25%;
+    z-index: 2;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.carousel-caption h5 {
+    font-size: 3rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 1rem;
+    color: white;
+    animation: fadeInDown 1s ease;
+}
+
+.carousel-caption p {
+    font-size: 1.3rem;
+    font-weight: 400;
+    max-width: 600px;
+    margin: 0 auto;
+    animation: fadeInUp 1s ease 0.3s both;
+}
+
+/* Carousel Controls Styling */
+.carousel-control-prev,
+.carousel-control-next {
+    width: 60px;
+    height: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 107, 53, 0.8);
+    border-radius: 50%;
+    opacity: 0;
+    transition: all 0.3s ease;
+    margin: 0 20px;
+}
+
+.carousel:hover .carousel-control-prev,
+.carousel:hover .carousel-control-next {
+    opacity: 1;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    background: var(--primary-color);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 25px;
+    height: 25px;
+}
+
+/* Carousel Indicators - Dish/Plate Shape */
+.carousel-indicators {
+    bottom: 30px;
+    z-index: 10;
+}
+
+.carousel-indicators button {
+    width: 35px;
+    height: 12px;
+    border-radius: 50% / 100%;
+    background: rgba(255, 255, 255, 0.5);
+    border: 2px solid white;
+    margin: 0 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Dish rim effect */
+.carousel-indicators button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.carousel-indicators button.active {
+    background: var(--ti-orange);
+    border-color: var(--ti-orange);
+    transform: scale(1.2);
+    box-shadow: 0 3px 10px rgba(255, 73, 0, 0.5);
+}
+
+.carousel-indicators button.active::before {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* =====================================================
+   HEADER WITH BACKGROUND - Overlays the hero
+   ===================================================== */
+
+.header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: transparent !important;
+}
+
+.navbar {
+    background: rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: none;
+    transition: all 0.3s ease;
+}
+
+/* Navbar scrolled state (add via JS) */
+.navbar.scrolled {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color)) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* =====================================================
+   NAV LINKS HOVER EFFECTS
+   ===================================================== */
+
+.navbar-nav .nav-link,
+.navbar-nav .nav-link.dropdown-toggle,
+header .navbar-nav .nav-link,
+.navbar .navbar-nav .nav-link {
+    color: white !important;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.75rem 1.25rem !important;
+    margin: 0 0.25rem;
+    position: relative;
+    transition: all 0.3s ease !important;
+    border-radius: 25px;
+    border: 2px solid transparent !important;
+    background: transparent !important;
+}
+
+/* Button-like hover effect - applies to ALL nav links including dropdowns */
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link:focus,
+.navbar-nav .dropdown-toggle:hover,
+.navbar-nav .dropdown-toggle:focus,
+.navbar-nav .nav-item:hover > .nav-link,
+.navbar-nav .nav-item:hover > .dropdown-toggle,
+header .navbar-nav .nav-link:hover,
+.navbar .navbar-nav .nav-link:hover {
+    color: white !important;
+    background: #FF4900 !important;
+    border-color: #FF4900 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 73, 0, 0.4) !important;
+}
+
+/* Active link state */
+.navbar-nav .nav-link.active,
+.navbar-nav .dropdown-toggle.active,
+.navbar-nav .nav-item.show > .nav-link,
+.navbar-nav .nav-item.show > .dropdown-toggle,
+header .navbar-nav .nav-link.active {
+    color: white !important;
+    background: #FF4900 !important;
+    border-color: #FF4900 !important;
+}
+
+/* Nav icons hover */
+.navbar-nav .nav-link i,
+.navbar-nav .nav-link svg {
+    transition: transform 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover i,
+.navbar-nav .nav-link:hover svg {
+    transform: scale(1.2);
+}
+
+/* Dropdown menu styling */
+.dropdown-menu {
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 0.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s ease;
+}
+
+.dropdown-item {
+    color: white !important;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white !important;
+    transform: translateX(5px);
+}
+
+/* Logo hover effect */
+.navbar-brand:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand img {
+    transition: all 0.3s ease;
+}
+
+.navbar-brand:hover img {
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+}
+
+/* =====================================================
+   ANIMATIONS
+   ===================================================== */
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Add padding to main content to account for fixed header */
+main[role="main"] {
+    padding-top: 0;
+}
+
+/* First section after header should have no top margin */
+.carousel.slide {
+    margin-top: 0;
+}
+
+/* =====================================================
+   RESPONSIVE ADJUSTMENTS
+   ===================================================== */
+
+@media (max-width: 991px) {
+    .carousel-item img {
+        height: 50vh;
+    }
+    
+    .carousel-caption h5 {
+        font-size: 2rem;
+    }
+    
+    .carousel-caption p {
+        font-size: 1rem;
+    }
+    
+    .navbar-nav .nav-link {
+        padding: 0.75rem 1rem !important;
+        text-align: center;
+    }
+    
+    .navbar-nav .nav-link::before {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .carousel-item img {
+        height: 40vh;
+    }
+    
+    .carousel-caption h5 {
+        font-size: 1.5rem;
+    }
+    
+    .carousel-indicators button {
+        width: 8px;
+        height: 8px;
+    }
+}
+
+/* =====================================================
+   CRITICAL FIX: Add to Order Button - Fit within Card
+   ===================================================== */
+
+/* Force ALL buttons inside cards to fit */
+.card .btn,
+.card button,
+.card .btn-primary,
+.card .btn-cart,
+.card [class*="btn"],
+.menu-item .btn,
+.menu-card .btn,
+[class*="menu"] .btn {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Button inner content - flex with gap */
+.card .btn > *,
+.card .btn .d-flex,
+.menu-item .btn > * {
+    display: inline !important;
+}
+
+/* Price inside button - inline and smaller */
+.card .btn .price,
+.card .btn .text-muted,
+.card .btn span:last-child,
+.menu-item .btn .price {
+    font-size: 0.75rem !important;
+    margin-left: 0.3rem !important;
+}
+
+/* Card body should contain button */
+.card .card-body,
+.card-body {
+    overflow: hidden !important;
+}
+
+/* Livewire menu item specific fix */
+[wire\\:id] .btn,
+.menu-item-list .btn,
+.menu-items .btn {
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* =====================================================
+   MODAL / POPUP - Menu Item Detail Fix
+   ===================================================== */
+
+/* Modal body - prevent horizontal overflow */
+.modal-body {
+    overflow-x: hidden !important;
+}
+
+/* Modal buttons - Add to Order in popup */
+.modal .btn,
+.modal .btn-primary,
+.modal button[type="submit"],
+.modal-body .btn,
+.modal-footer .btn,
+.offcanvas .btn,
+.offcanvas-body .btn {
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.9rem !important;
+    flex-wrap: wrap !important;
+}
+
+/* Price in modal button */
+.modal .btn .price,
+.modal .btn span,
+.modal-footer .btn span,
+.offcanvas .btn .price {
+    white-space: nowrap !important;
+    font-size: 0.85rem !important;
+}
+
+/* Modal button text - allow wrap */
+.modal .btn > span:first-child,
+.modal-footer .btn > span:first-child {
+    flex-shrink: 1;
+    text-align: center;
+}
+
+/* Quantity and price row in modal */
+.modal .d-flex,
+.modal-body .d-flex,
+.offcanvas-body .d-flex {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+}
+
+/* Price display in modal */
+.modal .menu-price,
+.modal .item-price,
+.modal .price,
+/* Cart box price styling - ensure prices don't get cut off */
+.cart-items .price {
+    font-size: 0.5rem !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    min-width: 85px !important;
+    text-align: right !important;
+    flex-shrink: 0 !important;
+}
+
+#cart-box .price,
+.module-box .price {
+    font-size: 0.5rem !important;
+    white-space: nowrap !important;
+}
+
+/* Cart item in modal/offcanvas */
+.offcanvas-body,
+.cart-items {
+    overflow-x: hidden !important;
+}
+
+.cart-item .btn,
+.cart-item button {
+    max-width: 100% !important;
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.8rem !important;
+}
