@@ -12,6 +12,8 @@ composer.lock
 node_modules
 
 /public/vendor
+!/public/vendor/igniter-orange
+!/public/vendor/igniter
 /public/storage
 
 /storage/clockwork
