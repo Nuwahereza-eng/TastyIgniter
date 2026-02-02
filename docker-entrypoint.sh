@@ -64,6 +64,9 @@ php artisan route:clear 2>&1 || echo "route:clear done"
 # Run any pending migrations
 php artisan migrate --force 2>&1 || echo "migrate done"
 
+# Sync all themes from filesystem to database (required for demo theme to be recognized)
+php artisan tinker --execute="\Igniter\Main\Models\Theme::syncAll();" 2>&1 || echo "theme sync done"
+
 # Set the theme to demo (correct syntax with --theme option)
 php artisan igniter:util set theme --theme=demo 2>&1 || echo "theme set done"
 
