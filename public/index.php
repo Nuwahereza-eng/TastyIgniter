@@ -31,6 +31,39 @@ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php'))
 |
 */
 
+// CRITICAL FIX: Define safe media_thumb BEFORE vendor autoloader
+// The vendor helpers.php uses "if (!function_exists('media_thumb'))" 
+// so our version takes precedence and prevents the crash
+if (!function_exists('media_thumb')) {
+    function media_thumb(?string $path, array $options = []): string
+    {
+        // After autoload, try the real implementation with error handling
+        try {
+            if (class_exists('Igniter\Main\Classes\MediaLibrary')) {
+                $library = app('Igniter\Main\Classes\MediaLibrary');
+                return $library->getMediaThumb($path ?? 'no_photo.png', $options);
+            }
+        } catch (\Throwable $e) {
+            // Log error if logging is available
+            if (function_exists('logger')) {
+                logger()->warning('media_thumb failed: ' . $e->getMessage());
+            }
+        }
+        
+        // Fallback: try media_url
+        try {
+            if (function_exists('media_url')) {
+                return media_url($path ?? 'no_photo.png');
+            }
+        } catch (\Throwable $e) {
+            // Ignore
+        }
+        
+        // Ultimate fallback: static asset
+        return '/vendor/igniter-orange/images/favicon.ico';
+    }
+}
+
 require __DIR__.'/../vendor/autoload.php';
 
 /*

@@ -15,6 +15,29 @@ define('LARAVEL_START', microtime(true));
 |
 */
 
+// CRITICAL FIX: Define safe media_thumb BEFORE vendor autoloader
+if (!function_exists('media_thumb')) {
+    function media_thumb(?string $path, array $options = []): string
+    {
+        try {
+            if (class_exists('Igniter\Main\Classes\MediaLibrary')) {
+                $library = app('Igniter\Main\Classes\MediaLibrary');
+                return $library->getMediaThumb($path ?? 'no_photo.png', $options);
+            }
+        } catch (\Throwable $e) {
+            if (function_exists('logger')) {
+                logger()->warning('media_thumb failed: ' . $e->getMessage());
+            }
+        }
+        try {
+            if (function_exists('media_url')) {
+                return media_url($path ?? 'no_photo.png');
+            }
+        } catch (\Throwable $e) {}
+        return '/vendor/igniter-orange/images/favicon.ico';
+    }
+}
+
 require __DIR__.'/vendor/autoload.php';
 
 $app = require_once __DIR__.'/bootstrap/app.php';
