@@ -9,6 +9,7 @@ description: Default layout with Uganda customizations
     
     <!-- Uganda Custom Styles - Load LAST to override -->
     <link rel="stylesheet" href="{{ asset('themes/demo/assets/css/uganda-custom.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('themes/demo/assets/css/chatbot.css') }}?v={{ time() }}">
 </head>
 <body class="d-flex flex-column h-100 {{ $this->page->bodyClass }}">
 
@@ -35,5 +36,6 @@ description: Default layout with Uganda customizations
 
 <!-- Uganda Custom JavaScript - Load LAST -->
 <script src="{{ asset('themes/demo/assets/js/uganda-enhancements.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('themes/demo/assets/js/chatbot.js') }}?v={{ time() }}"></script>
 </body>
 </html>

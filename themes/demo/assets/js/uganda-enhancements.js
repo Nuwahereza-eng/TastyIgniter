@@ -350,6 +350,88 @@
         };
     });
 
+    // =====================================================
+    // USE CURRENT LOCATION BUTTON ENHANCEMENT
+    // Detect location AND trigger search to go to locations page
+    // =====================================================
+    document.addEventListener('click', function(event) {
+        const button = event.target.closest('#use-current-location-btn');
+        if (!button) return;
+        
+        event.preventDefault();
+        
+        // Disable button and show loading state
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="fa fa-spinner fa-spin fs-5"></i> <span>Detecting location...</span>';
+        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    // Update button to show success
+                    button.innerHTML = '<i class="fa fa-check fs-5"></i> <span>Location found!</span>';
+                    
+                    // Dispatch the Livewire event to update position
+                    if (window.Livewire) {
+                        Livewire.dispatch('userPositionUpdated', {
+                            position: [lat, lng],
+                            updateMap: true
+                        });
+                        
+                        // Wait a moment then trigger the search
+                        setTimeout(function() {
+                            // Find the search form and submit it
+                            const searchForm = document.querySelector('#location-search');
+                            if (searchForm) {
+                                // Trigger Livewire form submission
+                                const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                                searchForm.dispatchEvent(submitEvent);
+                            } else {
+                                // Fallback: redirect to locations page directly
+                                window.location.href = '/locations';
+                            }
+                        }, 500);
+                    } else {
+                        // Fallback if Livewire not available
+                        window.location.href = '/locations';
+                    }
+                },
+                function(error) {
+                    // Error getting location
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                    
+                    let errorMessage = 'Unable to get your location.';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = 'Location access denied. Please enable location permissions.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = 'Location information is unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = 'Location request timed out. Please try again.';
+                            break;
+                    }
+                    
+                    alert(errorMessage);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 30000
+                }
+            );
+        } else {
+            button.disabled = false;
+            button.innerHTML = originalText;
+            alert('Geolocation is not supported by your browser.');
+        }
+    });
+
     // Add CSS animations
     const style = document.createElement('style');
     style.textContent = `
