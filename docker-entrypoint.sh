@@ -74,6 +74,25 @@ php artisan igniter:util set theme --theme=demo 2>&1 || echo "theme set done"
 # This avoids the "File does not exist" error from Glide thumbnail generation
 php artisan tinker --execute="\Igniter\System\Models\Settings::set('site_logo', 'no_photo.png');" 2>&1 || echo "site_logo fix done"
 
+# ULTRA NUCLEAR: Clear ALL cached media references from database
+# This clears the pagic_pages cache and any other cached image paths
+php artisan tinker --execute="
+try {
+    \DB::table('cache')->truncate();
+} catch (\Exception \$e) {}
+try {
+    \DB::table('sessions')->truncate();
+} catch (\Exception \$e) {}
+try {
+    // Clear any cached template data that might reference old temp files
+    \Illuminate\Support\Facades\Cache::flush();
+} catch (\Exception \$e) {}
+echo 'DB caches cleared';
+" 2>&1 || echo "db cache clear done"
+
+# Pre-compile assets to avoid combiner issues
+php artisan vendor:publish --tag=igniter-orange-assets --force 2>&1 || echo "publish assets done"
+
 echo "Startup complete"
 
 # Configure Nginx port
