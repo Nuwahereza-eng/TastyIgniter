@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -14,7 +15,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        // Force demo theme via config (earliest possible override)
+        config(['igniter-system.defaultTheme' => 'demo']);
     }
 
     /**
@@ -29,20 +31,26 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
         
-        // Force demo theme in production
-        if (config('app.env') === 'production') {
-            $this->app->booted(function () {
-                try {
-                    // Force set the active theme to demo
-                    if (class_exists(\Igniter\Main\Classes\ThemeManager::class)) {
-                        $themeManager = resolve(\Igniter\Main\Classes\ThemeManager::class);
-                        $themeManager->setActiveTheme('demo');
-                    }
-                } catch (\Throwable $e) {
-                    // Log but don't crash
-                    logger()->warning('Failed to set demo theme: ' . $e->getMessage());
-                }
+        // Register event listener to force demo theme
+        // This intercepts the ThemeGetActiveEvent and returns 'demo'
+        if (class_exists(\Igniter\Main\Events\ThemeGetActiveEvent::class)) {
+            Event::listen(\Igniter\Main\Events\ThemeGetActiveEvent::class, function ($event) {
+                return 'demo';
             });
         }
+        
+        // Also try to set via ThemeManager after app boots
+        $this->app->booted(function () {
+            try {
+                if (class_exists(\Igniter\Main\Classes\ThemeManager::class)) {
+                    $themeManager = resolve(\Igniter\Main\Classes\ThemeManager::class);
+                    if (method_exists($themeManager, 'setActiveTheme')) {
+                        $themeManager->setActiveTheme('demo');
+                    }
+                }
+            } catch (\Throwable $e) {
+                logger()->warning('Failed to set demo theme: ' . $e->getMessage());
+            }
+        });
     }
 }
