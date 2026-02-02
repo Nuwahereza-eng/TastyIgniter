@@ -64,8 +64,8 @@ php artisan route:clear 2>&1 || echo "route:clear done"
 # Run any pending migrations
 php artisan migrate --force 2>&1 || echo "migrate done"
 
-# Set the theme
-php artisan igniter:util set theme demo 2>&1 || echo "theme set done"
+# Set the theme to demo (correct syntax with --theme option)
+php artisan igniter:util set theme --theme=demo 2>&1 || echo "theme set done"
 
 echo "Startup complete"
 
