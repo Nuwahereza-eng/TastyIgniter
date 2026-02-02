@@ -67,8 +67,30 @@ php artisan migrate --force 2>&1 || echo "migrate done"
 # Sync all themes from filesystem to database (required for demo theme to be recognized)
 php artisan tinker --execute="\Igniter\Main\Models\Theme::syncAll();" 2>&1 || echo "theme sync done"
 
-# Set the theme to demo (correct syntax with --theme option)
-php artisan igniter:util set theme --theme=demo 2>&1 || echo "theme set done"
+# Set the theme to demo DIRECTLY in the database settings
+# This is more reliable than the artisan command
+php artisan tinker --execute="
+\$theme = \Igniter\Main\Models\Theme::where('code', 'demo')->first();
+if (\$theme) {
+    \$theme->update(['is_active' => true]);
+    // Also deactivate other themes
+    \Igniter\Main\Models\Theme::where('code', '!=', 'demo')->update(['is_active' => false]);
+    echo 'Demo theme activated directly in database';
+} else {
+    echo 'Demo theme not found in database, creating...';
+    \Igniter\Main\Models\Theme::create([
+        'name' => 'Demo Theme',
+        'code' => 'demo',
+        'description' => 'Uganda customizations theme',
+        'is_active' => true,
+    ]);
+}
+// Also set in system settings
+\Igniter\System\Models\Settings::set('default_themes', ['main' => 'demo']);
+" 2>&1 || echo "theme set done"
+
+# Set the theme using artisan as backup
+php artisan igniter:util set theme --theme=demo 2>&1 || echo "artisan theme set done"
 
 # CRITICAL FIX: Set site_logo to 'no_photo.png' to prevent media_thumb() errors
 # This avoids the "File does not exist" error from Glide thumbnail generation

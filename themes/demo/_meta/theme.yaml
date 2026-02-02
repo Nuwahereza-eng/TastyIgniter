@@ -1,0 +1,6 @@
+code: demo
+name: "UgaEats Demo Theme"
+description: "Uganda-customized theme extending igniter-orange"
+author: "UgaEats"
+version: "1.0.0"
+parent: igniter-orange
