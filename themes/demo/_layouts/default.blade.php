@@ -23,8 +23,8 @@ description: Default layout with Uganda customizations
 </main>
 
 @unless($this->page->hideFooter)
-<footer class="footer mt-auto">
-    @include('igniter-orange::includes.footer')
+<footer class="footer mt-auto bg-dark text-white">
+    @include('demo::includes.footer')
 </footer>
 @endunless
 <livewire:igniter-orange::utils.modal/>

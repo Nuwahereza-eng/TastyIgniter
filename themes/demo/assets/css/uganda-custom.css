@@ -1309,3 +1309,203 @@ main[role="main"] {
         font-size: 0.8rem !important;
     }
 }
+
+/* =====================================================
+   MOBILE DROPDOWN RESPONSIVENESS FIX
+   ===================================================== */
+
+/* Mobile Dropdown Menu Styling */
+@media (max-width: 991px) {
+    /* Navbar collapse mobile styling */
+    .navbar-collapse {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, var(--ti-orange, #FF4900) 0%, #e04000 100%) !important;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        padding: 1rem 0 !important;
+        z-index: 9999;
+    }
+    
+    /* Nav links in mobile */
+    .navbar-nav .nav-link {
+        color: white !important;
+        padding: 12px 20px !important;
+        font-size: 1rem !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        display: block !important;
+        text-align: left !important;
+    }
+    
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .nav-link:focus {
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: white !important;
+    }
+    
+    /* Dropdown toggle (Premium Features) */
+    .navbar-nav .dropdown-toggle {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .navbar-nav .dropdown-toggle::after {
+        border: none !important;
+        content: '▼';
+        font-size: 0.7rem;
+        margin-left: auto;
+        transition: transform 0.3s ease;
+    }
+    
+    .navbar-nav .dropdown.show .dropdown-toggle::after {
+        transform: rotate(180deg);
+    }
+    
+    /* Dropdown menu container */
+    .navbar-nav .dropdown-menu {
+        position: static !important;
+        float: none !important;
+        width: 100% !important;
+        background: rgba(0, 0, 0, 0.2) !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0.5rem 0 !important;
+        display: none;
+    }
+    
+    .navbar-nav .dropdown-menu.show {
+        display: block !important;
+    }
+    
+    /* Dropdown items */
+    .navbar-nav .dropdown-item {
+        color: white !important;
+        padding: 10px 30px !important;
+        font-size: 0.9rem !important;
+        background: transparent !important;
+    }
+    
+    .navbar-nav .dropdown-item:hover,
+    .navbar-nav .dropdown-item:focus {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: var(--uganda-yellow, #FCDC04) !important;
+    }
+    
+    .navbar-nav .dropdown-item i {
+        width: 25px;
+        text-align: center;
+        margin-right: 10px;
+    }
+    
+    /* Premium badge in mobile dropdown */
+    .navbar-nav .dropdown-item .badge {
+        font-size: 0.65rem !important;
+    }
+    
+    /* Hamburger menu icon styling */
+    .navbar-toggler {
+        border: 2px solid white !important;
+        padding: 8px 12px !important;
+        border-radius: 8px !important;
+    }
+    
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
+    
+    /* Ensure all nav items stack properly */
+    .navbar-nav {
+        width: 100%;
+    }
+    
+    .navbar-nav .nav-item {
+        width: 100%;
+    }
+    
+    /* Cart/Account buttons in mobile nav */
+    .navbar-nav .btn {
+        margin: 10px 20px !important;
+        width: calc(100% - 40px) !important;
+        justify-content: center !important;
+    }
+}
+
+/* Footer styling for mobile */
+@media (max-width: 767px) {
+    .uganda-footer {
+        padding: 2rem 0 !important;
+    }
+    
+    .footer-title {
+        font-size: 0.9rem !important;
+        margin-bottom: 1rem !important;
+        border-bottom: 2px solid var(--ti-orange, #FF4900);
+        padding-bottom: 0.5rem;
+        display: inline-block;
+    }
+    
+    .uganda-footer .row > div {
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .uganda-footer ul {
+        text-align: center;
+    }
+    
+    .social-icons {
+        justify-content: center !important;
+    }
+    
+    .social-icon {
+        width: 45px;
+        height: 45px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--ti-orange, #FF4900);
+        color: white;
+        border-radius: 50%;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .social-icon:hover {
+        background: white;
+        color: var(--ti-orange, #FF4900);
+        transform: translateY(-3px);
+    }
+    
+    #newsletter-box {
+        margin-top: 1rem;
+    }
+    
+    #newsletter-box .d-flex {
+        flex-direction: column;
+        gap: 0.5rem !important;
+    }
+    
+    #newsletter-box input {
+        width: 100% !important;
+    }
+    
+    #newsletter-box button {
+        width: 100% !important;
+    }
+    
+    .payment-icons {
+        margin-top: 0.5rem;
+    }
+    
+    /* WhatsApp button sizing on mobile */
+    .whatsapp-float a {
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 24px !important;
+    }
+}
