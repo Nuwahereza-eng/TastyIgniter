@@ -28,19 +28,11 @@
             @elseif($theme->logo_text)
                 <span class="text-logo">{{ $theme->logo_text }}</span>
             @else
-                @php
-                    try {
-                        $logoUrl = $site_logo !== 'no_photo.png' 
-                            ? media_thumb($site_logo) 
-                            : asset('vendor/igniter-orange/images/favicon.ico');
-                    } catch (\Exception $e) {
-                        $logoUrl = asset('vendor/igniter-orange/images/favicon.ico');
-                    }
-                @endphp
+                {{-- ULTRA SAFE: Skip media_thumb entirely, use static logo --}}
                 <img
                     class="img-logo"
                     alt="{{ $site_name }}"
-                    src="{{ $logoUrl }}"
+                    src="{{ asset('vendor/igniter-orange/images/favicon.ico') }}"
                 />
             @endif
         </a>

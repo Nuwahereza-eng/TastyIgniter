@@ -1,20 +1,7 @@
 {!! get_metas() !!}
 <meta name="csrf-token" content="{{ csrf_token() }}">
-@if ($favicon = $theme->favicon)
-    <link href="{{ media_url($favicon) }}" rel="shortcut icon" type="image/ico">
-@elseif ($site_logo !== 'no_photo.png')
-    @php
-        try {
-            $faviconUrl = media_thumb($site_logo, ['width' => 64, 'height' => 64]);
-        } catch (\Exception $e) {
-            // Fallback if image processing fails
-            $faviconUrl = media_url($site_logo);
-        }
-    @endphp
-    <link href="{{ $faviconUrl }}" rel="shortcut icon" type="image/ico">
-@else
-    {!! get_favicon() !!}
-@endif
+{{-- ULTRA SAFE: Skip media_thumb entirely, use static favicon --}}
+<link href="{{ asset('vendor/igniter-orange/images/favicon.ico') }}" rel="shortcut icon" type="image/ico">
 <title>{{ lang(get_title()).lang('igniter.orange::default.title_separator').setting('site_name') }}</title>
 @if ($page->description)
     <meta name="description" content="{{ $page->description }}">
