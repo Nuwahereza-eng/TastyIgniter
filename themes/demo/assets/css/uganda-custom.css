@@ -1115,3 +1115,197 @@ main[role="main"] {
     padding: 0.4rem 0.6rem !important;
     font-size: 0.8rem !important;
 }
+
+/* =====================================================
+   COMPREHENSIVE MOBILE RESPONSIVENESS FIX
+   ===================================================== */
+
+/* Mobile First Fixes */
+@media (max-width: 767px) {
+    /* Container and body */
+    body, html {
+        overflow-x: hidden !important;
+    }
+    
+    .container, .container-fluid {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+        overflow-x: hidden !important;
+    }
+    
+    /* Header/Navbar */
+    .navbar {
+        padding: 0.5rem 1rem !important;
+    }
+    
+    .navbar-brand {
+        font-size: 1.2rem !important;
+    }
+    
+    .navbar-brand img {
+        max-height: 40px !important;
+    }
+    
+    .navbar-toggler {
+        padding: 0.25rem 0.5rem !important;
+    }
+    
+    /* Mobile menu */
+    .navbar-collapse {
+        background: rgba(255, 73, 0, 0.98) !important;
+        padding: 1rem !important;
+        border-radius: 0 0 15px 15px;
+    }
+    
+    .navbar-nav .nav-link {
+        color: white !important;
+        padding: 0.75rem 1rem !important;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Hero Section */
+    .carousel-item img {
+        height: 35vh !important;
+        min-height: 250px;
+    }
+    
+    .carousel-caption {
+        bottom: 10% !important;
+        padding: 0 1rem;
+    }
+    
+    .carousel-caption h5 {
+        font-size: 1.3rem !important;
+        line-height: 1.3;
+    }
+    
+    .carousel-caption p {
+        font-size: 0.9rem !important;
+        display: none;
+    }
+    
+    /* Search Section */
+    .local-search, 
+    [class*="search"] {
+        padding: 1rem !important;
+    }
+    
+    .local-search input,
+    [class*="search"] input {
+        font-size: 14px !important;
+    }
+    
+    /* Menu Cards */
+    .card, .menu-card, .menu-item {
+        margin-bottom: 1rem !important;
+    }
+    
+    .card-body {
+        padding: 1rem !important;
+    }
+    
+    .card-title, .menu-card h3, .menu-card h4 {
+        font-size: 1rem !important;
+    }
+    
+    .card-text, .menu-card p {
+        font-size: 0.85rem !important;
+    }
+    
+    /* Menu Images */
+    .menu-card img,
+    .menu-item img,
+    .card-img-top {
+        height: 150px !important;
+    }
+    
+    /* Buttons on mobile */
+    .btn {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .btn-lg {
+        padding: 0.6rem 1.2rem !important;
+        font-size: 0.9rem !important;
+    }
+    
+    /* Price display */
+    .price {
+        font-size: 1rem !important;
+    }
+    
+    /* Footer */
+    footer, .footer {
+        padding: 2rem 1rem !important;
+    }
+    
+    footer h6, .footer h6 {
+        font-size: 1rem !important;
+        margin-bottom: 1rem;
+    }
+    
+    footer .row > div {
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Modal on mobile */
+    .modal-dialog {
+        margin: 0.5rem !important;
+        max-width: calc(100% - 1rem) !important;
+    }
+    
+    .modal-body {
+        padding: 1rem !important;
+    }
+    
+    /* Offcanvas/Sidebar */
+    .offcanvas {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    /* Cart */
+    #cart-box, .cart-box {
+        width: 100% !important;
+    }
+    
+    /* Forms */
+    input, select, textarea {
+        font-size: 16px !important; /* Prevents zoom on iOS */
+    }
+    
+    /* Tables */
+    table {
+        font-size: 0.85rem !important;
+    }
+    
+    /* Typography */
+    h1 { font-size: 1.75rem !important; }
+    h2 { font-size: 1.5rem !important; }
+    h3 { font-size: 1.25rem !important; }
+    h4 { font-size: 1.1rem !important; }
+    h5 { font-size: 1rem !important; }
+    h6 { font-size: 0.9rem !important; }
+}
+
+/* Extra small devices */
+@media (max-width: 375px) {
+    .navbar-brand {
+        font-size: 1rem !important;
+    }
+    
+    .carousel-caption h5 {
+        font-size: 1.1rem !important;
+    }
+    
+    .card-body {
+        padding: 0.75rem !important;
+    }
+    
+    .btn {
+        padding: 0.4rem 0.8rem !important;
+        font-size: 0.8rem !important;
+    }
+}
