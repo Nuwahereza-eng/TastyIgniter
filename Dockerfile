@@ -42,7 +42,8 @@ RUN rm -f .env && \
     rm -rf storage/framework/views/*.php && \
     rm -rf storage/framework/cache/data/* && \
     rm -rf storage/temp/* && \
-    rm -rf storage/igniter/combiner/*
+    rm -rf storage/igniter/combiner/* && \
+    rm -rf storage/igniter/cache/*
 
 # Create storage directories
 RUN mkdir -p storage/framework/{sessions,views,cache} \

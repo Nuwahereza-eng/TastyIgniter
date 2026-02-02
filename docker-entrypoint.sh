@@ -52,6 +52,7 @@ rm -rf /var/www/html/storage/framework/cache/data/* 2>/dev/null || true
 rm -rf /var/www/html/storage/framework/views/*.php 2>/dev/null || true
 rm -rf /var/www/html/storage/temp/* 2>/dev/null || true
 rm -rf /var/www/html/storage/igniter/combiner/* 2>/dev/null || true
+rm -rf /var/www/html/storage/igniter/cache/* 2>/dev/null || true
 echo "Cleared storage caches"
 
 # Clear Laravel caches to use fresh .env values
