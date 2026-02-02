@@ -70,6 +70,10 @@ php artisan tinker --execute="\Igniter\Main\Models\Theme::syncAll();" 2>&1 || ec
 # Set the theme to demo (correct syntax with --theme option)
 php artisan igniter:util set theme --theme=demo 2>&1 || echo "theme set done"
 
+# CRITICAL FIX: Set site_logo to 'no_photo.png' to prevent media_thumb() errors
+# This avoids the "File does not exist" error from Glide thumbnail generation
+php artisan tinker --execute="\Igniter\System\Models\Settings::set('site_logo', 'no_photo.png');" 2>&1 || echo "site_logo fix done"
+
 echo "Startup complete"
 
 # Configure Nginx port
