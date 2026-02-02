@@ -1,6 +1,6 @@
 <?php
 
-use Igniter\System\Classes\Assets;
+use Igniter\System\Facades\Assets;
 
 // add country & currency helper
 $defaultCountry = \Igniter\System\Models\Country::getDefault();
