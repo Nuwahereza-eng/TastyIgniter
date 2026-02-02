@@ -4,7 +4,7 @@ description: Default layout with Uganda customizations
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{{ App::getLocale() }}" class="h-100">
 <head>
-    @include('igniter-orange::includes.head')
+    @include('demo::includes.head')
     
     <!-- Uganda Custom Styles -->
     <link rel="stylesheet" href="{{ asset('themes/demo/assets/css/uganda-custom.css') }}?v={{ time() }}">
@@ -14,7 +14,7 @@ description: Default layout with Uganda customizations
 <body class="d-flex flex-column h-100 {{ $this->page->bodyClass }}">
 
 <header class="header">
-    @include('igniter-orange::includes.header')
+    @include('demo::includes.header')
 </header>
 
 <main role="main">
