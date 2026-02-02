@@ -37,10 +37,6 @@ mkdir -p /var/www/html/storage/temp
 mkdir -p /var/www/html/storage/igniter/{combiner,uploads,media}
 mkdir -p /var/www/html/bootstrap/cache
 
-# Clear any stale temp/combiner files from build
-rm -rf /var/www/html/storage/temp/* 2>/dev/null || true
-rm -rf /var/www/html/storage/igniter/combiner/* 2>/dev/null || true
-
 # Remove maintenance mode file
 rm -f /var/www/html/storage/framework/down
 
@@ -49,22 +45,28 @@ chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2
 chmod -R 777 /var/www/html/storage 2>/dev/null || true
 chmod -R 775 /var/www/html/bootstrap/cache 2>/dev/null || true
 
-# Clear config cache to use fresh .env values
+# IMPORTANT: Clear ALL cache data FIRST before any Laravel commands
+# This prevents stale cache entries from referencing non-existent temp files
 cd /var/www/html
+rm -rf /var/www/html/storage/framework/cache/data/* 2>/dev/null || true
+rm -rf /var/www/html/storage/framework/views/*.php 2>/dev/null || true
+rm -rf /var/www/html/storage/temp/* 2>/dev/null || true
+rm -rf /var/www/html/storage/igniter/combiner/* 2>/dev/null || true
+echo "Cleared storage caches"
+
+# Clear Laravel caches to use fresh .env values
 php artisan config:clear 2>&1 || echo "config:clear done"
 php artisan cache:clear 2>&1 || echo "cache:clear done"
 php artisan view:clear 2>&1 || echo "view:clear done"
+php artisan route:clear 2>&1 || echo "route:clear done"
 
 # Run any pending migrations
 php artisan migrate --force 2>&1 || echo "migrate done"
 
-# Build theme assets/combiner bundles
+# Set the theme
 php artisan igniter:util set theme demo 2>&1 || echo "theme set done"
 
-# Clear compiled views and file cache that may have stale paths
-rm -rf /var/www/html/storage/framework/views/*.php 2>/dev/null || true
-rm -rf /var/www/html/storage/framework/cache/data/* 2>/dev/null || true
-echo "Cleared all caches"
+echo "Startup complete"
 
 # Configure Nginx port
 PORT=${PORT:-80}
