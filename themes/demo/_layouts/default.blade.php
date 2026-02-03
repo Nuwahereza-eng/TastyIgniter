@@ -115,7 +115,7 @@ description: Default layout
 <footer class="footer mt-auto py-4">
     <div class="container">
         <div class="row">
-            <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+            <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
                 <h6 class="text-uppercase fw-bold mb-3">Quick Links</h6>
                 <ul class="list-unstyled mb-0">
                     <li class="mb-2"><a href="{{ page_url('home') }}" class="text-muted text-decoration-none">Home</a></li>
@@ -124,7 +124,7 @@ description: Default layout
                     <li class="mb-2"><a href="{{ page_url('contact') }}" class="text-muted text-decoration-none">Contact</a></li>
                 </ul>
             </div>
-            <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+            <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
                 <h6 class="text-uppercase fw-bold mb-3">Premium Features</h6>
                 <ul class="list-unstyled mb-0">
                     <li class="mb-2"><a href="{{ url('/account/features#group-orders') }}" class="text-muted text-decoration-none"><i class="fa fa-users me-2"></i>Group Orders</a></li>
@@ -133,24 +133,24 @@ description: Default layout
                     <li class="mb-2"><a href="{{ url('/track-order') }}" class="text-muted text-decoration-none"><i class="fa fa-motorcycle me-2"></i>Track Order</a></li>
                 </ul>
             </div>
-            <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+            <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
                 <h6 class="text-uppercase fw-bold mb-3">Follow Us</h6>
-                <div class="d-flex gap-2">
-                    <a href="https://facebook.com/tastyigniter" target="_blank" class="social-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border-radius: 8px; transition: transform 0.2s;">
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="https://facebook.com/tastyigniter" target="_blank" class="social-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border-radius: 8px;">
                         <i class="fab fa-facebook-f" style="color: #1877F2; font-size: 20px;"></i>
                     </a>
-                    <a href="https://x.com/tastyigniter" target="_blank" class="social-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border-radius: 8px; transition: transform 0.2s;">
+                    <a href="https://x.com/tastyigniter" target="_blank" class="social-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border-radius: 8px;">
                         <i class="fab fa-x-twitter" style="color: #000; font-size: 20px;"></i>
                     </a>
-                    <a href="https://tiktok.com/@tastyigniter" target="_blank" class="social-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border-radius: 8px; transition: transform 0.2s;">
+                    <a href="https://tiktok.com/@tastyigniter" target="_blank" class="social-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border-radius: 8px;">
                         <i class="fab fa-tiktok" style="color: #000; font-size: 20px;"></i>
                     </a>
-                    <a href="https://instagram.com/tastyigniter" target="_blank" class="social-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border-radius: 8px; transition: transform 0.2s;">
+                    <a href="https://instagram.com/tastyigniter" target="_blank" class="social-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border-radius: 8px;">
                         <i class="fab fa-instagram" style="color: #E4405F; font-size: 20px;"></i>
                     </a>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-3 col-md-6">
                 <h6 class="text-uppercase fw-bold mb-3">Newsletter</h6>
                 <livewire:igniter-orange::newsletter-subscribe-form />
             </div>
