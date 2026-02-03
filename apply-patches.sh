@@ -1,34 +1,40 @@
 #!/bin/bash
-# Apply patches after composer update
-# Run this script after running 'composer update' to reapply custom fixes
+# Apply patches after composer install
+# Works both locally and in Docker
+
+# Detect the project root directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="${SCRIPT_DIR}"
+
+# If running in Docker, use /var/www/html
+if [ -d "/var/www/html/vendor" ]; then
+    PROJECT_ROOT="/var/www/html"
+fi
 
 echo "Applying TastyIgniter patches..."
+echo "Project root: $PROJECT_ROOT"
 
 # Fix orderType bug in SearchesNearby trait
-SEARCHES_NEARBY="/home/petercodes/TastyIgniter/vendor/tastyigniter/ti-theme-orange/src/Livewire/Concerns/SearchesNearby.php"
+SEARCHES_NEARBY="$PROJECT_ROOT/vendor/tastyigniter/ti-theme-orange/src/Livewire/Concerns/SearchesNearby.php"
 
 if [ -f "$SEARCHES_NEARBY" ]; then
-    # Check if the fix is already applied
     if grep -q "property_exists.*orderType" "$SEARCHES_NEARBY"; then
         echo "✓ orderType fix already applied"
     else
-        # Apply the fix
         sed -i 's/if (\$this->orderType && \$this->orderType === LocationModel::DELIVERY && \$this->searchAutocompleteEnabled)/if (property_exists(\$this, '\''orderType'\'') \&\& \$this->orderType \&\& \$this->orderType === LocationModel::DELIVERY \&\& \$this->searchAutocompleteEnabled)/' "$SEARCHES_NEARBY"
         echo "✓ Applied orderType fix to SearchesNearby.php"
     fi
 else
-    echo "✗ SearchesNearby.php not found - theme may have changed"
+    echo "✗ SearchesNearby.php not found"
 fi
 
-# Fix Uganda address validation (street number not required)
-ORDER_MANAGER="/home/petercodes/TastyIgniter/vendor/tastyigniter/ti-ext-cart/src/Classes/OrderManager.php"
+# Fix Uganda address validation
+ORDER_MANAGER="$PROJECT_ROOT/vendor/tastyigniter/ti-ext-cart/src/Classes/OrderManager.php"
 
 if [ -f "$ORDER_MANAGER" ]; then
-    # Check if the fix is already applied
     if grep -q "Uganda addresses often don't have street numbers" "$ORDER_MANAGER"; then
         echo "✓ Uganda address validation fix already applied"
     else
-        # Apply the fix using sed to make address validation more lenient
         sed -i 's/if (!$userLocation->getStreetNumber() || !$userLocation->getStreetName()) {/\/\/ Uganda addresses often don'\''t have street numbers - be more lenient\n        $hasStreetInfo = $userLocation->getStreetName() || $userLocation->getStreetNumber();\n        $hasValidCoordinates = $userLocation->getCoordinates() \&\& $userLocation->getCoordinates()->getLatitude() != 0;\n        if (!$hasStreetInfo \&\& !$hasValidCoordinates) {/' "$ORDER_MANAGER"
         echo "✓ Applied Uganda address validation fix to OrderManager.php"
     fi
@@ -36,35 +42,55 @@ else
     echo "✗ OrderManager.php not found"
 fi
 
-# Copy custom feature pages to theme
-THEME_PAGES="/home/petercodes/TastyIgniter/vendor/tastyigniter/ti-theme-orange/resources/views/_pages"
-PATCHES_DIR="/home/petercodes/TastyIgniter/patches"
+# Apply search experience patch
+SEARCH_PATCH="$PROJECT_ROOT/patches/fix-search-experience.patch"
+LOCAL_SEARCH="$PROJECT_ROOT/vendor/tastyigniter/ti-theme-orange/resources/views/livewire/local-search.blade.php"
 
-# Check if features page exists in patches
+if [ -f "$SEARCH_PATCH" ] && [ -f "$LOCAL_SEARCH" ]; then
+    if grep -q 'position-relative' "$LOCAL_SEARCH"; then
+        echo "✓ Search experience patch already applied"
+    else
+        cd "$PROJECT_ROOT"
+        patch -p1 < "$SEARCH_PATCH" 2>/dev/null && echo "✓ Applied search experience patch" || echo "✗ Search experience patch failed"
+    fi
+fi
+
+# Apply other patches
+for patch_file in "$PROJECT_ROOT/patches"/*.patch; do
+    if [ -f "$patch_file" ] && [ "$patch_file" != "$SEARCH_PATCH" ]; then
+        patch_name=$(basename "$patch_file")
+        cd "$PROJECT_ROOT"
+        patch -p1 --forward < "$patch_file" 2>/dev/null && echo "✓ Applied $patch_name" || echo "- $patch_name (already applied or N/A)"
+    fi
+done
+
+# Copy custom feature pages
+THEME_PAGES="$PROJECT_ROOT/vendor/tastyigniter/ti-theme-orange/resources/views/_pages"
+PATCHES_DIR="$PROJECT_ROOT/patches"
+
 if [ -f "$PATCHES_DIR/features.blade.php" ]; then
     mkdir -p "$THEME_PAGES/account"
     cp "$PATCHES_DIR/features.blade.php" "$THEME_PAGES/account/features.blade.php"
-    echo "✓ Copied features page (Group Orders, Scheduled Orders, Subscriptions, Order Tracking)"
+    echo "✓ Copied features page"
 fi
 
 if [ -f "$PATCHES_DIR/track-order.blade.php" ]; then
     cp "$PATCHES_DIR/track-order.blade.php" "$THEME_PAGES/track-order.blade.php"
-    echo "✓ Copied public order tracking page"
+    echo "✓ Copied track-order page"
 fi
 
-# Copy features CSS
+if [ -f "$PATCHES_DIR/menus.blade.php" ]; then
+    mkdir -p "$THEME_PAGES/local"
+    cp "$PATCHES_DIR/menus.blade.php" "$THEME_PAGES/local/menus.blade.php"
+    echo "✓ Copied menus page"
+fi
+
+# Copy features CSS to public
 if [ -f "$PATCHES_DIR/features.css" ]; then
-    mkdir -p "/home/petercodes/TastyIgniter/public/themes/demo/assets/css"
-    cp "$PATCHES_DIR/features.css" "/home/petercodes/TastyIgniter/public/themes/demo/assets/css/features.css"
+    mkdir -p "$PROJECT_ROOT/public/themes/demo/assets/css"
+    cp "$PATCHES_DIR/features.css" "$PROJECT_ROOT/public/themes/demo/assets/css/features.css"
     echo "✓ Copied features CSS"
 fi
-
-# Clear caches after patching
-echo ""
-echo "Clearing caches..."
-cd /home/petercodes/TastyIgniter
-php artisan view:clear
-php artisan cache:clear
 
 echo ""
 echo "Done! All patches applied."

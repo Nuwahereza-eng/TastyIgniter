@@ -115,6 +115,16 @@ echo 'DB caches cleared';
 # Pre-compile assets to avoid combiner issues
 php artisan vendor:publish --tag=igniter-orange-assets --force 2>&1 || echo "publish assets done"
 
+# Apply custom patches (search experience, Uganda validation, features pages)
+echo "Applying custom patches..."
+if [ -f /var/www/html/apply-patches.sh ]; then
+    chmod +x /var/www/html/apply-patches.sh
+    /var/www/html/apply-patches.sh 2>&1 || echo "patches done"
+fi
+
+# Clear view cache after patches
+php artisan view:clear 2>&1 || echo "view:clear done"
+
 echo "Startup complete"
 
 # Configure Nginx port
