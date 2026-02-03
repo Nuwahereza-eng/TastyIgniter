@@ -118,17 +118,17 @@ description: Default layout
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item" href="{{ page_url('account.features') }}#group-orders">
+                                <a class="dropdown-item" href="{{ page_url('premium-features') }}#group-orders">
                                     <i class="fa fa-users me-2 text-primary"></i>Group Orders
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ page_url('account.features') }}#scheduled-orders">
+                                <a class="dropdown-item" href="{{ page_url('premium-features') }}#scheduled-orders">
                                     <i class="fa fa-clock me-2 text-warning"></i>Schedule Order
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ page_url('account.features') }}#subscriptions">
+                                <a class="dropdown-item" href="{{ page_url('premium-features') }}#subscriptions">
                                     <i class="fa fa-calendar-check me-2 text-success"></i>Meal Plans
                                 </a>
                             </li>
