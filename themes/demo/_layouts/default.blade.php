@@ -59,7 +59,8 @@ description: Default layout
     <nav class="navbar navbar-expand-md py-2">
         <div class="container">
             <a class="navbar-brand" href="{{ page_url('home') }}">
-                <img class="img-logo" alt="UgaEats" src="{{ asset('vendor/igniter-orange/images/favicon.ico') }}" style="max-height: 40px;">
+                <img class="img-logo" alt="TastyIgniter" src="{{ asset('vendor/igniter-orange/images/favicon.ico') }}" style="max-height: 40px;">
+                <span class="ms-2 fw-bold text-white d-none d-sm-inline">TastyIgniter</span>
             </a>
             
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMainHeader">
@@ -135,9 +136,9 @@ description: Default layout
             <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
                 <h6 class="text-uppercase fw-bold mb-3">Follow Us</h6>
                 <div class="d-flex gap-3">
-                    <a href="https://facebook.com/ugaeats" target="_blank"><img src="/themes/demo/assets/images/social/icons8-facebook-logo.svg" alt="Facebook" width="32"></a>
-                    <a href="https://x.com/ugaeats" target="_blank"><img src="/themes/demo/assets/images/social/icons8-x-logo-100.svg" alt="X" width="32"></a>
-                    <a href="https://tiktok.com/@ugaeats" target="_blank"><img src="/themes/demo/assets/images/social/icons8-tiktok-logo.svg" alt="TikTok" width="32"></a>
+                    <a href="https://facebook.com/tastyigniter" target="_blank"><img src="/themes/demo/assets/images/social/icons8-facebook-logo.svg" alt="Facebook" width="32"></a>
+                    <a href="https://x.com/tastyigniter" target="_blank"><img src="/themes/demo/assets/images/social/icons8-x-logo-100.svg" alt="X" width="32"></a>
+                    <a href="https://tiktok.com/@tastyigniter" target="_blank"><img src="/themes/demo/assets/images/social/icons8-tiktok-logo.svg" alt="TikTok" width="32"></a>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
@@ -147,14 +148,14 @@ description: Default layout
         </div>
         <hr class="my-3" style="border-color: #444;">
         <div class="text-center">
-            <p class="mb-0 text-muted small">&copy; {{ date('Y') }} UgaEats. All rights reserved.</p>
+            <p class="mb-0 text-muted small">&copy; {{ date('Y') }} TastyIgniter. All rights reserved.</p>
         </div>
     </div>
 </footer>
 @endunless
 
 <!-- WhatsApp Float -->
-<a href="https://wa.me/256779081600?text=Hi%20UgaEats!%20I%20would%20like%20to%20order%20food." class="whatsapp-float" target="_blank" title="Order via WhatsApp">
+<a href="https://wa.me/256779081600?text=Hi%20TastyIgniter!%20I%20would%20like%20to%20order%20food." class="whatsapp-float" target="_blank" title="Order via WhatsApp">
     <i class="fab fa-whatsapp"></i>
 </a>
 
