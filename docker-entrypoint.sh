@@ -146,11 +146,16 @@ echo 'DB caches cleared';
 # Pre-compile assets to avoid combiner issues
 php artisan vendor:publish --tag=igniter-orange-assets --force 2>&1 || echo "publish assets done"
 
-# Apply custom patches (search experience, Uganda validation, features pages)
-echo "Applying custom patches..."
+# Apply custom patches using PHP (more reliable than shell patches)
+echo "=== Applying PHP patches ==="
+if [ -f /var/www/html/scripts/apply-patches.php ]; then
+    php /var/www/html/scripts/apply-patches.php 2>&1 || echo "php patches done"
+fi
+
+# Also run shell patches as backup
 if [ -f /var/www/html/apply-patches.sh ]; then
     chmod +x /var/www/html/apply-patches.sh
-    /var/www/html/apply-patches.sh 2>&1 || echo "patches done"
+    /var/www/html/apply-patches.sh 2>&1 || echo "shell patches done"
 fi
 
 # Clear view cache after patches
