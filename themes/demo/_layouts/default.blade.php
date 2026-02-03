@@ -76,7 +76,7 @@ description: Default layout
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ page_url('locations') }}?type=reservation">
+                        <a class="nav-link" href="{{ page_url('reservations') }}">
                             <i class="fa fa-calendar-alt me-1"></i> Reservations
                         </a>
                     </li>
@@ -244,5 +244,16 @@ description: Default layout
 
 <!-- AI Chatbot -->
 <script src="/themes/demo/assets/js/chatbot.js"></script>
+
+<!-- Initialize Bootstrap Dropdowns -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all dropdowns
+    var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+    dropdownElementList.map(function(dropdownToggleEl) {
+        return new bootstrap.Dropdown(dropdownToggleEl);
+    });
+});
+</script>
 </body>
 </html>
