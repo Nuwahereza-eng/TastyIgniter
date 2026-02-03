@@ -20,9 +20,13 @@ description: Default layout
         .header .nav-link { color: white !important; padding: 0.5rem 1rem !important; }
         .header .nav-link:hover { background: rgba(255,255,255,0.1); border-radius: 4px; }
         .header .navbar-toggler-icon { filter: invert(1); }
-        .header .dropdown-menu { background: white; }
-        .header .dropdown-menu .dropdown-item { color: #333 !important; }
+        .header .dropdown-menu { background: white; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15); }
+        .header .dropdown-menu .dropdown-item { color: #333 !important; padding: 0.5rem 1rem; }
         .header .dropdown-menu .dropdown-item:hover { background: #f5f5f5; color: #FF4900 !important; }
+        
+        /* Dropdown Fix - CSS hover fallback */
+        .header .nav-item.dropdown:hover > .dropdown-menu { display: block; margin-top: 0; }
+        .header .dropdown-menu { margin-top: 0; }
         
         /* WhatsApp Float */
         .whatsapp-float {
