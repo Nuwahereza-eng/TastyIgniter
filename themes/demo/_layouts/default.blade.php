@@ -12,7 +12,9 @@ description: Default layout
     <!-- AI Chatbot Styles -->
     <link rel="stylesheet" href="/themes/demo/assets/css/chatbot.css">
     
-    <!-- Flatpickr Calendar (for reservations) -->
+    <!-- Flatpickr Calendar CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     
@@ -263,22 +265,53 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Initialize Flatpickr for reservation calendar
-    var datePickerEl = document.querySelector('[data-control="datepicker"]');
-    if (datePickerEl && typeof flatpickr !== 'undefined') {
-        var container = document.querySelector('[data-control="booking"]');
-        var options = {
-            inline: true,
-            static: true,
-            dateFormat: 'Y-m-d',
-            minDate: container ? container.dataset.minDate : 'today',
-            maxDate: container ? container.dataset.maxDate : null,
-            disable: container && container.dataset.disable ? JSON.parse(container.dataset.disable) : [],
-            onChange: function(selectedDates, dateStr) {
-                datePickerEl.value = dateStr;
-                datePickerEl.dispatchEvent(new Event('change'));
+    function initReservationCalendar() {
+        var datePickerEl = document.querySelector('[data-control="datepicker"]');
+        if (datePickerEl && typeof flatpickr !== 'undefined') {
+            // Check if already initialized
+            if (datePickerEl._flatpickr) return;
+            
+            var container = document.querySelector('[data-control="booking"]');
+            var options = {
+                inline: true,
+                static: true,
+                dateFormat: 'Y-m-d',
+                minDate: container ? container.dataset.minDate : 'today',
+                maxDate: container ? container.dataset.maxDate : null,
+                disable: [],
+                onChange: function(selectedDates, dateStr) {
+                    datePickerEl.value = dateStr;
+                    // Trigger Livewire update
+                    if (window.Livewire) {
+                        var wireEl = datePickerEl.closest('[wire\\:id]');
+                        if (wireEl) {
+                            var wireId = wireEl.getAttribute('wire:id');
+                            Livewire.find(wireId).set('date', dateStr);
+                        }
+                    }
+                }
+            };
+            
+            // Parse disabled dates
+            if (container && container.dataset.disable) {
+                try {
+                    options.disable = JSON.parse(container.dataset.disable);
+                } catch(e) {}
             }
-        };
-        flatpickr(datePickerEl, options);
+            
+            flatpickr(datePickerEl, options);
+            console.log('Flatpickr initialized for reservation calendar');
+        }
+    }
+    
+    // Run on page load
+    initReservationCalendar();
+    
+    // Also run after Livewire updates (for dynamic content)
+    if (window.Livewire) {
+        Livewire.hook('message.processed', function() {
+            setTimeout(initReservationCalendar, 100);
+        });
     }
 });
 </script>
