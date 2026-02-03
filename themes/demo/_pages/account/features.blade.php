@@ -1,5 +1,5 @@
 ---
-title: 'UgaEats Premium Features'
+title: 'TastyIgniter Premium Features'
 layout: default
 permalink: /account/features
 security: customer

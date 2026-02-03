@@ -69,33 +69,93 @@ description: Default layout
 
             <div class="collapse navbar-collapse" id="navbarMainHeader">
                 <!-- Main Navigation -->
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ page_url('locations') }}">View Menu</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ page_url('reservation.reservation') }}">Reservations</a></li>
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ page_url('locations') }}">
+                            <i class="fa fa-utensils me-1"></i> View Menu
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ page_url('locations') }}?type=reservation">
+                            <i class="fa fa-calendar-alt me-1"></i> Reservations
+                        </a>
+                    </li>
                     <!-- Premium Dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"><i class="fa fa-crown me-1"></i> Premium</a>
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-crown me-1"></i> Premium
+                        </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ url('/account/features#group-orders') }}"><i class="fa fa-users me-2 text-primary"></i>Group Orders</a></li>
-                            <li><a class="dropdown-item" href="{{ url('/account/features#scheduled-orders') }}"><i class="fa fa-clock me-2 text-warning"></i>Schedule Order</a></li>
-                            <li><a class="dropdown-item" href="{{ url('/account/features#subscriptions') }}"><i class="fa fa-calendar-check me-2 text-success"></i>Meal Plans</a></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ page_url('account.features') }}#group-orders">
+                                    <i class="fa fa-users me-2 text-primary"></i>Group Orders
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ page_url('account.features') }}#scheduled-orders">
+                                    <i class="fa fa-clock me-2 text-warning"></i>Schedule Order
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ page_url('account.features') }}#subscriptions">
+                                    <i class="fa fa-calendar-check me-2 text-success"></i>Meal Plans
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ url('/track-order') }}"><i class="fa fa-motorcycle me-2 text-info"></i>Track Order</a></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ page_url('track-order') }}">
+                                    <i class="fa fa-motorcycle me-2 text-info"></i>Track Order
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     @if(Auth::isLogged())
+                        <!-- Account Dropdown for Logged In Users -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"><i class="fa fa-user me-1"></i> My Account</a>
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-user-circle me-1"></i> My Account
+                            </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{{ page_url('account.account') }}"><i class="fa fa-user me-2"></i>My Account</a></li>
-                                <li><a class="dropdown-item" href="{{ page_url('account.orders') }}"><i class="fa fa-list me-2"></i>Orders</a></li>
-                                <li><a class="dropdown-item" href="{{ page_url('account.address') }}"><i class="fa fa-map-marker me-2"></i>Addresses</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ page_url('account.account') }}">
+                                        <i class="fa fa-user me-2"></i>Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ page_url('account.orders') }}">
+                                        <i class="fa fa-receipt me-2"></i>My Orders
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ page_url('account.reservations') }}">
+                                        <i class="fa fa-calendar me-2"></i>My Reservations
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ page_url('account.address') }}">
+                                        <i class="fa fa-map-marker-alt me-2"></i>Addresses
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{ page_url('account.logout') }}"><i class="fa fa-sign-out me-2"></i>Logout</a></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{{ page_url('account.logout') }}">
+                                        <i class="fa fa-sign-out-alt me-2"></i>Logout
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     @else
-                        <li class="nav-item"><a class="nav-link" href="{{ page_url('account.register') }}"><i class="fa fa-user-plus me-1"></i> Register</a></li>
+                        <!-- Login/Register for Guests -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ page_url('account.login') }}">
+                                <i class="fa fa-sign-in-alt me-1"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-outline-light btn-sm ms-2 px-3" href="{{ page_url('account.register') }}">
+                                <i class="fa fa-user-plus me-1"></i> Register
+                            </a>
+                        </li>
                     @endif
                 </ul>
             </div>
