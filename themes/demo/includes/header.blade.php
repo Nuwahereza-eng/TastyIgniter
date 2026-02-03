@@ -13,25 +13,23 @@
                 $isHomePage = request()->is('/') || request()->is('home');
             @endphp
             @if(!$isHomePage)
-                {{-- White logo for non-home pages with orange header --}}
                 <img
                     class="img-logo white-logo"
                     alt="{{ setting('site_name') }}"
                     src="{{ asset('themes/demo/assets/images/tastyigniter-white-logo.svg') }}"
                 />
-            @elseif($theme->logo_image)
+            @elseif($theme->logo_image ?? false)
                 <img
                     class="img-logo"
                     alt="{{ setting('site_name') }}"
                     src="{{ media_url($theme->logo_image) }}"
                 />
-            @elseif($theme->logo_text)
+            @elseif($theme->logo_text ?? false)
                 <span class="text-logo">{{ $theme->logo_text }}</span>
             @else
-                {{-- ULTRA SAFE: Skip media_thumb entirely, use static logo --}}
                 <img
                     class="img-logo"
-                    alt="{{ $site_name }}"
+                    alt="{{ $site_name ?? 'UgaEats' }}"
                     src="{{ asset('vendor/igniter-orange/images/favicon.ico') }}"
                 />
             @endif
@@ -49,7 +47,7 @@
         <div class="justify-content-end collapse navbar-collapse" id="navbarMainHeader">
             <x-igniter-orange::nav code="main-menu"/>
             
-            <!-- Premium Features Dropdown - Between Reservation and Account -->
+            <!-- Premium Features Dropdown -->
             <ul class="navbar-nav premium-nav">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="premiumFeaturesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -84,6 +82,8 @@
                     </ul>
                 </li>
             </ul>
+
+            <livewire:igniter-orange::cart-box />
         </div>
     </div>
 </nav>
@@ -130,7 +130,6 @@
 </div>
 
 <script>
-// Loyalty Points System
 function getLoyaltyPoints() {
     return parseInt(localStorage.getItem('ugaeats_loyalty_points') || '0');
 }
@@ -143,7 +142,6 @@ function updateLoyaltyDisplay() {
     if (loyaltyPointsEl) loyaltyPointsEl.textContent = points;
     if (headerPointsEl) headerPointsEl.textContent = points;
     
-    // Update progress bar (100 points per level)
     const progress = (points % 100);
     const progressBar = document.getElementById('loyaltyProgress');
     const pointsToNext = document.getElementById('pointsToNext');
@@ -151,7 +149,6 @@ function updateLoyaltyDisplay() {
     if (progressBar) progressBar.style.width = progress + '%';
     if (pointsToNext) pointsToNext.textContent = 100 - progress;
     
-    // Update reward items
     document.querySelectorAll('.loyalty-reward-item').forEach(item => {
         const requiredPoints = parseInt(item.dataset.points);
         if (points >= requiredPoints) {
@@ -171,11 +168,9 @@ function closeLoyaltyModal() {
     document.getElementById('loyaltyModal').classList.remove('active');
 }
 
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     updateLoyaltyDisplay();
     
-    // Add click handler for loyalty badge
     const loyaltyBadge = document.getElementById('loyaltyCornerBadge');
     if (loyaltyBadge) {
         loyaltyBadge.addEventListener('click', function() {
@@ -183,7 +178,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Close modal on outside click
     const modal = document.getElementById('loyaltyModal');
     if (modal) {
         modal.addEventListener('click', function(e) {
