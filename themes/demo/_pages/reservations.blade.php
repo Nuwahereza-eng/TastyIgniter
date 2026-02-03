@@ -12,7 +12,7 @@ layout: default
     
     <div class="row">
         @php
-            $locations = \Igniter\Local\Models\Location::isEnabled()->get();
+            $locations = \Igniter\Local\Models\Location::where('location_status', true)->get();
         @endphp
         
         @forelse($locations as $location)
