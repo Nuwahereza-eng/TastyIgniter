@@ -12,6 +12,10 @@ description: Default layout
     <!-- AI Chatbot Styles -->
     <link rel="stylesheet" href="/themes/demo/assets/css/chatbot.css">
     
+    <!-- Flatpickr Calendar (for reservations) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
     <style>
         /* Header Fix - Compact Size */
         .header { background: linear-gradient(135deg, #FF4900 0%, #e04000 100%); }
@@ -257,6 +261,25 @@ document.addEventListener('DOMContentLoaded', function() {
     dropdownElementList.map(function(dropdownToggleEl) {
         return new bootstrap.Dropdown(dropdownToggleEl);
     });
+    
+    // Initialize Flatpickr for reservation calendar
+    var datePickerEl = document.querySelector('[data-control="datepicker"]');
+    if (datePickerEl && typeof flatpickr !== 'undefined') {
+        var container = document.querySelector('[data-control="booking"]');
+        var options = {
+            inline: true,
+            static: true,
+            dateFormat: 'Y-m-d',
+            minDate: container ? container.dataset.minDate : 'today',
+            maxDate: container ? container.dataset.maxDate : null,
+            disable: container && container.dataset.disable ? JSON.parse(container.dataset.disable) : [],
+            onChange: function(selectedDates, dateStr) {
+                datePickerEl.value = dateStr;
+                datePickerEl.dispatchEvent(new Event('change'));
+            }
+        };
+        flatpickr(datePickerEl, options);
+    }
 });
 </script>
 </body>
