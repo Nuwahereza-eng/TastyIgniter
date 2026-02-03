@@ -29,10 +29,10 @@ hideFooter: 1
         </div>
         <div class="row align-items-start">
             <div class="col-lg-8">
-                <x-igniter-orange::local-header/>
+                <livewire:igniter-orange::local-header />
             </div>
             <div class="col-lg-4 mt-4 mt-lg-0">
-                <x-igniter-orange::cart-box/>
+                <livewire:igniter-orange::cart-box />
             </div>
         </div>
     </div>
@@ -46,13 +46,13 @@ hideFooter: 1
 
         <div class="row">
             <div class="col-lg-3 mb-4">
-                <x-igniter-orange::category-list/>
+                <livewire:igniter-orange::category-list />
             </div>
             <div class="col-lg-9 mb-4">
-                <x-igniter-orange::menu-item-list/>
+                <livewire:igniter-orange::menu-item-list />
             </div>
         </div>
     </div>
 </div>
 
-<x-igniter-orange::fulfillment-modal/>
+<livewire:igniter-orange::fulfillment-modal />
