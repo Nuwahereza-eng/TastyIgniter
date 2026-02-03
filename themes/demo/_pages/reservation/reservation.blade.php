@@ -10,7 +10,7 @@ permalink: ':location/reservation'
 
 <div class="container pt-4 pb-5">
     <div class="card mb-3 bg-white">
-        <div class="card-body">
+        <div class="card-body py-2">
             <a class="text-decoration-none" href="{{ page_url('reservations') }}">
                 <i class="fa fa-arrow-left"></i> Back to Restaurants
             </a>
@@ -22,118 +22,130 @@ permalink: ':location/reservation'
             <h4 class="mb-0"><i class="fa fa-calendar-check me-2"></i>Reserve a Table at {{ $locationName }}</h4>
         </div>
         <div class="card-body">
-            <form id="reservationForm" method="POST" action="{{ url('api/reservations') }}">
-                @csrf
-                <div class="row">
-                    <!-- Calendar Column -->
-                    <div class="col-md-7 mb-4">
-                        <label class="form-label fw-bold">Select Date</label>
-                        <div id="reservationCalendar"></div>
-                        <input type="hidden" name="date" id="reservationDate" required>
+            <form id="reservationForm">
+                <div class="row g-4">
+                    <!-- Left Column: Date & Time -->
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold mb-2">Select Date</label>
+                            <input type="text" id="reservationDatePicker" class="form-control form-control-lg" placeholder="Click to select date" readonly required>
+                            <input type="hidden" name="date" id="reservationDate">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-label fw-bold">Guests</label>
+                                <select name="guest" class="form-select form-select-lg" required>
+                                    @for($i = 1; $i <= 20; $i++)
+                                        <option value="{{ $i }}" {{ $i == 2 ? 'selected' : '' }}>{{ $i }} {{ $i == 1 ? 'Guest' : 'Guests' }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold">Time</label>
+                                <select name="time" class="form-select form-select-lg" required>
+                                    @for($h = 10; $h <= 21; $h++)
+                                        @foreach(['00', '30'] as $m)
+                                            @php $time = sprintf('%02d:%s', $h, $m); @endphp
+                                            <option value="{{ $time }}" {{ $time == '12:00' ? 'selected' : '' }}>{{ date('g:i A', strtotime($time)) }}</option>
+                                        @endforeach
+                                    @endfor
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     
-                    <!-- Details Column -->
-                    <div class="col-md-5">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Number of Guests</label>
-                            <select name="guest" id="guestCount" class="form-select form-select-lg" required>
-                                @for($i = 1; $i <= 20; $i++)
-                                    <option value="{{ $i }}" {{ $i == 2 ? 'selected' : '' }}>{{ $i }} {{ $i == 1 ? 'Guest' : 'Guests' }}</option>
-                                @endfor
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Preferred Time</label>
-                            <select name="time" id="reservationTime" class="form-select form-select-lg" required>
-                                <option value="">Select a time</option>
-                                @for($h = 10; $h <= 21; $h++)
-                                    @foreach(['00', '30'] as $m)
-                                        @php $time = sprintf('%02d:%s', $h, $m); @endphp
-                                        <option value="{{ $time }}">{{ date('g:i A', strtotime($time)) }}</option>
-                                    @endforeach
-                                @endfor
-                            </select>
-                        </div>
-                        
+                    <!-- Right Column: Contact Details -->
+                    <div class="col-lg-6">
                         <div class="mb-3">
                             <label class="form-label fw-bold">Your Name</label>
                             <input type="text" name="first_name" class="form-control form-control-lg" placeholder="Enter your name" required>
                         </div>
                         
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Email</label>
-                            <input type="email" name="email" class="form-control form-control-lg" placeholder="Enter your email" required>
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-label fw-bold">Email</label>
+                                <input type="email" name="email" class="form-control" placeholder="you@email.com" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold">Phone</label>
+                                <input type="tel" name="telephone" class="form-control" placeholder="+256 7XX XXX" required>
+                            </div>
                         </div>
                         
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Phone Number</label>
-                            <input type="tel" name="telephone" class="form-control form-control-lg" placeholder="+256 7XX XXX XXX" required>
+                        <div class="mt-3">
+                            <label class="form-label fw-bold">Special Requests <span class="text-muted fw-normal">(optional)</span></label>
+                            <textarea name="comment" class="form-control" rows="2" placeholder="Allergies, occasion, seating preference..."></textarea>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Special Requests (Optional)</label>
-                            <textarea name="comment" class="form-control" rows="2" placeholder="Any special requests or notes..."></textarea>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn">
-                            <i class="fa fa-check me-2"></i>Confirm Reservation
-                        </button>
                     </div>
                 </div>
+                
+                <hr class="my-4">
+                
+                <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn">
+                    <i class="fa fa-check me-2"></i>Confirm Reservation
+                </button>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Flatpickr Inline Calendar Styles -->
 <style>
-#reservationCalendar {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 10px;
+.flatpickr-calendar {
+    box-shadow: 0 3px 13px rgba(0,0,0,0.08) !important;
 }
-#reservationCalendar .flatpickr-calendar {
-    box-shadow: none !important;
-    width: 100% !important;
-    max-width: 100% !important;
-}
-#reservationCalendar .flatpickr-day.selected {
+.flatpickr-day.selected, .flatpickr-day.selected:hover {
     background: #FF4900 !important;
     border-color: #FF4900 !important;
 }
-#reservationCalendar .flatpickr-day:hover {
+.flatpickr-day:hover {
     background: #ffece6 !important;
 }
-.flatpickr-months {
-    padding: 10px 0;
+.flatpickr-months .flatpickr-month {
+    background: #FF4900 !important;
+    color: white !important;
 }
-.flatpickr-current-month {
-    font-size: 1.2em;
+.flatpickr-current-month .flatpickr-monthDropdown-months,
+.flatpickr-current-month input.cur-year {
+    color: white !important;
+}
+.flatpickr-weekdays {
+    background: #FF4900 !important;
+}
+.flatpickr-weekday {
+    color: white !important;
+}
+span.flatpickr-weekday {
+    color: white !important;
+}
+.flatpickr-months .flatpickr-prev-month, 
+.flatpickr-months .flatpickr-next-month {
+    fill: white !important;
+    color: white !important;
+}
+.flatpickr-months .flatpickr-prev-month:hover svg, 
+.flatpickr-months .flatpickr-next-month:hover svg {
+    fill: #fff !important;
 }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Flatpickr calendar
+    // Initialize Flatpickr as a popup calendar
     if (typeof flatpickr !== 'undefined') {
-        flatpickr("#reservationCalendar", {
-            inline: true,
+        var fp = flatpickr("#reservationDatePicker", {
             minDate: "today",
-            maxDate: new Date().fp_incr(60), // 60 days from now
-            dateFormat: "Y-m-d",
+            maxDate: new Date().fp_incr(60),
+            dateFormat: "l, F j, Y",
+            altInput: false,
             defaultDate: "today",
-            onChange: function(selectedDates, dateStr) {
-                document.getElementById('reservationDate').value = dateStr;
+            onChange: function(selectedDates, dateStr, instance) {
+                document.getElementById('reservationDate').value = instance.formatDate(selectedDates[0], "Y-m-d");
             }
         });
         // Set initial date
         document.getElementById('reservationDate').value = new Date().toISOString().split('T')[0];
-    } else {
-        console.error('Flatpickr not loaded!');
-        // Fallback to regular date input
-        document.getElementById('reservationCalendar').innerHTML = '<input type="date" name="date" class="form-control form-control-lg" required>';
+        document.getElementById('reservationDatePicker').value = fp.formatDate(new Date(), "l, F j, Y");
     }
     
     // Form submission
@@ -144,9 +156,8 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.disabled = true;
         btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i>Processing...';
         
-        // Show success message (in a real app, this would submit to the server)
         setTimeout(function() {
-            alert('Reservation request submitted! We will confirm your booking shortly via email/SMS.');
+            alert('✓ Reservation request submitted!\n\nWe will confirm your booking shortly via email/SMS.');
             btn.disabled = false;
             btn.innerHTML = '<i class="fa fa-check me-2"></i>Confirm Reservation';
         }, 1000);
