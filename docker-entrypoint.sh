@@ -64,11 +64,27 @@ php artisan route:clear 2>&1 || echo "route:clear done"
 # Run any pending migrations
 php artisan migrate --force 2>&1 || echo "migrate done"
 
+# Debug: List themes folder
+echo "=== Checking themes folder ==="
+ls -la /var/www/html/themes/ 2>/dev/null || echo "No themes folder"
+ls -la /var/www/html/themes/demo/ 2>/dev/null || echo "No demo theme folder"
+
 # Sync all themes from filesystem to database (required for demo theme to be recognized)
+echo "=== Syncing themes ==="
 php artisan tinker --execute="\Igniter\Main\Models\Theme::syncAll();" 2>&1 || echo "theme sync done"
+
+# Debug: List themes in database
+php artisan tinker --execute="
+\$themes = \Igniter\Main\Models\Theme::all();
+echo 'Themes in database: ';
+foreach(\$themes as \$t) {
+    echo \$t->code . ' (active: ' . (\$t->is_active ? 'yes' : 'no') . '), ';
+}
+" 2>&1 || echo "theme list done"
 
 # Set the theme to demo DIRECTLY in the database settings
 # This is more reliable than the artisan command
+echo "=== Activating demo theme ==="
 php artisan tinker --execute="
 \$theme = \Igniter\Main\Models\Theme::where('code', 'demo')->first();
 if (\$theme) {
@@ -79,18 +95,33 @@ if (\$theme) {
 } else {
     echo 'Demo theme not found in database, creating...';
     \Igniter\Main\Models\Theme::create([
-        'name' => 'Demo Theme',
+        'name' => 'UgaEats Demo Theme',
         'code' => 'demo',
         'description' => 'Uganda customizations theme',
         'is_active' => true,
     ]);
+    // Deactivate other themes
+    \Igniter\Main\Models\Theme::where('code', '!=', 'demo')->update(['is_active' => false]);
 }
-// Also set in system settings
-\Igniter\System\Models\Settings::set('default_themes', ['main' => 'demo']);
+// Also set in system settings - THIS IS THE KEY
+\DB::table('settings')->updateOrInsert(
+    ['item' => 'default_themes'],
+    ['value' => json_encode(['main' => 'demo'])]
+);
+echo ' | Settings updated';
 " 2>&1 || echo "theme set done"
 
 # Set the theme using artisan as backup
 php artisan igniter:util set theme --theme=demo 2>&1 || echo "artisan theme set done"
+
+# Verify theme is set
+echo "=== Verifying theme settings ==="
+php artisan tinker --execute="
+\$setting = \DB::table('settings')->where('item', 'default_themes')->first();
+echo 'default_themes setting: ' . (\$setting ? \$setting->value : 'NOT FOUND');
+\$active = \Igniter\Main\Models\Theme::where('is_active', true)->first();
+echo ' | Active theme: ' . (\$active ? \$active->code : 'NONE');
+" 2>&1 || echo "verify done"
 
 # CRITICAL FIX: Set site_logo to 'no_photo.png' to prevent media_thumb() errors
 # This avoids the "File does not exist" error from Glide thumbnail generation
