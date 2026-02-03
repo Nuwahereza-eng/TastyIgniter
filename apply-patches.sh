@@ -55,6 +55,20 @@ if [ -f "$SEARCH_PATCH" ] && [ -f "$LOCAL_SEARCH" ]; then
     fi
 fi
 
+# Apply saved-address-picker patch (Use Current Location and Use Saved Address buttons)
+SAVED_ADDRESS_PICKER="$PROJECT_ROOT/vendor/tastyigniter/ti-theme-orange/resources/views/includes/local/saved-address-picker.blade.php"
+if [ -f "$SAVED_ADDRESS_PICKER" ]; then
+    if grep -q 'Use Current Location' "$SAVED_ADDRESS_PICKER"; then
+        echo "✓ Saved address picker patch already applied"
+    else
+        PICKER_PATCH="$PROJECT_ROOT/patches/fix-saved-address-picker.patch"
+        if [ -f "$PICKER_PATCH" ]; then
+            cd "$PROJECT_ROOT"
+            patch -p1 < "$PICKER_PATCH" 2>/dev/null && echo "✓ Applied saved-address-picker patch" || echo "✗ Saved-address-picker patch failed"
+        fi
+    fi
+fi
+
 # Apply other patches
 for patch_file in "$PROJECT_ROOT/patches"/*.patch; do
     if [ -f "$patch_file" ] && [ "$patch_file" != "$SEARCH_PATCH" ]; then
