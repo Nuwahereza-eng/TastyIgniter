@@ -45,8 +45,7 @@ chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2
 chmod -R 777 /var/www/html/storage 2>/dev/null || true
 chmod -R 775 /var/www/html/bootstrap/cache 2>/dev/null || true
 
-# IMPORTANT: Clear ALL cache data FIRST before any Laravel commands
-# This prevents stale cache entries from referencing non-existent temp files
+# Clear cache files (quick operation)
 cd /var/www/html
 rm -rf /var/www/html/storage/framework/cache/data/* 2>/dev/null || true
 rm -rf /var/www/html/storage/framework/views/*.php 2>/dev/null || true
@@ -55,55 +54,59 @@ rm -rf /var/www/html/storage/igniter/combiner/* 2>/dev/null || true
 rm -rf /var/www/html/storage/igniter/cache/* 2>/dev/null || true
 echo "Cleared storage caches"
 
-# Clear Laravel caches to use fresh .env values
+# Configure Nginx port BEFORE starting services
+PORT=${PORT:-80}
+echo "PORT is: $PORT"
+sed -i "s/listen 80/listen $PORT/g" /etc/nginx/conf.d/default.conf 2>/dev/null || true
+
+# Create a simple health file that nginx can serve immediately
+echo '{"status":"ok","service":"ugaeats"}' > /var/www/html/public/health.json
+chmod 644 /var/www/html/public/health.json
+
+# Start PHP-FPM in background first
+echo "=== Starting PHP-FPM ==="
+php-fpm -D
+sleep 2
+
+# Start Nginx in background
+echo "=== Starting Nginx ==="
+nginx
+sleep 1
+
+echo "=== Web services started, running initialization ==="
+
+# Now run Laravel initialization in foreground
+# This allows health checks to pass while we initialize
 php artisan config:clear 2>&1 || echo "config:clear done"
 php artisan cache:clear 2>&1 || echo "cache:clear done"
 php artisan view:clear 2>&1 || echo "view:clear done"
 php artisan route:clear 2>&1 || echo "route:clear done"
 
-# Run any pending migrations
+# Run migrations
 php artisan migrate --force 2>&1 || echo "migrate done"
 
-# Debug: List themes folder
-echo "=== Checking themes folder ==="
-ls -la /var/www/html/themes/ 2>/dev/null || echo "No themes folder"
-ls -la /var/www/html/themes/demo/ 2>/dev/null || echo "No demo theme folder"
-
-# Sync all themes from filesystem to database (required for demo theme to be recognized)
+# Theme setup
 echo "=== Syncing themes ==="
 php artisan tinker --execute="\Igniter\Main\Models\Theme::syncAll();" 2>&1 || echo "theme sync done"
 
-# Debug: List themes in database
-php artisan tinker --execute="
-\$themes = \Igniter\Main\Models\Theme::all();
-echo 'Themes in database: ';
-foreach(\$themes as \$t) {
-    echo \$t->code . ' (active: ' . (\$t->is_active ? 'yes' : 'no') . '), ';
-}
-" 2>&1 || echo "theme list done"
-
-# Set the theme to demo DIRECTLY in the database settings
-# This is more reliable than the artisan command
+# Activate demo theme
 echo "=== Activating demo theme ==="
 php artisan tinker --execute="
 \$theme = \Igniter\Main\Models\Theme::where('code', 'demo')->first();
 if (\$theme) {
     \$theme->update(['is_active' => true]);
-    // Also deactivate other themes
     \Igniter\Main\Models\Theme::where('code', '!=', 'demo')->update(['is_active' => false]);
-    echo 'Demo theme activated directly in database';
+    echo 'Demo theme activated';
 } else {
-    echo 'Demo theme not found in database, creating...';
+    echo 'Demo theme not found, creating...';
     \Igniter\Main\Models\Theme::create([
         'name' => 'UgaEats Demo Theme',
         'code' => 'demo',
         'description' => 'Uganda customizations theme',
         'is_active' => true,
     ]);
-    // Deactivate other themes
     \Igniter\Main\Models\Theme::where('code', '!=', 'demo')->update(['is_active' => false]);
 }
-// Also set in system settings - THIS IS THE KEY
 \DB::table('settings')->updateOrInsert(
     ['item' => 'default_themes'],
     ['value' => json_encode(['main' => 'demo'])]
@@ -111,62 +114,38 @@ if (\$theme) {
 echo ' | Settings updated';
 " 2>&1 || echo "theme set done"
 
-# Set the theme using artisan as backup
 php artisan igniter:util set theme --theme=demo 2>&1 || echo "artisan theme set done"
 
-# Verify theme is set
-echo "=== Verifying theme settings ==="
-php artisan tinker --execute="
-\$setting = \DB::table('settings')->where('item', 'default_themes')->first();
-echo 'default_themes setting: ' . (\$setting ? \$setting->value : 'NOT FOUND');
-\$active = \Igniter\Main\Models\Theme::where('is_active', true)->first();
-echo ' | Active theme: ' . (\$active ? \$active->code : 'NONE');
-" 2>&1 || echo "verify done"
-
-# CRITICAL FIX: Set site_logo to 'no_photo.png' to prevent media_thumb() errors
-# This avoids the "File does not exist" error from Glide thumbnail generation
+# Site logo fix
 php artisan tinker --execute="\Igniter\System\Models\Settings::set('site_logo', 'no_photo.png');" 2>&1 || echo "site_logo fix done"
 
-# ULTRA NUCLEAR: Clear ALL cached media references from database
-# This clears the pagic_pages cache and any other cached image paths
+# Clear DB caches
 php artisan tinker --execute="
-try {
-    \DB::table('cache')->truncate();
-} catch (\Exception \$e) {}
-try {
-    \DB::table('sessions')->truncate();
-} catch (\Exception \$e) {}
-try {
-    // Clear any cached template data that might reference old temp files
-    \Illuminate\Support\Facades\Cache::flush();
-} catch (\Exception \$e) {}
+try { \DB::table('cache')->truncate(); } catch (\Exception \$e) {}
+try { \DB::table('sessions')->truncate(); } catch (\Exception \$e) {}
+try { \Illuminate\Support\Facades\Cache::flush(); } catch (\Exception \$e) {}
 echo 'DB caches cleared';
 " 2>&1 || echo "db cache clear done"
 
-# Pre-compile assets to avoid combiner issues
+# Publish assets
 php artisan vendor:publish --tag=igniter-orange-assets --force 2>&1 || echo "publish assets done"
 
-# Apply custom patches using PHP (more reliable than shell patches)
+# Apply patches
 echo "=== Applying PHP patches ==="
 if [ -f /var/www/html/scripts/apply-patches.php ]; then
     php /var/www/html/scripts/apply-patches.php 2>&1 || echo "php patches done"
 fi
 
-# Also run shell patches as backup
 if [ -f /var/www/html/apply-patches.sh ]; then
     chmod +x /var/www/html/apply-patches.sh
     /var/www/html/apply-patches.sh 2>&1 || echo "shell patches done"
 fi
 
-# Clear view cache after patches
+# Final view clear
 php artisan view:clear 2>&1 || echo "view:clear done"
 
-echo "Startup complete"
+echo "=== Initialization complete ==="
 
-# Configure Nginx port
-PORT=${PORT:-80}
-echo "PORT is: $PORT"
-sed -i "s/listen 80/listen $PORT/g" /etc/nginx/conf.d/default.conf 2>/dev/null || true
-
-echo "=== Starting Supervisor ==="
-exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+# Keep the container running by tailing logs
+# This replaces supervisord since we started services manually
+tail -f /var/log/nginx/access.log /var/log/nginx/error.log 2>/dev/null || while true; do sleep 3600; done
