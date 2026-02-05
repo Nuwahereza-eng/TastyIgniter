@@ -218,10 +218,10 @@ description: Default layout
             <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
                 <h6 class="text-uppercase fw-bold mb-3">Premium Features</h6>
                 <ul class="list-unstyled mb-0">
-                    <li class="mb-2"><a href="{{ url('/account/features#group-orders') }}" class="text-muted text-decoration-none"><i class="fa fa-users me-2"></i>Group Orders</a></li>
-                    <li class="mb-2"><a href="{{ url('/account/features#scheduled-orders') }}" class="text-muted text-decoration-none"><i class="fa fa-clock me-2"></i>Schedule Order</a></li>
-                    <li class="mb-2"><a href="{{ url('/account/features#subscriptions') }}" class="text-muted text-decoration-none"><i class="fa fa-calendar-check me-2"></i>Meal Plans</a></li>
-                    <li class="mb-2"><a href="{{ url('/track-order') }}" class="text-muted text-decoration-none"><i class="fa fa-motorcycle me-2"></i>Track Order</a></li>
+                    <li class="mb-2"><a href="{{ page_url('premium-features') }}#group-orders" class="text-muted text-decoration-none"><i class="fa fa-users me-2"></i>Group Orders</a></li>
+                    <li class="mb-2"><a href="{{ page_url('premium-features') }}#scheduled-orders" class="text-muted text-decoration-none"><i class="fa fa-clock me-2"></i>Schedule Order</a></li>
+                    <li class="mb-2"><a href="{{ page_url('premium-features') }}#subscriptions" class="text-muted text-decoration-none"><i class="fa fa-calendar-check me-2"></i>Meal Plans</a></li>
+                    <li class="mb-2"><a href="{{ page_url('track-order') }}" class="text-muted text-decoration-none"><i class="fa fa-motorcycle me-2"></i>Track Order</a></li>
                 </ul>
             </div>
             <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
@@ -255,7 +255,7 @@ description: Default layout
 @endunless
 
 <!-- WhatsApp Float -->
-<a href="https://wa.me/256779081600?text=Hi%20TastyIgniter!%20I%20would%20like%20to%20order%20food." class="whatsapp-float" target="_blank" title="Order via WhatsApp">
+<a href="https://wa.me/256779081600?text=Hi%20TastyIgniter!%20I%20would%20like%20to%20order%20food." class="whatsapp-float" target="_blank" title="Reach us via WhatsApp">
     <i class="fab fa-whatsapp"></i>
 </a>
 
@@ -268,7 +268,9 @@ description: Default layout
 <livewire:igniter-orange::utils.flash-message/>
 @include('igniter-orange::includes.eucookiebanner')
 @livewireScripts
-@include('igniter-orange::includes.scripts')
+
+{{-- Use custom scripts partial that bypasses asset combiner --}}
+@include('demo::_partials.scripts')
 
 <!-- Uganda Custom JavaScript -->
 <script src="/themes/demo/assets/js/uganda-enhancements.js"></script>

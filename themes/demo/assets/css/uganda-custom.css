@@ -11,6 +11,69 @@
     --text-light: #7F8C8D;
 }
 
+/* =====================================================
+   FIND RESTAURANT SECTION - Gradient Text & Orange Icons
+   ===================================================== */
+
+/* Bold white heading with elevated shadow effect */
+.find-restaurant-section h2 {
+    font-weight: 800 !important;
+    font-size: 2.5rem !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    text-shadow: 
+        0 1px 2px rgba(0, 0, 0, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.3),
+        0 4px 8px rgba(0, 0, 0, 0.2),
+        1px 1px 0 rgba(0, 0, 0, 0.5),
+        -1px -1px 0 rgba(100, 100, 100, 0.3) !important;
+    letter-spacing: 0.5px;
+}
+
+/* Location icon with orange background and white icon */
+.find-restaurant-section button[data-control="user-position"],
+#local-search-container button[data-control="user-position"] {
+    background: var(--ti-orange) !important;
+    background-color: var(--ti-orange) !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+.find-restaurant-section button[data-control="user-position"]:hover,
+#local-search-container button[data-control="user-position"]:hover {
+    background: #e04000 !important;
+    background-color: #e04000 !important;
+    transform: scale(1.05);
+}
+
+.find-restaurant-section button[data-control="user-position"] i,
+#local-search-container button[data-control="user-position"] i {
+    color: #ffffff !important;
+}
+
+/* Orange Search Button in Find Restaurant Section */
+.find-restaurant-section button[data-control="search-local"],
+.find-restaurant-section button[type="submit"],
+#local-search-container button[data-control="search-local"] {
+    background: var(--ti-orange) !important;
+    background-color: var(--ti-orange) !important;
+    border-color: var(--ti-orange) !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+    transition: all 0.3s ease !important;
+}
+
+.find-restaurant-section button[data-control="search-local"]:hover,
+.find-restaurant-section button[type="submit"]:hover,
+#local-search-container button[data-control="search-local"]:hover {
+    background: #e04000 !important;
+    background-color: #e04000 !important;
+    border-color: #e04000 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 73, 0, 0.5) !important;
+}
+
 /* Custom Scrollbar with ti-orange */
 ::-webkit-scrollbar {
     width: 10px;
@@ -1508,4 +1571,34 @@ main[role="main"] {
         height: 50px !important;
         font-size: 24px !important;
     }
+}
+
+/* =====================================================
+   MENU ITEM CARDS - Clean Design
+   ===================================================== */
+.menu-card {
+    transition: all 0.3s ease;
+    cursor: pointer !important;
+}
+
+.menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.menu-card .menu-thumb-wrapper img {
+    transition: transform 0.3s ease;
+}
+
+.menu-card:hover .menu-thumb-wrapper img {
+    transform: scale(1.05);
+}
+
+.menu-card .menu-name {
+    font-size: 1rem;
+    line-height: 1.3;
+}
+
+.menu-card .menu-price {
+    white-space: nowrap;
 }

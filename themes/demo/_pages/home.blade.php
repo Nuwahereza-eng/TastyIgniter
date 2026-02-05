@@ -53,10 +53,10 @@ bodyClass: home-page
 </div>
 
 {{-- Find Restaurant Section --}}
-<div class="border-bottom" style="background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);">
+<div class="find-restaurant-section" style="background: #ffffff; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 2rem 0;">
     <div class="container">
         <div class="row justify-content-md-center">
-            <div class="col-lg-8 py-5">
+            <div class="col-lg-8 py-4">
                 {{-- Search Form - has its own heading --}}
                 <livewire:igniter-orange::local-search/>
             </div>
