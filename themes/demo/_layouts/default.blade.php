@@ -75,10 +75,10 @@ description: Default layout
         }
         .chatbot-float:hover { transform: scale(1.1); }
         
-        /* Footer Styling with Food Pattern Background */
+        /* Footer Styling with Food Photo Background */
         .footer { 
-            background: linear-gradient(rgba(26, 26, 26, 0.95), rgba(26, 26, 26, 0.98)), 
-                        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='%23FF4900' fill-opacity='0.15'%3E%3Cpath d='M30 5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 54c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM5 30c0 1.1.9 2 2 2s2-.9 2-2-.9-2-2-2-2 .9-2 2zm48 0c0 1.1.9 2 2 2s2-.9 2-2-.9-2-2-2-2 .9-2 2zm-23-7c-3.9 0-7 3.1-7 7s3.1 7 7 7 7-3.1 7-7-3.1-7-7-7zm0 11c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z'/%3E%3Ccircle cx='15' cy='15' r='3'/%3E%3Ccircle cx='45' cy='15' r='3'/%3E%3Ccircle cx='15' cy='45' r='3'/%3E%3Ccircle cx='45' cy='45' r='3'/%3E%3C/g%3E%3C/svg%3E");
+            background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.9)), 
+                        url('/images/footer-bg.jpg') center/cover no-repeat;
             color: #ccc; 
         }
         .footer h6 { color: white; }
