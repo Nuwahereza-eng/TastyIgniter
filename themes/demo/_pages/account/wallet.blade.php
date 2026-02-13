@@ -42,13 +42,15 @@ security: customer
                                 <i class="fa fa-gift me-1"></i> Pay with wallet and earn 5% cashback on every order!
                             </p>
                         </div>
-                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                            <button class="btn btn-light btn-lg me-2" data-bs-toggle="modal" data-bs-target="#depositModal">
-                                <i class="fa fa-plus me-1"></i> Deposit
-                            </button>
-                            <button class="btn btn-outline-light btn-lg" data-bs-toggle="modal" data-bs-target="#withdrawModal">
-                                <i class="fa fa-minus me-1"></i> Withdraw
-                            </button>
+                        <div class="col-md-4 mt-3 mt-md-0">
+                            <div class="d-flex flex-column gap-2">
+                                <button class="btn btn-light w-100" data-bs-toggle="modal" data-bs-target="#depositModal">
+                                    <i class="fa fa-plus me-2"></i> Deposit Funds
+                                </button>
+                                <button class="btn btn-outline-light w-100" data-bs-toggle="modal" data-bs-target="#withdrawModal">
+                                    <i class="fa fa-minus me-2"></i> Withdraw Funds
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

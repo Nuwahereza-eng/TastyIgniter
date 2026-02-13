@@ -169,7 +169,7 @@ description: Default layout
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <a class="dropdown-item text-danger" href="{{ page_url('account.logout') }}">
+                                    <a class="dropdown-item text-danger" href="/logout">
                                         <i class="fa fa-sign-out-alt me-2"></i>Logout
                                     </a>
                                 </li>

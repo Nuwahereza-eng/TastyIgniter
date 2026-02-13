@@ -98,3 +98,10 @@ Route::prefix('ajax/wallet')->middleware(['web'])->group(function () {
     Route::post('/deposit', [WalletController::class, 'deposit'])->name('wallet.deposit');
     Route::post('/withdraw', [WalletController::class, 'withdraw'])->name('wallet.withdraw');
 });
+
+// Reservation routes with commitment fee
+Route::prefix('ajax/reservation')->middleware(['web'])->group(function () {
+    Route::post('/create', [\App\Http\Controllers\ReservationController::class, 'create'])->name('reservation.create');
+    Route::get('/fee', [\App\Http\Controllers\ReservationController::class, 'getFee'])->name('reservation.fee');
+    Route::get('/status/{id}', [\App\Http\Controllers\ReservationController::class, 'status'])->name('reservation.status');
+});
