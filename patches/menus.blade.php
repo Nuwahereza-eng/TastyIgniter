@@ -8,7 +8,11 @@ hideFooter: 1
 '[igniter-orange::local-header]': []
 '[igniter-orange::fulfillment]': []
 '[igniter-orange::category-list]': []
-'[igniter-orange::menu-item-list]': []
+'[igniter-orange::menu-item-list]':
+    showThumb: true
+    menuThumbWidth: 120
+    menuThumbHeight: 120
+    itemsPerPage: 20
 '[igniter-orange::cart-box]': []
 '[igniter-orange::fulfillment-modal]': []
 ---

@@ -80,22 +80,28 @@ done
 
 # Copy custom feature pages
 THEME_PAGES="$PROJECT_ROOT/vendor/tastyigniter/ti-theme-orange/resources/views/_pages"
+DEMO_THEME_PAGES="$PROJECT_ROOT/themes/demo/_pages"
 PATCHES_DIR="$PROJECT_ROOT/patches"
 
 if [ -f "$PATCHES_DIR/features.blade.php" ]; then
     mkdir -p "$THEME_PAGES/account"
+    mkdir -p "$DEMO_THEME_PAGES/account"
     cp "$PATCHES_DIR/features.blade.php" "$THEME_PAGES/account/features.blade.php"
+    cp "$PATCHES_DIR/features.blade.php" "$DEMO_THEME_PAGES/account/features.blade.php"
     echo "✓ Copied features page"
 fi
 
 if [ -f "$PATCHES_DIR/track-order.blade.php" ]; then
     cp "$PATCHES_DIR/track-order.blade.php" "$THEME_PAGES/track-order.blade.php"
+    cp "$PATCHES_DIR/track-order.blade.php" "$DEMO_THEME_PAGES/track-order.blade.php"
     echo "✓ Copied track-order page"
 fi
 
 if [ -f "$PATCHES_DIR/menus.blade.php" ]; then
     mkdir -p "$THEME_PAGES/local"
+    mkdir -p "$DEMO_THEME_PAGES/local"
     cp "$PATCHES_DIR/menus.blade.php" "$THEME_PAGES/local/menus.blade.php"
+    cp "$PATCHES_DIR/menus.blade.php" "$DEMO_THEME_PAGES/local/menus.blade.php"
     echo "✓ Copied menus page"
 fi
 
