@@ -45,6 +45,12 @@ chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2
 chmod -R 777 /var/www/html/storage 2>/dev/null || true
 chmod -R 775 /var/www/html/bootstrap/cache 2>/dev/null || true
 
+# Create storage symlink for public access to uploaded files
+echo "Creating storage symlink..."
+rm -rf /var/www/html/public/storage 2>/dev/null || true
+ln -sf /var/www/html/storage/app/public /var/www/html/public/storage
+echo "Storage symlink created"
+
 # Clear cache files (quick operation)
 cd /var/www/html
 rm -rf /var/www/html/storage/framework/cache/data/* 2>/dev/null || true

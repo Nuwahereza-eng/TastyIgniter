@@ -16,5 +16,8 @@ node_modules
 !/public/vendor/igniter
 /public/storage
 
+# Don't ignore media attachments - we want these deployed
+!/storage/app/public/media
+
 /storage/clockwork
 /_ide_helper.php
