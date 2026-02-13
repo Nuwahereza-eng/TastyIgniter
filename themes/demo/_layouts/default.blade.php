@@ -7,7 +7,7 @@ description: Default layout
     @include('igniter-orange::includes.head')
     
     <!-- Uganda Custom Styles -->
-    <link rel="stylesheet" href="/themes/demo/assets/css/uganda-custom.css">
+    <link rel="stylesheet" href="/themes/demo/assets/css/uganda-custom.css?v={{ time() }}">
     
     <!-- AI Chatbot Styles -->
     <link rel="stylesheet" href="/themes/demo/assets/css/chatbot.css">
@@ -19,8 +19,18 @@ description: Default layout
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     
     <style>
-        /* Header Fix - Compact Size */
-        .header { background: linear-gradient(135deg, #FF4900 0%, #e04000 100%); }
+        /* Header Fix - Compact Size & Sticky positioning */
+        .header { 
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 1000 !important;
+            background: linear-gradient(135deg, #FF4900 0%, #e04000 100%); 
+        }
+        /* Home page uses absolute positioning for hero overlay */
+        body.home-page .header {
+            position: absolute !important;
+            background: transparent !important;
+        }
         .header .navbar { padding: 0.5rem 0 !important; min-height: auto !important; background: transparent !important; }
         .header .navbar-brand .img-logo { max-height: 40px !important; }
         .header .nav-link { color: white !important; padding: 0.5rem 1rem !important; }
@@ -57,31 +67,35 @@ description: Default layout
         
         /* WhatsApp Float */
         .whatsapp-float {
-            position: fixed; bottom: 90px; right: 20px; z-index: 9999;
+            position: fixed; bottom: 90px; right: 20px; z-index: 1040;
             width: 55px; height: 55px; background: #25D366; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             color: white; font-size: 28px; box-shadow: 0 4px 15px rgba(37,211,102,0.4);
             transition: all 0.3s ease; text-decoration: none;
         }
         .whatsapp-float:hover { transform: scale(1.1); color: white; }
+        body.modal-open .whatsapp-float { z-index: 1000 !important; pointer-events: none; opacity: 0.3; }
         
         /* Chatbot Float */
         .chatbot-float {
-            position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+            position: fixed; bottom: 20px; right: 20px; z-index: 1040;
             width: 55px; height: 55px; background: #FF4900; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             color: white; font-size: 24px; box-shadow: 0 4px 15px rgba(255,73,0,0.4);
             cursor: pointer; transition: all 0.3s ease;
         }
         .chatbot-float:hover { transform: scale(1.1); }
+        body.modal-open .chatbot-float { z-index: 1000 !important; pointer-events: none; opacity: 0.3; }
         
         /* Footer Styling with Food Photo Background */
         .footer { 
             background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.9)), 
-                        url('/images/footer-bg.jpg') center/cover no-repeat;
-            color: #ccc; 
+                        url('/images/footer-bg.jpg') center/cover no-repeat !important;
+            background-size: cover !important;
+            background-position: center !important;
+            color: #ccc !important; 
         }
-        .footer h6 { color: white; }
+        .footer h6 { color: white !important; }
         .footer a:hover { color: #FF4900 !important; }
     </style>
     
@@ -115,34 +129,11 @@ description: Default layout
                             <i class="fa fa-calendar-alt me-1"></i> Reservations
                         </a>
                     </li>
-                    <!-- Premium Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <!-- Premium Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ page_url('premium-features') }}">
                             <i class="fa fa-crown me-1"></i> Premium
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="{{ page_url('premium-features') }}#group-orders">
-                                    <i class="fa fa-users me-2 text-primary"></i>Group Orders
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ page_url('premium-features') }}#scheduled-orders">
-                                    <i class="fa fa-clock me-2 text-warning"></i>Schedule Order
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ page_url('premium-features') }}#subscriptions">
-                                    <i class="fa fa-calendar-check me-2 text-success"></i>Meal Plans
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item" href="{{ page_url('track-order') }}">
-                                    <i class="fa fa-motorcycle me-2 text-info"></i>Track Order
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                     @if(Auth::isLogged())
                         <!-- Account Dropdown for Logged In Users -->
@@ -154,6 +145,11 @@ description: Default layout
                                 <li>
                                     <a class="dropdown-item" href="{{ page_url('account.account') }}">
                                         <i class="fa fa-user me-2"></i>Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/account/wallet">
+                                        <i class="fa fa-wallet me-2"></i>Tasty Wallet
                                     </a>
                                 </li>
                                 <li>
@@ -207,7 +203,7 @@ description: Default layout
 
 <!-- FOOTER -->
 @unless($this->page->hideFooter ?? false)
-<footer class="footer mt-auto py-4">
+<footer class="footer mt-auto py-4" style="background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.7)), url('/images/footer-bg.jpg') center/cover no-repeat !important; background-size: cover !important;">
     <div class="container">
         <div class="row">
             <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">

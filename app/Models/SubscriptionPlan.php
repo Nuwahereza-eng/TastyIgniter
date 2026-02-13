@@ -9,20 +9,32 @@ class SubscriptionPlan extends Model
 {
     use HasFactory;
 
+    protected $table = 'subscription_plans';
+
     protected $fillable = [
         'name',
         'slug',
+        'description',
         'price',
         'billing_period',
         'meals_per_period',
-        'features',
+        'free_delivery',
+        'express_delivery',
+        'premium_restaurants',
+        'priority_support',
+        'family_members',
         'is_active',
+        'sort_order',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'meals_per_period' => 'integer',
-        'features' => 'array',
+        'free_delivery' => 'boolean',
+        'express_delivery' => 'boolean',
+        'premium_restaurants' => 'boolean',
+        'priority_support' => 'boolean',
+        'family_members' => 'integer',
         'is_active' => 'boolean',
     ];
 
@@ -99,6 +111,34 @@ class SubscriptionPlan extends Model
     public function scopeOrderByPrice($query, $direction = 'asc')
     {
         return $query->orderBy('price', $direction);
+    }
+
+    /**
+     * Get features as an array (derived from boolean columns)
+     */
+    public function getFeaturesAttribute(): array
+    {
+        $features = [];
+        
+        $features[] = $this->meals_per_period . ' meals per ' . ($this->billing_period === 'weekly' ? 'week' : 'month');
+        
+        if ($this->free_delivery) {
+            $features[] = 'Free delivery';
+        }
+        if ($this->express_delivery) {
+            $features[] = 'Express delivery';
+        }
+        if ($this->premium_restaurants) {
+            $features[] = 'Premium restaurants access';
+        }
+        if ($this->priority_support) {
+            $features[] = 'Priority support';
+        }
+        if ($this->family_members > 1) {
+            $features[] = 'Up to ' . $this->family_members . ' family members';
+        }
+        
+        return $features;
     }
 
     /**

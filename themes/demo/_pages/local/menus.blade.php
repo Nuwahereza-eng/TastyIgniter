@@ -20,10 +20,11 @@ hideFooter: 1
     <div class="container py-4">
         <div class="mb-3" wire:ignore>
             <a
-                class="text-decoration-none"
+                class="text-decoration-none back-button d-inline-flex align-items-center px-3 py-2 rounded"
                 href="{{page_url('locations')}}"
+                style="background: #f8f9fa; color: #495057; font-weight: 500;"
             >
-                <i class="fa fa-arrow-left-long"></i>&nbsp;&nbsp;
+                <i class="fa fa-arrow-left-long me-2" style="color: #FF4900;"></i>
                 @lang('igniter.orange::default.button_back')
             </a>
         </div>
@@ -45,7 +46,7 @@ hideFooter: 1
                 <livewire:igniter-orange::menu-item-list />
             </div>
             <div class="col-lg-4 mb-4">
-                <div class="sticky-top" style="top: 20px;">
+                <div class="sticky-top" style="top: 80px; z-index: 100;">
                     <livewire:igniter-orange::cart-box />
                 </div>
             </div>

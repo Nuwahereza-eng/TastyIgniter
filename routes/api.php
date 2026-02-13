@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ScheduledOrderController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\OrderTrackingController;
 use App\Http\Controllers\Api\LocationScheduleController;
+use App\Http\Controllers\Api\WalletController;
 
 /*
 |--------------------------------------------------------------------------
@@ -111,4 +112,14 @@ Route::prefix('location-schedule')->group(function () {
     Route::post('/set', [LocationScheduleController::class, 'setSchedule']);
     Route::get('/timeslots', [LocationScheduleController::class, 'getTimeslots']);
     Route::post('/clear', [LocationScheduleController::class, 'clearSchedule']);
+});
+
+// ==========================================
+// TASTY WALLET
+// ==========================================
+Route::prefix('wallet')->group(function () {
+    Route::get('/', [WalletController::class, 'getWallet']);
+    Route::get('/transactions', [WalletController::class, 'getTransactions']);
+    Route::post('/deposit', [WalletController::class, 'deposit']);
+    Route::post('/withdraw', [WalletController::class, 'withdraw']);
 });

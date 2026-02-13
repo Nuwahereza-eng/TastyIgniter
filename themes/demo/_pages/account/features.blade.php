@@ -501,50 +501,193 @@ security: customer
 </div>
 
 <!-- Subscription Confirmation Modal -->
-<div class="modal fade" id="subscriptionModal" tabindex="-1">
-    <div class="modal-dialog">
+<div class="modal fade" id="subscriptionModal" tabindex="-1" aria-labelledby="subscriptionModalLabel" style="display: none;">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="fa fa-crown text-warning me-2"></i>Confirm Subscription</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="subscriptionModalLabel"><i class="fa fa-crown me-2"></i>Subscribe to Meal Plan</h5>
+                <button type="button" class="btn-close" onclick="closeSubscriptionModalManual()" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="text-center mb-4">
                     <div class="subscription-selected-plan mb-3">
-                        <span id="selectedPlanBadge" class="badge bg-primary fs-6">Premium Plan</span>
+                        <span id="selectedPlanBadge" class="badge bg-primary fs-5 px-4 py-2">Premium Plan</span>
                     </div>
-                    <h4 id="selectedPlanPrice">UGX 280,000/week</h4>
+                    <h3 id="selectedPlanPrice" class="text-success fw-bold">UGX 280,000/week</h3>
+                    <p class="text-muted small">Billed weekly. Cancel anytime.</p>
                 </div>
                 
-                <div class="mb-3">
-                    <label class="form-label">Delivery Address</label>
-                    <textarea class="form-control" rows="2" id="subscriptionAddress" placeholder="Enter your default delivery address"></textarea>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold"><i class="fa fa-map-marker-alt text-danger me-2"></i>Delivery Address</label>
+                            <textarea class="form-control" rows="2" id="subscriptionAddress" placeholder="e.g., Ntinda Shopping Center, Kampala"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold"><i class="fa fa-clock text-warning me-2"></i>Preferred Delivery Time</label>
+                            <select class="form-select" id="subscriptionTime">
+                                <option value="12:00">12:00 PM - Lunch</option>
+                                <option value="13:00">1:00 PM</option>
+                                <option value="18:00">6:00 PM - Dinner</option>
+                                <option value="19:00">7:00 PM</option>
+                                <option value="20:00">8:00 PM</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold"><i class="fa fa-calendar me-2"></i>Start Date</label>
+                            <input type="date" class="form-control" id="subscriptionStartDate" min="">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold"><i class="fa fa-credit-card text-primary me-2"></i>Payment Method</label>
+                        
+                        <!-- Mobile Money Options -->
+                        <div class="payment-methods">
+                            <div class="form-check payment-option mb-2" onclick="selectPayment('mtn')">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="payMTN" value="mtn" checked>
+                                <label class="form-check-label d-flex align-items-center" for="payMTN">
+                                    <span class="payment-icon bg-warning text-dark rounded me-2 px-2 py-1 fw-bold" style="font-size: 0.75rem;">MTN</span>
+                                    MTN Mobile Money
+                                </label>
+                            </div>
+                            
+                            <div class="form-check payment-option mb-2" onclick="selectPayment('airtel')">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="payAirtel" value="airtel">
+                                <label class="form-check-label d-flex align-items-center" for="payAirtel">
+                                    <span class="payment-icon bg-danger text-white rounded me-2 px-2 py-1 fw-bold" style="font-size: 0.75rem;">Airtel</span>
+                                    Airtel Money
+                                </label>
+                            </div>
+                            
+                            <div class="form-check payment-option mb-2" onclick="selectPayment('card')">
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="payCard" value="card">
+                                <label class="form-check-label d-flex align-items-center" for="payCard">
+                                    <i class="fa fa-credit-card text-primary me-2"></i>
+                                    Visa / Mastercard
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Phone Number for Mobile Money -->
+                        <div class="mt-3" id="mobileMoneyInput">
+                            <label class="form-label">Mobile Money Number</label>
+                            <div class="input-group">
+                                <span class="input-group-text">+256</span>
+                                <input type="tel" class="form-control" id="mobileMoneyNumber" placeholder="7XX XXX XXX" maxlength="9">
+                            </div>
+                            <small class="text-muted">You will receive a payment prompt on this number</small>
+                        </div>
+                        
+                        <!-- Card Input (hidden by default) -->
+                        <div class="mt-3 d-none" id="cardInput">
+                            <div class="mb-2">
+                                <label class="form-label">Card Number</label>
+                                <input type="text" class="form-control" id="cardNumber" placeholder="4242 4242 4242 4242">
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <label class="form-label">Expiry</label>
+                                    <input type="text" class="form-control" id="cardExpiry" placeholder="MM/YY">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">CVV</label>
+                                    <input type="text" class="form-control" id="cardCvv" placeholder="123">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="mb-3">
-                    <label class="form-label">Preferred Delivery Time</label>
-                    <select class="form-select" id="subscriptionTime">
-                        <option value="12:00">12:00 PM - Lunch</option>
-                        <option value="13:00">1:00 PM</option>
-                        <option value="18:00">6:00 PM - Dinner</option>
-                        <option value="19:00">7:00 PM</option>
-                    </select>
-                </div>
-                
-                <div class="alert alert-info">
-                    <i class="fa fa-info-circle me-2"></i>
-                    <small>You can cancel anytime. First payment will be charged today.</small>
+                <div class="alert alert-success mt-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-shield-alt fa-2x me-3 text-success"></i>
+                        <div>
+                            <strong>Secure Payment</strong>
+                            <p class="mb-0 small">Your payment is protected. Cancel anytime with no fees.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="confirmSubscription()">
-                    <i class="fa fa-credit-card me-2"></i>Subscribe Now
+                <button type="button" class="btn btn-outline-secondary" onclick="closeSubscriptionModalManual()">Cancel</button>
+                <button type="button" class="btn btn-success btn-lg" onclick="confirmSubscription()" id="subscribeBtn">
+                    <i class="fa fa-check-circle me-2"></i>Subscribe Now
                 </button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+// Payment method selection
+function selectPayment(method) {
+    document.querySelector(`input[value="${method}"]`).checked = true;
+    
+    if (method === 'card') {
+        document.getElementById('mobileMoneyInput').classList.add('d-none');
+        document.getElementById('cardInput').classList.remove('d-none');
+    } else {
+        document.getElementById('mobileMoneyInput').classList.remove('d-none');
+        document.getElementById('cardInput').classList.add('d-none');
+    }
+}
+
+// Set minimum date for subscription start
+document.addEventListener('DOMContentLoaded', function() {
+    const startDateInput = document.getElementById('subscriptionStartDate');
+    if (startDateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        startDateInput.min = today;
+        startDateInput.value = today;
+    }
+    
+    // Clean up any orphaned modal backdrops on page load
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+    
+    // Add event listener to clean up when modal is hidden
+    const subscriptionModal = document.getElementById('subscriptionModal');
+    if (subscriptionModal) {
+        subscriptionModal.addEventListener('hidden.bs.modal', function () {
+            // Remove any orphaned backdrops
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
+    }
+});
+
+// Close modal helper function
+function closeSubscriptionModal() {
+    const modalElement = document.getElementById('subscriptionModal');
+    const modal = bootstrap.Modal.getInstance(modalElement);
+    if (modal) {
+        modal.hide();
+    }
+    // Force cleanup
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+}
+</script>
+
+<script>
+// Set customer info from TastyIgniter session
+@php
+    $customer = null;
+    if (class_exists('\Igniter\User\Facades\Auth')) {
+        $customer = \Igniter\User\Facades\Auth::customer();
+    }
+@endphp
+window.ugaeatsCustomerEmail = '{{ $customer ? $customer->email : "" }}';
+window.ugaeatsCustomerName = '{{ $customer ? $customer->first_name . " " . $customer->last_name : "" }}';
+</script>
 
 <script>
 // ============ API CONFIGURATION ============
@@ -1209,6 +1352,8 @@ async function loadSubscriptionPlans() {
 }
 
 function selectPlan(plan) {
+    console.log('selectPlan called with:', plan);
+    
     const plans = subscriptionPlans.basic ? subscriptionPlans : {
         basic: { name: 'Basic Plan', price: 'UGX 150,000/week', badge: 'bg-secondary' },
         premium: { name: 'Premium Plan', price: 'UGX 280,000/week', badge: 'bg-primary' },
@@ -1217,59 +1362,281 @@ function selectPlan(plan) {
     
     const selected = plans[plan];
     document.getElementById('selectedPlanBadge').textContent = selected.name;
-    document.getElementById('selectedPlanBadge').className = `badge ${selected.badge} fs-6`;
+    document.getElementById('selectedPlanBadge').className = `badge ${selected.badge} fs-5 px-4 py-2`;
     document.getElementById('selectedPlanPrice').textContent = selected.price;
     document.getElementById('selectedPlanBadge').dataset.planId = selected.id || plan;
     document.getElementById('selectedPlanBadge').dataset.planSlug = plan;
     
-    const modal = new bootstrap.Modal(document.getElementById('subscriptionModal'));
-    modal.show();
+    // Get modal element
+    const modalElement = document.getElementById('subscriptionModal');
+    const modalDialog = modalElement.querySelector('.modal-dialog');
+    
+    // Manual modal show - bypass Bootstrap issues
+    // First clean up
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    
+    // Create backdrop
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade show';
+    backdrop.id = 'subscriptionModalBackdrop';
+    backdrop.style.zIndex = '1055';
+    document.body.appendChild(backdrop);
+    
+    // Show modal
+    modalElement.style.display = 'block';
+    modalElement.style.zIndex = '1060';
+    modalElement.classList.add('show');
+    modalElement.removeAttribute('aria-hidden');
+    modalElement.setAttribute('aria-modal', 'true');
+    modalElement.setAttribute('role', 'dialog');
+    document.body.classList.add('modal-open');
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = '0px';
+    
+    // Focus the first input in the modal
+    setTimeout(() => {
+        const firstInput = modalElement.querySelector('textarea, input, select');
+        if (firstInput) firstInput.focus();
+    }, 100);
+    
+    // Add click listener on modal element to close only when clicking outside modal-dialog
+    modalElement.onclick = function(e) {
+        // Only close if clicking directly on the modal overlay (not on modal-dialog or its children)
+        if (e.target === modalElement) {
+            closeSubscriptionModalManual();
+        }
+    };
+    
+    // Prevent clicks inside modal-dialog from propagating to modal overlay
+    if (modalDialog) {
+        modalDialog.onclick = function(e) {
+            e.stopPropagation();
+        };
+    }
+    
+    // Add ESC key listener
+    document.addEventListener('keydown', handleEscKey);
+    
+    console.log('Modal should now be visible');
+}
+
+function handleEscKey(e) {
+    if (e.key === 'Escape') {
+        closeSubscriptionModalManual();
+    }
+}
+
+// Close subscription modal manually
+function closeSubscriptionModalManual() {
+    const modalElement = document.getElementById('subscriptionModal');
+    const modalDialog = modalElement?.querySelector('.modal-dialog');
+    const backdrop = document.getElementById('subscriptionModalBackdrop');
+    
+    if (modalElement) {
+        modalElement.style.display = 'none';
+        modalElement.classList.remove('show');
+        modalElement.removeAttribute('aria-modal');
+        modalElement.setAttribute('aria-hidden', 'true');
+        // Clear the onclick handler
+        modalElement.onclick = null;
+    }
+    
+    if (modalDialog) {
+        modalDialog.onclick = null;
+    }
+    
+    if (backdrop) {
+        backdrop.remove();
+    }
+    
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+    
+    // Remove ESC key listener
+    document.removeEventListener('keydown', handleEscKey);
 }
 
 async function confirmSubscription() {
     const address = document.getElementById('subscriptionAddress').value;
     const time = document.getElementById('subscriptionTime').value;
+    const startDate = document.getElementById('subscriptionStartDate')?.value;
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    const mobileMoneyNumber = document.getElementById('mobileMoneyNumber')?.value;
     
     if (!address) {
         alert('Please enter your delivery address');
         return;
     }
     
-    const planSlug = document.getElementById('selectedPlanBadge').dataset.planSlug;
-    const planId = document.getElementById('selectedPlanBadge').dataset.planId;
+    if ((paymentMethod === 'mtn' || paymentMethod === 'airtel') && !mobileMoneyNumber) {
+        alert('Please enter your Mobile Money number');
+        return;
+    }
     
-    const btn = event.target;
+    if (paymentMethod === 'card') {
+        // Card payments will redirect to payment page
+    }
+    
+    const planSlug = document.getElementById('selectedPlanBadge').dataset.planSlug;
+    const planId = parseInt(document.getElementById('selectedPlanBadge').dataset.planId, 10);
+    const planPrice = document.getElementById('selectedPlanPrice').textContent;
+    
+    // Extract amount from price (e.g., "UGX 280,000/week" -> 280000)
+    const amountMatch = planPrice.match(/[\d,]+/);
+    const amount = amountMatch ? parseInt(amountMatch[0].replace(/,/g, '')) : 0;
+    
+    if (!amount) {
+        alert('Invalid plan price');
+        return;
+    }
+    
+    const btn = document.getElementById('subscribeBtn');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing Payment...';
     
     try {
-        const response = await apiCall('/subscriptions/subscribe', 'POST', {
-            plan_id: planId,
-            auto_renew: true,
+        // Get customer email from session or use default
+        const customerEmail = window.ugaeatsCustomerEmail || 'customer@ugaeats.com';
+        const customerName = window.ugaeatsCustomerName || 'Customer';
+        
+        // Try to create the subscription record (may fail if already subscribed)
+        let subscriptionId = null;
+        try {
+            const subscriptionResponse = await apiCall('/subscriptions/subscribe', 'POST', {
+                plan_id: planId,
+                auto_renew: true,
+                delivery_address: address,
+                delivery_time: time,
+                start_date: startDate,
+            });
+            subscriptionId = subscriptionResponse.subscription?.id || null;
+        } catch (subError) {
+            console.warn('Subscription creation note:', subError.message);
+            // Continue with payment anyway - subscription will be created after successful payment
+        }
+        
+        // Now process payment
+        const paymentResponse = await fetch('/ajax/payments/initialize', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': CSRF_TOKEN,
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                amount: amount,
+                email: customerEmail,
+                name: customerName,
+                phone: mobileMoneyNumber ? '256' + mobileMoneyNumber : null,
+                type: 'subscription',
+                reference_id: subscriptionId,
+                plan_id: planId,  // Include plan ID for subscription creation
+                payment_method: paymentMethod,
+            }),
         });
         
-        bootstrap.Modal.getInstance(document.getElementById('subscriptionModal')).hide();
-        alert(response.message || 'Subscription activated! You will receive your first meal soon.');
-        updateSubscriptionStatus();
-    } catch (error) {
-        // Fallback to localStorage for demo
-        const subscription = {
-            plan: document.getElementById('selectedPlanBadge').textContent,
-            price: document.getElementById('selectedPlanPrice').textContent,
-            address: address,
-            deliveryTime: time,
-            startDate: new Date().toISOString(),
-            status: 'active'
-        };
-        localStorage.setItem('ugaeats_subscription', JSON.stringify(subscription));
+        const paymentData = await paymentResponse.json();
+        console.log('Payment response:', paymentData);
+        console.log('Payment response status:', paymentResponse.status);
         
-        bootstrap.Modal.getInstance(document.getElementById('subscriptionModal')).hide();
-        alert('Subscription activated! You will receive your first meal soon.');
-        updateSubscriptionStatus();
+        // Check for TastyIgniter flash message errors (session expired, etc.)
+        if (paymentData.X_IGNITER_FLASH_MESSAGES) {
+            const flashMessages = paymentData.X_IGNITER_FLASH_MESSAGES;
+            const errorMsg = flashMessages.find(m => m.class === 'danger');
+            if (errorMsg) {
+                if (errorMsg.text && errorMsg.text.includes('session')) {
+                    throw new Error('Session expired. Please reload the page and try again.');
+                }
+                throw new Error(errorMsg.text || 'Server error');
+            }
+        }
+        
+        // Check for HTTP errors first
+        if (!paymentResponse.ok) {
+            // Handle validation errors
+            if (paymentData.errors) {
+                const errorMessages = Object.values(paymentData.errors).flat().join(', ');
+                throw new Error('Validation error: ' + errorMessages);
+            }
+            throw new Error(paymentData.message || paymentData.error || 'Server error');
+        }
+        
+        if (paymentData.success) {
+            if (paymentData.redirect_url) {
+                // Card payment - redirect to payment page
+                window.location.href = paymentData.redirect_url;
+                return;
+            }
+            
+            // Mobile money or demo payment - show success
+            closeSubscriptionModalManual();
+            
+            const methodName = paymentMethod === 'mtn' ? 'MTN Mobile Money' : 
+                               paymentMethod === 'airtel' ? 'Airtel Money' : 'Card';
+            
+            showPaymentSuccess({
+                txRef: paymentData.tx_ref,
+                plan: document.getElementById('selectedPlanBadge').textContent,
+                price: planPrice,
+                paymentMethod: methodName,
+                message: paymentData.message,
+            });
+            
+            updateSubscriptionStatus();
+        } else {
+            throw new Error(paymentData.message || paymentData.error || 'Payment processing failed');
+        }
+    } catch (error) {
+        console.error('Payment error:', error);
+        alert(error.message || 'Payment failed. Please try again.');
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fa fa-check me-2"></i>Confirm Subscription';
+        btn.innerHTML = '<i class="fa fa-check-circle me-2"></i>Subscribe Now';
     }
+}
+
+function showPaymentSuccess(data) {
+    const modal = document.createElement('div');
+    modal.className = 'modal fade show';
+    modal.style.display = 'block';
+    modal.style.zIndex = '1070';
+    modal.innerHTML = `
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="fa fa-check-circle me-2"></i>Payment Successful!</h5>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fa fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4 class="mb-3">Your subscription is now active!</h4>
+                    <div class="text-start mx-auto" style="max-width: 300px;">
+                        <p class="mb-2"><strong>Plan:</strong> ${data.plan}</p>
+                        <p class="mb-2"><strong>Amount:</strong> ${data.price}</p>
+                        <p class="mb-2"><strong>Payment:</strong> ${data.paymentMethod}</p>
+                        <p class="mb-2"><strong>Reference:</strong> <code>${data.txRef}</code></p>
+                    </div>
+                    <p class="text-muted small mt-3">${data.message || 'You will receive a confirmation SMS shortly.'}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="this.closest('.modal').remove(); document.querySelector('.modal-backdrop-success')?.remove();">
+                        <i class="fa fa-thumbs-up me-2"></i>Great!
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade show modal-backdrop-success';
+    backdrop.style.zIndex = '1065';
+    
+    document.body.appendChild(backdrop);
+    document.body.appendChild(modal);
 }
 
 async function updateSubscriptionStatus() {

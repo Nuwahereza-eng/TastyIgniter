@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\WalletController;
 use App\Http\Controllers\Api\LocationScheduleController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\OrderTrackingController;
@@ -73,4 +75,26 @@ Route::prefix('ajax/group-orders')->middleware(['web', 'igniter'])->group(functi
     Route::post('/{id}/finalize', [GroupOrderWebController::class, 'finalize']);
     Route::post('/{id}/cancel', [GroupOrderWebController::class, 'cancel']);
     Route::post('/{id}/leave', [GroupOrderWebController::class, 'leave']);
+});
+
+// Payment routes - using web middleware only, auth handled in controller
+Route::prefix('ajax/payments')->middleware(['web'])->group(function () {
+    Route::get('/config', [PaymentController::class, 'config'])->name('payment.config');
+    Route::post('/initialize', [PaymentController::class, 'initialize'])->name('payment.initialize');
+    Route::get('/verify', [PaymentController::class, 'verify'])->name('payment.verify');
+    Route::get('/history', [PaymentController::class, 'history'])->name('payment.history');
+});
+
+// Payment callback and webhook (public routes)
+Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
+Route::post('/payment/webhook', [PaymentController::class, 'webhook'])->name('payment.webhook');
+
+// Tasty Wallet routes
+Route::prefix('ajax/wallet')->middleware(['web'])->group(function () {
+    Route::get('/balance', [WalletController::class, 'balance'])->name('wallet.balance');
+    Route::get('/transactions', [WalletController::class, 'transactions'])->name('wallet.transactions');
+    Route::post('/topup', [WalletController::class, 'topup'])->name('wallet.topup');
+    Route::get('/verify-topup', [WalletController::class, 'verifyTopup'])->name('wallet.verify-topup');
+    Route::post('/deposit', [WalletController::class, 'deposit'])->name('wallet.deposit');
+    Route::post('/withdraw', [WalletController::class, 'withdraw'])->name('wallet.withdraw');
 });

@@ -47,35 +47,12 @@
                 </li>
             </ul>
             
-            <!-- Premium Features Dropdown -->
+            <!-- Premium Link -->
             <ul class="navbar-nav">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="premiumFeaturesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center" href="{{ page_url('premium-features') }}">
                         <i class="fa fa-crown me-1"></i> Premium
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="premiumFeaturesDropdown">
-                        <li>
-                            <a class="dropdown-item" href="{{ url('/account/features#group-orders') }}">
-                                <i class="fa fa-users text-primary me-2"></i>Group Orders
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ url('/account/features#scheduled-orders') }}">
-                                <i class="fa fa-clock text-warning me-2"></i>Schedule Order
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ url('/account/features#subscriptions') }}">
-                                <i class="fa fa-calendar-check text-success me-2"></i>Meal Plans
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="{{ url('/track-order') }}">
-                                <i class="fa fa-motorcycle text-info me-2"></i>Track Order
-                            </a>
-                        </li>
-                    </ul>
                 </li>
             </ul>
 
@@ -93,6 +70,8 @@
                             <li><a class="dropdown-item" href="{{ page_url('account.account') }}"><i class="fa fa-user me-2"></i>My Account</a></li>
                             <li><a class="dropdown-item" href="{{ page_url('account.orders') }}"><i class="fa fa-list me-2"></i>My Orders</a></li>
                             <li><a class="dropdown-item" href="{{ page_url('account.address') }}"><i class="fa fa-map-marker me-2"></i>Address Book</a></li>
+                            <li><a class="dropdown-item" href="/account/wallet"><i class="fa fa-wallet me-2 text-warning"></i>Tasty Wallet</a></li>
+                            <li><a class="dropdown-item" href="/account/features"><i class="fa fa-star me-2 text-success"></i>Subscriptions</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ page_url('account.logout') }}"><i class="fa fa-sign-out me-2"></i>Logout</a></li>
                         </ul>

@@ -108,11 +108,10 @@
 /* Primary buttons with ti-orange */
 .btn-primary,
 .btn-success,
-button[type="submit"],
+button[type="submit"]:not(#cart-box button):not(.cart-items button),
 .add-to-cart,
 .btn-add-cart,
-[class*="add-to-cart"],
-[class*="cart"] .btn {
+[class*="add-to-cart"] {
     background: var(--ti-orange) !important;
     background-color: var(--ti-orange) !important;
     border-color: var(--ti-orange) !important;
@@ -122,11 +121,10 @@ button[type="submit"],
 
 .btn-primary:hover,
 .btn-success:hover,
-button[type="submit"]:hover,
+button[type="submit"]:not(#cart-box button):not(.cart-items button):hover,
 .add-to-cart:hover,
 .btn-add-cart:hover,
-[class*="add-to-cart"]:hover,
-[class*="cart"] .btn:hover {
+[class*="add-to-cart"]:hover {
     background: #e04000 !important;
     background-color: #e04000 !important;
     border-color: #e04000 !important;
@@ -472,8 +470,10 @@ button .d-flex {
 /* Enhanced Footer with Food Photo Background */
 .footer {
     background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.9)), 
-                url('/images/footer-bg.jpg') center/cover no-repeat;
-    color: white;
+                url('/images/footer-bg.jpg') center/cover no-repeat !important;
+    background-size: cover !important;
+    background-position: center !important;
+    color: white !important;
     padding: 3rem 0 1rem;
 }
 
@@ -525,6 +525,157 @@ button .d-flex {
 
 .payment-method.flutterwave {
     border-left: 4px solid #F5A623;
+}
+
+/* Payment Options in Subscription Modal */
+.payment-option {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.payment-option:hover {
+    border-color: #FF4900;
+    background-color: #fff8f5;
+}
+
+.payment-option .form-check-input:checked ~ .form-check-label {
+    font-weight: 600;
+}
+
+.payment-option:has(.form-check-input:checked) {
+    border-color: #FF4900;
+    background-color: #fff8f5;
+}
+
+.payment-icon {
+    min-width: 45px;
+    text-align: center;
+}
+
+/* Subscription Cards Enhancement */
+.subscription-card {
+    border: 2px solid #e9ecef;
+    border-radius: 16px;
+    padding: 1.5rem;
+    padding-top: 2.5rem; /* Extra padding for badge */
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: visible;
+    background: #fff;
+}
+
+.subscription-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border-color: #FF4900;
+}
+
+.subscription-card.featured {
+    border-color: #FF4900;
+    box-shadow: 0 5px 20px rgba(255, 73, 0, 0.2);
+}
+
+.subscription-badge {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #6c757d;
+    color: white;
+    padding: 0.35rem 1.25rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 20px;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.subscription-plan h5 {
+    margin-top: 0.5rem;
+    font-weight: 700;
+}
+
+.subscription-price .amount {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #FF4900;
+}
+
+.subscription-price .period {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.subscription-features {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+}
+
+.subscription-features li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.subscription-features li:last-child {
+    border-bottom: none;
+}
+
+/* Subscription Modal - Proper z-index to appear above chatbot */
+#subscriptionModal.modal {
+    z-index: 1060 !important;
+}
+
+#subscriptionModal.modal.show {
+    display: block !important;
+}
+
+#subscriptionModal .modal-dialog {
+    z-index: 1061;
+    position: relative;
+    margin: 1.75rem auto;
+}
+
+#subscriptionModal .modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1062;
+}
+
+#subscriptionModal input:focus,
+#subscriptionModal textarea:focus,
+#subscriptionModal select:focus {
+    outline: 2px solid #FF4900;
+    outline-offset: 2px;
+}
+
+/* Ensure modal is scrollable on small screens */
+#subscriptionModal .modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Fix modal backdrop - visual only, no click blocking */
+body.modal-open {
+    overflow: hidden !important;
+}
+
+.modal-backdrop {
+    z-index: 1055 !important;
+    pointer-events: none !important; /* Backdrop doesn't block clicks - modal handles close logic */
+}
+
+.modal-backdrop.show {
+    opacity: 0.3 !important; /* Lighter backdrop for better form visibility */
+}
+
+.modal-backdrop.show {
+    opacity: 0.5 !important;
 }
 
 /* Delivery Zone Styling */
@@ -832,24 +983,35 @@ html {
 }
 
 /* =====================================================
-   HEADER WITH BACKGROUND - Overlays the hero
+   HEADER WITH BACKGROUND - Sticky header for all pages
    ===================================================== */
 
 .header {
-    position: absolute;
+    position: sticky;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
+    background: linear-gradient(135deg, #FF4900 0%, #e04000 100%) !important;
+}
+
+/* Only use absolute positioning on home page with hero */
+body.home-page .header {
+    position: absolute;
     background: transparent !important;
 }
 
 .navbar {
-    background: rgba(0, 0, 0, 0.3) !important;
+    background: rgba(0, 0, 0, 0.2) !important;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     box-shadow: none;
     transition: all 0.3s ease;
+}
+
+/* Solid navbar background on non-hero pages */
+body:not(.home-page) .navbar {
+    background: transparent !important;
 }
 
 /* Navbar scrolled state (add via JS) */
@@ -1153,7 +1315,7 @@ main[role="main"] {
 .modal .price,
 /* Cart box price styling - ensure prices don't get cut off */
 .cart-items .price {
-    font-size: 0.5rem !important;
+    font-size: 1rem !important;
     font-weight: 600 !important;
     white-space: nowrap !important;
     min-width: 85px !important;
@@ -1163,7 +1325,7 @@ main[role="main"] {
 
 #cart-box .price,
 .module-box .price {
-    font-size: 0.5rem !important;
+    font-size: 1rem !important;
     white-space: nowrap !important;
 }
 
@@ -1602,4 +1764,339 @@ main[role="main"] {
 
 .menu-card .menu-price {
     white-space: nowrap;
+}
+
+/* =====================================================
+   CART BOX - Reduced Orange, Clean Professional Look
+   ===================================================== */
+
+/* Cart sticky container - position below header */
+.sticky-top:has(#cart-box),
+main .sticky-top,
+#page-wrapper .sticky-top {
+    top: 80px !important;
+    z-index: 100 !important;
+}
+
+/* Cart box container - clean white background */
+#cart-box {
+    background: #ffffff !important;
+    border: 1px solid #e9ecef !important;
+}
+
+/* Cart quantity buttons (+/-) - with orange hover effect */
+#cart-box .btn-outline-secondary,
+.cart-items .btn-outline-secondary,
+.cart-items button.btn.btn-outline-secondary,
+#cart-box button.btn.btn-outline-secondary,
+button.btn.btn-outline-secondary.btn-sm.rounded-circle {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-color: #dee2e6 !important;
+    color: #495057 !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+}
+
+#cart-box .btn-outline-secondary:hover,
+.cart-items .btn-outline-secondary:hover,
+.cart-items button.btn.btn-outline-secondary:hover,
+#cart-box button.btn.btn-outline-secondary:hover,
+button.btn.btn-outline-secondary.btn-sm.rounded-circle:hover,
+.cart-items button.btn-outline-secondary:hover,
+#cart-box button.btn-outline-secondary:hover {
+    background: #FF4900 !important;
+    background-color: #FF4900 !important;
+    border-color: #FF4900 !important;
+    color: #ffffff !important;
+    transform: scale(1.15) !important;
+    box-shadow: 0 3px 10px rgba(255, 73, 0, 0.4) !important;
+}
+
+#cart-box .btn-outline-secondary:active,
+.cart-items .btn-outline-secondary:active,
+.cart-items button.btn.btn-outline-secondary:active,
+#cart-box button.btn.btn-outline-secondary:active {
+    background: #e04000 !important;
+    background-color: #e04000 !important;
+    transform: scale(0.95) !important;
+}
+
+/* Style the icons inside +/- buttons - ensure visibility on hover */
+.cart-items .btn-outline-secondary i,
+.cart-items .btn-outline-secondary i.fa,
+.cart-items .btn-outline-secondary i.fa-plus,
+.cart-items .btn-outline-secondary i.fa-minus,
+#cart-box .btn-outline-secondary i,
+#cart-box .btn-outline-secondary i.fa,
+#cart-box .btn-outline-secondary i.fa-plus,
+#cart-box .btn-outline-secondary i.fa-minus {
+    color: #495057 !important;
+    transition: color 0.2s ease !important;
+}
+
+.cart-items .btn-outline-secondary:hover i,
+.cart-items .btn-outline-secondary:hover i.fa,
+.cart-items .btn-outline-secondary:hover i.fa-plus,
+.cart-items .btn-outline-secondary:hover i.fa-minus,
+.cart-items .btn-outline-secondary:hover i.fa-fw,
+#cart-box .btn-outline-secondary:hover i,
+#cart-box .btn-outline-secondary:hover i.fa,
+#cart-box .btn-outline-secondary:hover i.fa-plus,
+#cart-box .btn-outline-secondary:hover i.fa-minus,
+#cart-box .btn-outline-secondary:hover i.fa-fw,
+.cart-items button:hover i.fa-plus,
+.cart-items button:hover i.fa-minus,
+#cart-box button:hover i.fa-plus,
+#cart-box button:hover i.fa-minus {
+    color: #ffffff !important;
+}
+
+.cart-items .btn-outline-secondary:active i,
+#cart-box .btn-outline-secondary:active i {
+    color: #ffffff !important;
+}
+
+/* Cart item text buttons - remove orange styling */
+#cart-box .cart-items button.btn.shadow-none,
+.cart-items button.btn.shadow-none {
+    background: transparent !important;
+    border: none !important;
+    color: #212529 !important;
+}
+
+#cart-box .cart-items button.btn.shadow-none:hover,
+.cart-items button.btn.shadow-none:hover {
+    background: transparent !important;
+    color: #495057 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Cart prices - dark text, no orange */
+#cart-box .price,
+.cart-items .price,
+#cart-totals td {
+    color: #212529 !important;
+}
+
+/* Coupon form input - neutral styling */
+#cart-box input[type="text"],
+#cart-box .form-control {
+    border-color: #dee2e6 !important;
+}
+
+#cart-box input[type="text"]:focus,
+#cart-box .form-control:focus {
+    border-color: #adb5bd !important;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Apply coupon button - subtle, not orange */
+#cart-box button[wire\\:click*="onApplyCoupon"],
+#cart-box .btn[wire\\:click*="onApplyCoupon"] {
+    background: #6c757d !important;
+    border-color: #6c757d !important;
+    color: white !important;
+}
+
+#cart-box button[wire\\:click*="onApplyCoupon"]:hover,
+#cart-box .btn[wire\\:click*="onApplyCoupon"]:hover {
+    background: #5a6268 !important;
+    border-color: #5a6268 !important;
+}
+
+/* Remove condition button - subtle */
+#cart-box button[wire\\:click*="onRemoveCondition"],
+#cart-totals button[wire\\:click*="onRemoveCondition"] {
+    background: transparent !important;
+    color: #dc3545 !important;
+}
+
+/* Tip buttons - subtle secondary style */
+#cart-box .btn-group .btn,
+.tip-form .btn-group .btn {
+    background: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+    color: #495057 !important;
+}
+
+#cart-box .btn-group .btn:hover,
+#cart-box .btn-group .btn.active,
+.tip-form .btn-group .btn:hover,
+.tip-form .btn-group .btn.active {
+    background: #e9ecef !important;
+    border-color: #adb5bd !important;
+    color: #212529 !important;
+}
+
+/* ONLY the main checkout button stays orange */
+#cart-box .checkout-btn,
+#cart-buttons .checkout-btn,
+.checkout-btn.btn-primary {
+    background: var(--ti-orange) !important;
+    border-color: var(--ti-orange) !important;
+    color: white !important;
+}
+
+#cart-box .checkout-btn:hover,
+#cart-buttons .checkout-btn:hover,
+.checkout-btn.btn-primary:hover {
+    background: #e04000 !important;
+    border-color: #e04000 !important;
+}
+
+/* Mobile cart button at bottom - keep orange for visibility */
+.fixed-bottom .cart-toggle,
+.fixed-bottom .btn-primary {
+    background: var(--ti-orange) !important;
+    border-color: var(--ti-orange) !important;
+}
+
+/* Cart totals table - clean styling */
+#cart-totals table {
+    color: #212529 !important;
+}
+
+#cart-totals .fw-bold {
+    color: #212529 !important;
+}
+
+/* Remove orange from generic cart buttons */
+#cart-box .btn:not(.checkout-btn):not(.btn-primary),
+.cart-items .btn:not(.checkout-btn):not(.btn-primary) {
+    background: transparent !important;
+    border-color: #dee2e6 !important;
+    color: #495057 !important;
+    box-shadow: none !important;
+}
+
+#cart-box .btn:not(.checkout-btn):not(.btn-primary):hover,
+.cart-items .btn:not(.checkout-btn):not(.btn-primary):hover {
+    background: #f8f9fa !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* =====================================================
+   CATEGORY NAVIGATION - Orange Active State Only
+   ===================================================== */
+
+/* Category pills container */
+#navbar-categories {
+    background: transparent;
+}
+
+/* All category nav links - neutral gray by default */
+#navbar-categories .nav-link {
+    background: #f8f9fa !important;
+    background-color: #f8f9fa !important;
+    color: #495057 !important;
+    border: 1px solid #dee2e6 !important;
+    margin-right: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+#navbar-categories .nav-link:hover {
+    background: #e9ecef !important;
+    background-color: #e9ecef !important;
+    color: #212529 !important;
+    border-color: #adb5bd !important;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Active category - ORANGE */
+#navbar-categories .nav-link.active {
+    background: #FF4900 !important;
+    background-color: #FF4900 !important;
+    color: #ffffff !important;
+    border-color: #FF4900 !important;
+    box-shadow: 0 2px 8px rgba(255, 73, 0, 0.4);
+}
+
+#navbar-categories .nav-link.active:hover {
+    background: #e04000 !important;
+    border-color: #e04000 !important;
+}
+
+/* =====================================================
+   BACK BUTTON STYLING - Ensure visibility on all pages
+   ===================================================== */
+
+/* Main content area - ensure it's below header */
+main[role="main"],
+#page-wrapper {
+    position: relative;
+    z-index: 1;
+}
+
+/* Header z-index - ensure proper layering */
+.header,
+header.header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Back button link styling - make it visible */
+.bg-white a[href*="locations"] .fa-arrow-left-long,
+.bg-white a[href*="locations"] .fa-arrow-left,
+a.text-decoration-none .fa-arrow-left-long,
+a.text-decoration-none .fa-arrow-left {
+    color: var(--ti-orange) !important;
+}
+
+a.text-decoration-none:has(.fa-arrow-left-long),
+a.text-decoration-none:has(.fa-arrow-left) {
+    color: #495057 !important;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    transition: color 0.2s ease;
+}
+
+a.text-decoration-none:has(.fa-arrow-left-long):hover,
+a.text-decoration-none:has(.fa-arrow-left):hover {
+    color: var(--ti-orange) !important;
+}
+
+/* Back button container on menu/cart pages */
+.bg-white.border-bottom {
+    position: relative;
+    z-index: 10;
+    margin-top: 0;
+    padding-top: 1rem !important;
+}
+
+/* Ensure content doesn't overlap with header */
+.container .mb-3:first-child a[href*="locations"] {
+    color: #495057 !important;
+    font-weight: 500;
+}
+
+.container .mb-3:first-child a[href*="locations"] i {
+    color: var(--ti-orange) !important;
+    margin-right: 0.25rem;
+}
+
+.container .mb-3:first-child a[href*="locations"]:hover {
+    color: var(--ti-orange) !important;
+}
+
+/* Generic back button styling */
+.py-4 a[href]:has(.fa-arrow-left-long),
+.py-4 a[href]:has(.fa-arrow-left) {
+    background: #f8f9fa;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px;
+    color: #495057 !important;
+    font-weight: 500;
+}
+
+.py-4 a[href]:has(.fa-arrow-left-long):hover,
+.py-4 a[href]:has(.fa-arrow-left):hover {
+    background: #e9ecef;
+    color: var(--ti-orange) !important;
 }

@@ -11,8 +11,12 @@ permalink: ':location/reservation'
 <div class="container pt-4 pb-5">
     <div class="card mb-3 bg-white">
         <div class="card-body py-2">
-            <a class="text-decoration-none" href="{{ page_url('reservations') }}">
-                <i class="fa fa-arrow-left"></i> Back to Restaurants
+            <a 
+                class="text-decoration-none back-button d-inline-flex align-items-center px-3 py-2 rounded" 
+                href="{{ page_url('reservations') }}"
+                style="background: #f8f9fa; color: #495057; font-weight: 500;"
+            >
+                <i class="fa fa-arrow-left me-2" style="color: #FF4900;"></i> Back to Restaurants
             </a>
         </div>
     </div>

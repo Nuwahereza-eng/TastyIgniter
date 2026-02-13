@@ -35,4 +35,22 @@ return [
         'api_key' => env('GEMINI_API_KEY'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Flutterwave Payment Gateway
+    |--------------------------------------------------------------------------
+    |
+    | Flutterwave API credentials for payment processing.
+    | Supports Mobile Money (MTN, Airtel) and Card payments in Uganda.
+    | Get your keys at: https://dashboard.flutterwave.com/settings/apis
+    |
+    */
+    'flutterwave' => [
+        'public_key' => env('FLUTTERWAVE_PUBLIC_KEY', ''),
+        'secret_key' => env('FLUTTERWAVE_SECRET_KEY', ''),
+        'encryption_key' => env('FLUTTERWAVE_ENCRYPTION_KEY', ''),
+        'secret_hash' => env('FLUTTERWAVE_SECRET_HASH', ''),
+        'base_url' => env('FLUTTERWAVE_BASE_URL', 'https://api.flutterwave.com/v3'),
+    ],
+
 ];

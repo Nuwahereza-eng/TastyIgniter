@@ -9,21 +9,31 @@ class Subscription extends Model
 {
     use HasFactory;
 
+    protected $table = 'customer_subscriptions';
+
     protected $fillable = [
         'customer_id',
         'plan_id',
         'status',
         'started_at',
         'expires_at',
+        'cancelled_at',
+        'delivery_address',
+        'preferred_delivery_time',
         'meals_remaining',
-        'auto_renew',
+        'meals_used',
+        'amount_paid',
+        'payment_method',
+        'payment_reference',
     ];
 
     protected $casts = [
         'started_at' => 'datetime',
         'expires_at' => 'datetime',
+        'cancelled_at' => 'datetime',
         'meals_remaining' => 'integer',
-        'auto_renew' => 'boolean',
+        'meals_used' => 'integer',
+        'amount_paid' => 'decimal:2',
     ];
 
     /**
