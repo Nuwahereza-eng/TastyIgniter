@@ -293,29 +293,6 @@
             });
         });
 
-        // Add "Call to Order" floating button for mobile
-        if (window.innerWidth < 768) {
-            const floatingBtn = document.createElement('a');
-            floatingBtn.href = 'tel:+256700000000'; // Update with actual number
-            floatingBtn.className = 'floating-call-btn';
-            floatingBtn.innerHTML = '📞 Call to Order';
-            floatingBtn.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #FF6B35, #004E89);
-                color: white;
-                padding: 15px 25px;
-                border-radius: 50px;
-                text-decoration: none;
-                font-weight: 600;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-                z-index: 1000;
-                animation: pulse 2s infinite;
-            `;
-            document.body.appendChild(floatingBtn);
-        }
-
         // Add notification for order updates
         function showNotification(message, type = 'success') {
             const notification = document.createElement('div');

@@ -77,15 +77,62 @@
     </div>
 </div>
 
-<!-- WhatsApp Floating Button -->
-<a href="https://wa.me/256779081600?text=Hi%20UgaEats!%20I%20would%20like%20to%20order%20food." 
-   class="whatsapp-float" 
-   target="_blank" 
-   title="Order via WhatsApp">
-    <i class="fab fa-whatsapp"></i>
-</a>
-
-<!-- AI Chatbot Button -->
-<div class="chatbot-float" id="chatbotToggle" title="Chat with AI">
-    <i class="fa fa-comments"></i>
+<!-- Consolidated FAB Menu -->
+<div class="fab-container" id="fabContainer">
+    <button class="fab-main" id="fabMain" aria-label="Contact options">
+        <i class="fa fa-plus fab-icon-open"></i>
+        <i class="fa fa-times fab-icon-close"></i>
+    </button>
+    <div class="fab-options">
+        <a href="https://wa.me/256779081600?text=Hi%20UgaEats!%20I%20would%20like%20to%20order%20food." 
+           class="fab-option whatsapp" target="_blank" title="Order via WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+            <span>WhatsApp</span>
+        </a>
+        <a href="tel:+256779081600" class="fab-option call" title="Call to Order">
+            <i class="fa fa-phone"></i>
+            <span>Call Us</span>
+        </a>
+        <button class="fab-option chat" id="fabChatbot" title="Chat with AI">
+            <i class="fa fa-comments"></i>
+            <span>AI Chat</span>
+        </button>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fabContainer = document.getElementById('fabContainer');
+    const fabMain = document.getElementById('fabMain');
+    const fabChatbot = document.getElementById('fabChatbot');
+    
+    if (fabMain) {
+        fabMain.addEventListener('click', function() {
+            fabContainer.classList.toggle('active');
+            fabMain.classList.toggle('active');
+        });
+    }
+    
+    // Close FAB when clicking outside
+    document.addEventListener('click', function(e) {
+        if (fabContainer && !fabContainer.contains(e.target)) {
+            fabContainer.classList.remove('active');
+            fabMain.classList.remove('active');
+        }
+    });
+    
+    // AI Chatbot toggle
+    if (fabChatbot) {
+        fabChatbot.addEventListener('click', function() {
+            // Trigger chatbot modal if exists
+            const chatModal = document.getElementById('chatbotModal');
+            if (chatModal && typeof bootstrap !== 'undefined') {
+                const modal = new bootstrap.Modal(chatModal);
+                modal.show();
+            }
+            fabContainer.classList.remove('active');
+            fabMain.classList.remove('active');
+        });
+    }
+});
+</script>

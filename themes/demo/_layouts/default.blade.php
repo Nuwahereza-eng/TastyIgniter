@@ -65,27 +65,54 @@ description: Default layout
         .header .nav-item.dropdown:hover > .dropdown-menu { display: block; margin-top: 0; }
         .header .dropdown-menu { margin-top: 0; }
         
-        /* WhatsApp Float */
-        .whatsapp-float {
-            position: fixed; bottom: 90px; right: 20px; z-index: 1040;
-            width: 55px; height: 55px; background: #25D366; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 28px; box-shadow: 0 4px 15px rgba(37,211,102,0.4);
-            transition: all 0.3s ease; text-decoration: none;
-        }
-        .whatsapp-float:hover { transform: scale(1.1); color: white; }
-        body.modal-open .whatsapp-float { z-index: 1000 !important; pointer-events: none; opacity: 0.3; }
-        
-        /* Chatbot Float */
-        .chatbot-float {
+        /* Consolidated FAB Menu */
+        .fab-container {
             position: fixed; bottom: 20px; right: 20px; z-index: 1040;
-            width: 55px; height: 55px; background: #FF4900; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 24px; box-shadow: 0 4px 15px rgba(255,73,0,0.4);
-            cursor: pointer; transition: all 0.3s ease;
+            display: flex; flex-direction: column-reverse; align-items: flex-end; gap: 12px;
         }
-        .chatbot-float:hover { transform: scale(1.1); }
-        body.modal-open .chatbot-float { z-index: 1000 !important; pointer-events: none; opacity: 0.3; }
+        .fab-main {
+            width: 60px; height: 60px; background: linear-gradient(135deg, #FF4900, #FF6B35);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 26px; box-shadow: 0 4px 20px rgba(255,73,0,0.5);
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none; outline: none;
+        }
+        .fab-main:hover { transform: scale(1.1); box-shadow: 0 6px 25px rgba(255,73,0,0.6); }
+        .fab-main.active { transform: rotate(45deg); background: #333; }
+        .fab-main .fab-icon-open { display: block; }
+        .fab-main .fab-icon-close { display: none; }
+        .fab-main.active .fab-icon-open { display: none; }
+        .fab-main.active .fab-icon-close { display: block; }
+        
+        .fab-options {
+            display: flex; flex-direction: column; gap: 10px; opacity: 0;
+            transform: translateY(20px) scale(0.8); pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .fab-container.active .fab-options {
+            opacity: 1; transform: translateY(0) scale(1); pointer-events: all;
+        }
+        .fab-option {
+            display: flex; align-items: center; gap: 10px; text-decoration: none;
+            background: white; padding: 10px 16px; border-radius: 30px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.15); transition: all 0.3s ease;
+            color: #333; font-weight: 600; font-size: 14px; white-space: nowrap;
+            cursor: pointer; border: none;
+        }
+        .fab-option:hover { transform: translateX(-5px); box-shadow: 0 5px 20px rgba(0,0,0,0.2); color: #333; text-decoration: none; }
+        .fab-option i { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; }
+        .fab-option.whatsapp i { background: #25D366; }
+        .fab-option.call i { background: #007bff; }
+        .fab-option.chat i { background: #FF4900; }
+        
+        /* Mobile optimization */
+        @media (max-width: 576px) {
+            .fab-container { bottom: 15px; right: 15px; }
+            .fab-main { width: 55px; height: 55px; font-size: 24px; }
+            .fab-option { padding: 8px 14px; font-size: 13px; }
+            .fab-option i { width: 28px; height: 28px; font-size: 14px; }
+        }
+        body.modal-open .fab-container { z-index: 1000 !important; pointer-events: none; opacity: 0.3; }
         
         /* Footer Styling with Food Photo Background */
         .footer { 
@@ -253,16 +280,6 @@ description: Default layout
     </div>
 </footer>
 @endunless
-
-<!-- WhatsApp Float -->
-<a href="https://wa.me/256779081600?text=Hi%20TastyIgniter!%20I%20would%20like%20to%20order%20food." class="whatsapp-float" target="_blank" title="Reach us via WhatsApp">
-    <i class="fab fa-whatsapp"></i>
-</a>
-
-<!-- Chatbot Float -->
-<div class="chatbot-float" id="chatbotToggle" title="Chat with AI">
-    <i class="fa fa-comments"></i>
-</div>
 
 <livewire:igniter-orange::utils.modal/>
 <livewire:igniter-orange::utils.flash-message/>
