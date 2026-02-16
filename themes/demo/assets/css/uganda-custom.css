@@ -197,11 +197,11 @@ button[type="submit"]:focus {
     border-radius: 15px;
     overflow: hidden;
     background: white;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
 }
 
 .menu-item-image {
-    height: 250px;
+    height: 220px;
     object-fit: cover;
     transition: transform 0.3s ease;
 }
@@ -228,12 +228,12 @@ button[type="submit"]:focus {
 .menu-item-card,
 [class*="menu"] .card {
     position: relative;
-    border-radius: 15px;
+    border-radius: 12px;
     overflow: hidden;
     background: white;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
 }
 
 .menu-card:hover,
@@ -263,7 +263,7 @@ button[type="submit"]:focus {
 /* Menu Card Body */
 .menu-card .card-body,
 .menu-item-card .card-body {
-    padding: 1.5rem;
+    padding: 0.5rem 0.75rem;
 }
 
 /* Menu Item Title */
@@ -273,21 +273,22 @@ button[type="submit"]:focus {
 .menu-item-card h3,
 .menu-card h4,
 .menu-item-card h4 {
-    font-size: 1.25rem;
-    font-weight: 700;
+    font-size: 0.85rem;
+    font-weight: 600;
     color: var(--uganda-black);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.15rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Menu Item Description */
+/* Menu Item Description - hide or minimal */
 .menu-card .card-text,
 .menu-item-card .card-text,
-.menu-card p,
-.menu-item-card p {
-    color: #7F8C8D;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    margin-bottom: 1rem;
+.menu-card p:not(.price),
+.menu-item-card p:not(.price) {
+    display: none;
 }
 
 /* Menu Item Price */
@@ -295,25 +296,27 @@ button[type="submit"]:focus {
 .menu-item-card .price,
 .menu-card [class*="price"],
 .menu-item-card [class*="price"] {
-    font-size: 1.5rem;
-    font-weight: 800;
+    font-size: 0.9rem;
+    font-weight: 700;
     color: var(--primary-color);
-    display: block;
-    margin: 1rem 0;
+    display: inline-block;
+    margin: 0.25rem 0;
 }
 
 /* Add to Cart Button in Menu Cards */
 .menu-card .btn,
 .menu-item-card .btn {
-    width: 100%;
-    margin-top: 0.5rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    width: auto;
+    margin-top: 0;
+    background: var(--primary-color);
     border: none;
-    border-radius: 50px;
-    padding: 0.75rem 1.5rem;
+    border-radius: 20px;
+    padding: 0.3rem 0.75rem;
     color: white;
     font-weight: 600;
+    font-size: 0.75rem;
     transition: all 0.3s ease;
+    float: right;
 }
 
 .menu-card .btn:hover,
@@ -1770,12 +1773,21 @@ main[role="main"] {
    CART BOX - Reduced Orange, Clean Professional Look
    ===================================================== */
 
-/* Cart sticky container - position below header */
+/* Cart sticky container - position below header and category nav */
 .sticky-top:has(#cart-box),
 main .sticky-top,
 #page-wrapper .sticky-top {
-    top: 80px !important;
+    top: 120px !important;
     z-index: 100 !important;
+}
+
+/* Sticky cart wrapper for menus page */
+.sticky-cart-wrapper {
+    position: sticky;
+    top: 120px;
+    z-index: 100;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
 }
 
 /* Cart box container - clean white background */

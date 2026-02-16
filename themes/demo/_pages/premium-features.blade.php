@@ -15,7 +15,7 @@ permalink: /premium-features
         <div class="col-md-6 col-lg-4" id="group-orders">
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body text-center p-4">
-                    <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3 mx-auto" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                    <div class="feature-icon bg-warning bg-gradient text-white rounded-circle mb-3 mx-auto" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
                         <i class="fa fa-users fa-2x"></i>
                     </div>
                     <h4 class="card-title">Group Orders</h4>
@@ -27,9 +27,9 @@ permalink: /premium-features
                         <li class="mb-2"><i class="fa fa-check text-success me-2"></i>One delivery, less fees</li>
                     </ul>
                     @if(Auth::isLogged())
-                        <a href="{{ page_url('account.features') }}#group-orders" class="btn btn-primary">Start Group Order</a>
+                        <a href="{{ page_url('account.features') }}#group-orders" class="btn btn-warning">Start Group Order</a>
                     @else
-                        <a href="{{ page_url('account.login') }}" class="btn btn-outline-primary">Login to Start</a>
+                        <a href="{{ page_url('account.login') }}" class="btn btn-outline-warning">Login to Start</a>
                     @endif
                 </div>
             </div>
@@ -39,21 +39,21 @@ permalink: /premium-features
         <div class="col-md-6 col-lg-4" id="scheduled-orders">
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body text-center p-4">
-                    <div class="feature-icon bg-warning bg-gradient text-white rounded-circle mb-3 mx-auto" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                    <div class="feature-icon bg-gradient text-white rounded-circle mb-3 mx-auto" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; background-color: #FF4900;">
                         <i class="fa fa-clock fa-2x"></i>
                     </div>
                     <h4 class="card-title">Schedule Orders</h4>
                     <p class="text-muted">Plan your meals ahead. Schedule orders for later today, tomorrow, or any day of the week.</p>
                     <ul class="list-unstyled text-start small">
-                        <li class="mb-2"><i class="fa fa-check text-success me-2"></i>Order up to 7 days in advance</li>
-                        <li class="mb-2"><i class="fa fa-check text-success me-2"></i>Choose exact delivery time</li>
-                        <li class="mb-2"><i class="fa fa-check text-success me-2"></i>Perfect for office lunches</li>
-                        <li class="mb-2"><i class="fa fa-check text-success me-2"></i>Never miss a meal</li>
+                        <li class="mb-2"><i class="fa fa-check me-2" style="color: #FF4900;"></i>Order up to 7 days in advance</li>
+                        <li class="mb-2"><i class="fa fa-check me-2" style="color: #FF4900;"></i>Choose exact delivery time</li>
+                        <li class="mb-2"><i class="fa fa-check me-2" style="color: #FF4900;"></i>Perfect for office lunches</li>
+                        <li class="mb-2"><i class="fa fa-check me-2" style="color: #FF4900;"></i>Never miss a meal</li>
                     </ul>
                     @if(Auth::isLogged())
-                        <a href="{{ page_url('account.features') }}#scheduled-orders" class="btn btn-warning">Schedule Now</a>
+                        <a href="{{ page_url('account.features') }}#scheduled-orders" class="btn" style="background-color: #FF4900; border-color: #FF4900; color: white;">Schedule Now</a>
                     @else
-                        <a href="{{ page_url('account.login') }}" class="btn btn-outline-warning">Login to Schedule</a>
+                        <a href="{{ page_url('account.login') }}" class="btn" style="border-color: #FF4900; color: #FF4900;">Login to Schedule</a>
                     @endif
                 </div>
             </div>
@@ -63,21 +63,21 @@ permalink: /premium-features
         <div class="col-md-6 col-lg-4" id="subscriptions">
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body text-center p-4">
-                    <div class="feature-icon bg-success bg-gradient text-white rounded-circle mb-3 mx-auto" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                    <div class="feature-icon bg-warning bg-gradient text-white rounded-circle mb-3 mx-auto" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
                         <i class="fa fa-calendar-check fa-2x"></i>
                     </div>
                     <h4 class="card-title">Meal Plans</h4>
                     <p class="text-muted">Subscribe to regular meal deliveries. Save money and never worry about what to eat.</p>
                     <ul class="list-unstyled text-start small">
-                        <li class="mb-2"><i class="fa fa-check text-success me-2"></i>Daily, weekly, or monthly plans</li>
-                        <li class="mb-2"><i class="fa fa-check text-success me-2"></i>Up to 20% savings</li>
-                        <li class="mb-2"><i class="fa fa-check text-success me-2"></i>Customize your menu</li>
-                        <li class="mb-2"><i class="fa fa-check text-success me-2"></i>Skip or pause anytime</li>
+                        <li class="mb-2"><i class="fa fa-check text-warning me-2"></i>Daily, weekly, or monthly plans</li>
+                        <li class="mb-2"><i class="fa fa-check text-warning me-2"></i>Up to 20% savings</li>
+                        <li class="mb-2"><i class="fa fa-check text-warning me-2"></i>Customize your menu</li>
+                        <li class="mb-2"><i class="fa fa-check text-warning me-2"></i>Skip or pause anytime</li>
                     </ul>
                     @if(Auth::isLogged())
-                        <a href="{{ page_url('account.features') }}#subscriptions" class="btn btn-success">View Plans</a>
+                        <a href="{{ page_url('account.features') }}#subscriptions" class="btn btn-warning">View Plans</a>
                     @else
-                        <a href="{{ page_url('account.login') }}" class="btn btn-outline-success">Login to Subscribe</a>
+                        <a href="{{ page_url('account.login') }}" class="btn btn-outline-warning">Login to Subscribe</a>
                     @endif
                 </div>
             </div>
@@ -89,10 +89,10 @@ permalink: /premium-features
         <div class="col-12">
             <div class="card bg-light border-0">
                 <div class="card-body text-center p-5">
-                    <i class="fa fa-motorcycle fa-3x text-info mb-3"></i>
+                    <i class="fa fa-motorcycle fa-3x mb-3" style="color: #FF4900;"></i>
                     <h3>Track Your Order</h3>
                     <p class="text-muted mb-4">Know exactly where your food is with real-time GPS tracking</p>
-                    <a href="{{ page_url('track-order') }}" class="btn btn-info btn-lg">
+                    <a href="{{ page_url('track-order') }}" class="btn btn-lg" style="background-color: #FF4900; border-color: #FF4900; color: white;">
                         <i class="fa fa-map-marker-alt me-2"></i>Track Now
                     </a>
                 </div>

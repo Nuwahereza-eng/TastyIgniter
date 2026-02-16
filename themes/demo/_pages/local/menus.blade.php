@@ -16,6 +16,29 @@ hideFooter: 1
 '[igniter-orange::cart-box]': []
 '[igniter-orange::fulfillment-modal]': []
 ---
+{{-- Group Order Banner --}}
+<div id="groupOrderBanner" class="d-none">
+    <div class="bg-warning text-dark py-2">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div>
+                    <i class="fa fa-users me-2"></i>
+                    <strong>Group Order:</strong>
+                    <span id="groupOrderInfo">Adding items to group order</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-success" onclick="finishAddingItems()">
+                        <i class="fa fa-check me-1"></i>Done Adding
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-dark" onclick="exitGroupOrder()">
+                        <i class="fa fa-times me-1"></i>Exit Group
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- Scheduled Order Banner --}}
 <div id="scheduledOrderBanner" class="d-none">
     <div class="bg-success text-white py-2">
@@ -36,6 +59,9 @@ hideFooter: 1
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Check for active group order
+    checkGroupOrder();
+    
     // Check for scheduled order in localStorage
     const scheduledOrder = localStorage.getItem('ugaeats_scheduled_order');
     if (scheduledOrder) {
@@ -99,6 +125,111 @@ function clearScheduledOrder() {
         document.getElementById('scheduledOrderBanner').classList.add('d-none');
     });
 }
+
+// ============ GROUP ORDER FUNCTIONS ============
+function checkGroupOrder() {
+    const activeGroup = localStorage.getItem('ugaeats_active_group_order');
+    if (!activeGroup) return;
+    
+    try {
+        const groupData = JSON.parse(activeGroup);
+        
+        // Check if still valid (within 4 hours)
+        if (Date.now() - groupData.timestamp > 4 * 60 * 60 * 1000) {
+            localStorage.removeItem('ugaeats_active_group_order');
+            return;
+        }
+        
+        // Show group order banner
+        document.getElementById('groupOrderInfo').textContent = 'Adding items to group order';
+        document.getElementById('groupOrderBanner').classList.remove('d-none');
+        
+        // Also check URL param
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('group_order')) {
+            // Store in localStorage if not already there
+            if (!activeGroup) {
+                localStorage.setItem('ugaeats_active_group_order', JSON.stringify({
+                    id: urlParams.get('group_order'),
+                    return_url: '/account/features#group-orders',
+                    timestamp: Date.now()
+                }));
+            }
+        }
+    } catch (e) {
+        console.error('Error checking group order:', e);
+    }
+}
+
+async function finishAddingItems() {
+    const activeGroup = localStorage.getItem('ugaeats_active_group_order');
+    if (!activeGroup) {
+        alert('No active group order found');
+        return;
+    }
+    
+    const groupData = JSON.parse(activeGroup);
+    const btn = event.target;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Syncing...';
+    
+    try {
+        // Sync cart to group order
+        const response = await fetch('/ajax/group-orders/sync-cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            },
+            credentials: 'include'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Show success message
+            alert(`Items synced! ${result.items_count || 0} items added to group order (UGX ${(result.subtotal || 0).toLocaleString()})`);
+            
+            // Redirect back to group order
+            const returnUrl = groupData.return_url || '/account/features#group-orders';
+            
+            // Clear local storage
+            localStorage.removeItem('ugaeats_active_group_order');
+            
+            window.location.href = returnUrl;
+        } else {
+            throw new Error(result.error || 'Failed to sync cart');
+        }
+    } catch (error) {
+        console.error('Error syncing cart:', error);
+        alert('Failed to sync items: ' + error.message);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-check me-1"></i>Done Adding';
+    }
+}
+
+function exitGroupOrder() {
+    if (!confirm('Are you sure you want to exit the group order? Your items will not be added to the group.')) {
+        return;
+    }
+    
+    // Clear localStorage
+    localStorage.removeItem('ugaeats_active_group_order');
+    
+    // Call API to clear active group order
+    fetch('/ajax/group-orders/clear-active', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+        }
+    }).finally(() => {
+        // Hide banner
+        document.getElementById('groupOrderBanner').classList.add('d-none');
+    });
+}
 </script>
 
 <div class="bg-white border-bottom border-1">
@@ -126,11 +257,10 @@ function clearScheduledOrder() {
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<div class="sticky-top bg-white border-bottom border-1">
-    <div class="container">
-        <x-igniter-orange::category-list/>
+        {{-- Category navigation placed here below the location card --}}
+        <div class="mt-3">
+            <x-igniter-orange::category-list/>
+        </div>
     </div>
 </div>
 <div class="container pt-3 pb-5">
@@ -140,7 +270,9 @@ function clearScheduledOrder() {
         </div>
 
         <div class="col-lg-4 d-none d-lg-inline-block">
-            <livewire:igniter-orange::cart-box/>
+            <div style="position: sticky; top: 80px;">
+                <livewire:igniter-orange::cart-box/>
+            </div>
         </div>
     </div>
 </div>

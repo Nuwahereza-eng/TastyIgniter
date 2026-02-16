@@ -54,14 +54,14 @@ bodyClass: home-page
                 <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)); pointer-events: none;"></div>
                 <div class="position-relative text-center text-white p-4 d-flex align-items-center justify-content-center" style="min-height: 400px; z-index: 10;">
                     <div>
-                        <div class="mb-3">
-                            <span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 70px; height: 70px; background: rgba(255,73,0,0.9); box-shadow: 0 4px 20px rgba(255,73,0,0.5);">
-                                <i class="fa {{ $icon }} fa-2x"></i>
+                        <div class="mb-2">
+                            <span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 56px; height: 56px; background: rgba(255,73,0,0.9); box-shadow: 0 4px 20px rgba(255,73,0,0.5);">
+                                <i class="fa {{ $icon }} fa-lg"></i>
                             </span>
                         </div>
-                        <h1 class="display-5 fw-bold mb-2" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">{{ $title }}</h1>
-                        <p class="lead mb-4 px-3" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.6); max-width: 600px; margin: 0 auto;">{{ $description }}</p>
-                        <a href="{{ $link }}" class="btn btn-lg px-5 fw-bold" style="background: linear-gradient(135deg, #FF4900, #ff6b35); border: none; color: white; box-shadow: 0 4px 15px rgba(255,73,0,0.4); text-decoration: none;">
+                        <h2 class="h3 fw-bold mb-2" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.6);">{{ $title }}</h2>
+                        <p class="mb-3 px-3" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.6); max-width: 500px; margin: 0 auto; font-size: 1rem;">{{ $description }}</p>
+                        <a href="{{ $link }}" class="btn btn-md px-4 fw-bold" style="background: linear-gradient(135deg, #FF4900, #ff6b35); border: none; color: white; box-shadow: 0 4px 15px rgba(255,73,0,0.4); text-decoration: none;">
                             <i class="fa {{ $icon }} me-2"></i>{{ $buttonText }}
                         </a>
                     </div>

@@ -134,9 +134,9 @@ description: Default layout
 <header class="header">
     <nav class="navbar navbar-expand-md py-2">
         <div class="container">
-            <a class="navbar-brand" href="{{ page_url('home') }}">
-                <img class="img-logo" alt="TastyIgniter" src="{{ asset('vendor/igniter-orange/images/favicon.ico') }}" style="max-height: 40px;">
-                <span class="ms-2 fw-bold text-white d-none d-sm-inline">TastyIgniter</span>
+            <a class="navbar-brand d-flex align-items-end" href="{{ page_url('home') }}">
+                <img class="img-logo" alt="TastyIgniter" src="/storage/media/uploads/tastyigniter-logo-only.svg" style="height: 50px; width: auto;">
+                <span class="fw-bold text-white d-none d-sm-inline" style="font-size: 1.1rem; margin-left: 6px; line-height: 1; padding-bottom: 2px;">TastyIgniter</span>
             </a>
             
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMainHeader">

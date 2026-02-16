@@ -1,23 +1,12 @@
 <nav class="navbar navbar-light navbar-top navbar-expand-md py-2">
     <div class="container">
         <a class="navbar-brand" href="{{ page_url('home') }}">
-            @if($theme->logo_image ?? false)
-                <img
-                    class="img-logo"
-                    alt="{{ setting('site_name') }}"
-                    src="{{ media_url($theme->logo_image) }}"
-                    style="max-height: 45px;"
-                />
-            @elseif($theme->logo_text ?? false)
-                <span class="text-logo">{{ $theme->logo_text }}</span>
-            @else
-                <img
-                    class="img-logo"
-                    alt="{{ $site_name ?? 'UgaEats' }}"
-                    src="{{ asset('vendor/igniter-orange/images/favicon.ico') }}"
-                    style="max-height: 45px;"
-                />
-            @endif
+            <img
+                class="img-logo"
+                alt="{{ setting('site_name') }}"
+                src="{{ asset('themes/demo/assets/images/tastyigniter-white-logo.svg') }}"
+                style="max-height: 45px;"
+            />
         </a>
         
         <button

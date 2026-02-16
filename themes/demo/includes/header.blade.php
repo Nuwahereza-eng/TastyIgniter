@@ -9,30 +9,12 @@
     
     <div class="container">
         <a class="navbar-brand" href="{{ page_url('home') }}">
-            @php
-                $isHomePage = request()->is('/') || request()->is('home');
-            @endphp
-            @if(!$isHomePage)
-                <img
-                    class="img-logo white-logo"
-                    alt="{{ setting('site_name') }}"
-                    src="{{ asset('themes/demo/assets/images/tastyigniter-white-logo.svg') }}"
-                />
-            @elseif($theme->logo_image ?? false)
-                <img
-                    class="img-logo"
-                    alt="{{ setting('site_name') }}"
-                    src="{{ media_url($theme->logo_image) }}"
-                />
-            @elseif($theme->logo_text ?? false)
-                <span class="text-logo">{{ $theme->logo_text }}</span>
-            @else
-                <img
-                    class="img-logo"
-                    alt="{{ $site_name ?? 'UgaEats' }}"
-                    src="{{ asset('vendor/igniter-orange/images/favicon.ico') }}"
-                />
-            @endif
+            <img
+                class="img-logo"
+                alt="{{ setting('site_name') }}"
+                src="{{ asset('themes/demo/assets/images/tastyigniter-white-logo.svg') }}"
+                style="max-height: 45px;"
+            />
         </a>
         <button
             class="navbar-toggler border-0"
@@ -75,7 +57,7 @@
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <a class="dropdown-item" href="{{ url('/track-order') }}">
-                                <i class="fa fa-motorcycle text-info me-2"></i>Track Order
+                                <i class="fa fa-motorcycle text-warning me-2"></i>Track Order
                                 <small class="d-block text-muted">Real-time delivery tracking</small>
                             </a>
                         </li>
