@@ -6,6 +6,8 @@ security: customer
 
 '[igniter-orange::account-settings]': []
 ---
+
+<link rel="stylesheet" href="{{ asset('themes/demo/assets/css/features.css') }}">
 @php
     $customer = \Igniter\User\Facades\Auth::customer();
     $wallet = null;
@@ -25,7 +27,7 @@ security: customer
 
         <div class="col-sm-10">
             <!-- Wallet Balance Card -->
-            <div class="card border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);">
+            <div class="card border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);">
                 <div class="card-body text-white p-4">
                     <div class="row align-items-center">
                         <div class="col-md-8">
@@ -276,11 +278,24 @@ security: customer
                         <div class="d-flex gap-2">
                             <label class="flex-fill">
                                 <input type="radio" name="provider" value="mtn" class="btn-check" checked>
-                                <span class="btn btn-outline-warning w-100">MTN Mobile Money</span>
+                                <span class="btn w-100 d-flex align-items-center justify-content-center gap-2" style="background: #fff8f5; border: 2px solid #ff4900; color: #212529;">
+                                    <img src="/images/payments/mtn.png" alt="MTN" style="height: 24px; width: auto;">
+                                    MTN MoMo
+                                </span>
                             </label>
                             <label class="flex-fill">
                                 <input type="radio" name="provider" value="airtel" class="btn-check">
-                                <span class="btn btn-outline-danger w-100">Airtel Money</span>
+                                <span class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2">
+                                    <img src="/images/payments/airtel.png" alt="Airtel" style="height: 24px; width: auto;">
+                                    Airtel Money
+                                </span>
+                            </label>
+                            <label class="flex-fill">
+                                <input type="radio" name="provider" value="marz" class="btn-check">
+                                <span class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2">
+                                    <img src="/images/payments/marz.png" alt="Marz" style="height: 24px; width: auto;" onerror="this.style.display='none'">
+                                    Marz Wallet
+                                </span>
                             </label>
                         </div>
                     </div>
@@ -312,19 +327,19 @@ security: customer
 <style>
 .payment-option input:checked + .btn-outline-warning,
 input[type="radio"].btn-check:checked + .btn-outline-warning {
-    background-color: #ffc107;
-    color: #000;
-    border-color: #ffc107;
+    background-color: #ff4900;
+    color: #212529;
+    border-color: #ff4900;
 }
 .payment-option input:checked + .btn-outline-primary {
-    background-color: #0d6efd;
-    color: #fff;
-    border-color: #0d6efd;
+    background-color: #212529;
+    color: #ffffff;
+    border-color: #212529;
 }
 input[type="radio"].btn-check:checked + .btn-outline-danger {
-    background-color: #dc3545;
-    color: #fff;
-    border-color: #dc3545;
+    background-color: #212529;
+    color: #ffffff;
+    border-color: #212529;
 }
 </style>
 
@@ -374,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         icon: 'success',
                         title: 'Deposit Successful!',
                         text: data.message,
-                        confirmButtonColor: '#FF4900'
+                        confirmButtonColor: '#ff4900'
                     }).then(() => location.reload());
                 } else {
                     alert('Deposit Successful! ' + data.message);
@@ -386,7 +401,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         icon: 'error',
                         title: 'Deposit Failed',
                         text: data.error || 'Something went wrong',
-                        confirmButtonColor: '#FF4900'
+                        confirmButtonColor: '#ff4900'
                     });
                 } else {
                     alert('Deposit Failed: ' + (data.error || 'Something went wrong'));
@@ -429,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         icon: 'success',
                         title: 'Withdrawal Successful!',
                         text: data.message,
-                        confirmButtonColor: '#FF4900'
+                        confirmButtonColor: '#ff4900'
                     }).then(() => location.reload());
                 } else {
                     alert('Withdrawal Successful! ' + data.message);
@@ -441,7 +456,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         icon: 'error',
                         title: 'Withdrawal Failed',
                         text: data.error || 'Something went wrong',
-                        confirmButtonColor: '#FF4900'
+                        confirmButtonColor: '#ff4900'
                     });
                 } else {
                     alert('Withdrawal Failed: ' + (data.error || 'Something went wrong'));

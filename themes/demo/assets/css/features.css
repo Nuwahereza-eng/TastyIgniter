@@ -17,13 +17,13 @@
 }
 
 .feature-header h1 {
-    color: #333;
+    color: #212529;
     font-weight: 700;
     margin-bottom: 10px;
 }
 
 .feature-header p {
-    color: #666;
+    color: #6c757d;
     font-size: 1.1rem;
 }
 
@@ -56,7 +56,7 @@
    GROUP ORDERS
    ===================================================== */
 .group-order-banner {
-    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
     color: white;
     border-radius: 16px;
     padding: 40px;
@@ -89,7 +89,7 @@
 
 .group-code-display {
     background: #f8f9fa;
-    border: 2px dashed #FF4900;
+    border: 2px dashed #ff4900;
     border-radius: 12px;
     padding: 20px;
     text-align: center;
@@ -99,13 +99,13 @@
 .group-code {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #FF4900;
+    color: #ff4900;
     letter-spacing: 4px;
     font-family: monospace;
 }
 
 .group-code-label {
-    color: #666;
+    color: #6c757d;
     font-size: 0.9rem;
     margin-top: 5px;
 }
@@ -123,7 +123,7 @@
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #FF4900, #FF6B35);
+    background: linear-gradient(135deg, #ff4900, #ff6b35);
     color: white;
     display: flex;
     align-items: center;
@@ -136,12 +136,12 @@
 .group-member-info h5 {
     margin: 0;
     font-size: 1rem;
-    color: #333;
+    color: #212529;
 }
 
 .group-member-info span {
     font-size: 0.85rem;
-    color: #666;
+    color: #6c757d;
 }
 
 .group-member-status {
@@ -153,17 +153,17 @@
 }
 
 .group-member-status.ordering {
-    background: #fff3cd;
-    color: #856404;
+    background: #fff8f5;
+    color: #cc3a00;
 }
 
 .group-member-status.ready {
-    background: #d4edda;
-    color: #155724;
+    background: #fff8f5;
+    color: #cc3a00;
 }
 
 .group-member-status.host {
-    background: #FF4900;
+    background: #ff4900;
     color: white;
 }
 
@@ -187,12 +187,12 @@
 }
 
 .schedule-day:hover {
-    background: #fff5f0;
-    border-color: #FF4900;
+    background: #fff8f5;
+    border-color: #ff4900;
 }
 
 .schedule-day.selected {
-    background: #FF4900;
+    background: #ff4900;
     color: white;
 }
 
@@ -216,21 +216,21 @@
     display: inline-block;
     padding: 10px 20px;
     margin: 5px;
-    border: 2px solid #e5e5e5;
+    border: 2px solid #e9ecef;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .time-slot:hover {
-    border-color: #FF4900;
-    background: #fff5f0;
+    border-color: #ff4900;
+    background: #fff8f5;
 }
 
 .time-slot.selected {
-    background: #FF4900;
+    background: #ff4900;
     color: white;
-    border-color: #FF4900;
+    border-color: #ff4900;
 }
 
 .time-slot.unavailable {
@@ -240,7 +240,7 @@
 }
 
 .scheduled-order-summary {
-    background: #28a745;
+    background: #ff4900;
     color: white;
     border-radius: 12px;
     padding: 25px;
@@ -288,7 +288,7 @@
 }
 
 .subscription-card.featured {
-    border-color: #FF4900;
+    border-color: #ff4900;
     transform: scale(1.02);
 }
 
@@ -314,11 +314,11 @@
     font-size: 1.4rem;
     font-weight: 700;
     margin-bottom: 15px;
-    color: #333;
+    color: #212529;
 }
 
 .subscription-card.popular {
-    border-color: #FF4900;
+    border-color: #ff4900;
 }
 
 .subscription-card.popular::before {
@@ -327,7 +327,7 @@
     top: -12px;
     left: 50%;
     transform: translateX(-50%);
-    background: #FF4900;
+    background: #ff4900;
     color: white;
     padding: 5px 20px;
     border-radius: 20px;
@@ -343,7 +343,7 @@
 .subscription-name {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #333;
+    color: #212529;
     margin-bottom: 5px;
 }
 
@@ -354,16 +354,16 @@
 .subscription-price .amount {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #FF4900;
+    color: #ff4900;
 }
 
 .subscription-price .currency {
     font-size: 1.2rem;
-    color: #666;
+    color: #6c757d;
 }
 
 .subscription-price .period {
-    color: #999;
+    color: #adb5bd;
     font-size: 0.9rem;
 }
 
@@ -376,7 +376,7 @@
 
 .subscription-features li {
     padding: 10px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #e9ecef;
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -406,22 +406,22 @@
 }
 
 .subscription-cta.primary {
-    background: #FF4900;
+    background: #ff4900;
     color: white;
 }
 
 .subscription-cta.primary:hover {
-    background: #e04000;
+    background: #cc3a00;
     transform: scale(1.02);
 }
 
 .subscription-cta.secondary {
-    background: #f5f5f5;
-    color: #333;
+    background: #f8f9fa;
+    color: #212529;
 }
 
 .subscription-cta.secondary:hover {
-    background: #eee;
+    background: #e9ecef;
 }
 
 /* =====================================================
@@ -433,7 +433,7 @@
 }
 
 .tracking-header {
-    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
     color: white;
     border-radius: 16px 16px 0 0;
     padding: 30px;
@@ -467,11 +467,11 @@
 .tracking-eta-time {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #FF4900;
+    color: #ff4900;
 }
 
 .tracking-eta-label {
-    color: #666;
+    color: #6c757d;
     font-size: 0.9rem;
 }
 
@@ -487,7 +487,7 @@
     top: 0;
     bottom: 0;
     width: 3px;
-    background: #e5e5e5;
+    background: #e9ecef;
 }
 
 .tracking-step {
@@ -504,17 +504,17 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #e5e5e5;
+    background: #e9ecef;
     border: 3px solid white;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .tracking-step.completed::before {
-    background: #28a745;
+    background: #ff4900;
 }
 
 .tracking-step.active::before {
-    background: #FF4900;
+    background: #ff4900;
     animation: pulse-tracking 2s infinite;
 }
 
@@ -524,35 +524,35 @@
 }
 
 .tracking-step.pending::before {
-    background: #e5e5e5;
+    background: #e9ecef;
 }
 
 .tracking-step-title {
     font-weight: 600;
-    color: #333;
+    color: #212529;
     margin-bottom: 5px;
 }
 
 .tracking-step-time {
     font-size: 0.85rem;
-    color: #666;
+    color: #6c757d;
 }
 
 .tracking-step-desc {
     font-size: 0.9rem;
-    color: #888;
+    color: #6c757d;
     margin-top: 5px;
 }
 
 .tracking-map {
     height: 250px;
-    background: #f0f0f0;
+    background: #f8f9fa;
     border-radius: 12px;
     margin-top: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #999;
+    color: #adb5bd;
     position: relative;
     overflow: hidden;
 }
@@ -577,7 +577,7 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #FF4900, #FF6B35);
+    background: linear-gradient(135deg, #ff4900, #ff6b35);
     color: white;
     display: flex;
     align-items: center;
@@ -589,16 +589,16 @@
 
 .driver-details h5 {
     margin: 0;
-    color: #333;
+    color: #212529;
 }
 
 .driver-details span {
-    color: #666;
+    color: #6c757d;
     font-size: 0.9rem;
 }
 
 .driver-rating {
-    color: #ffc107;
+    color: #ff4900;
     margin-top: 3px;
 }
 
@@ -621,12 +621,12 @@
 }
 
 .driver-contact-btn.call {
-    background: #28a745;
+    background: #ff4900;
     color: white;
 }
 
 .driver-contact-btn.message {
-    background: #FF4900;
+    background: #ff4900;
     color: white;
 }
 
@@ -648,9 +648,9 @@
 .feature-tab {
     padding: 12px 25px;
     border-radius: 25px;
-    border: 2px solid #e5e5e5;
+    border: 2px solid #e9ecef;
     background: white;
-    color: #666;
+    color: #6c757d;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -658,13 +658,13 @@
 }
 
 .feature-tab:hover {
-    border-color: #FF4900;
-    color: #FF4900;
+    border-color: #ff4900;
+    color: #ff4900;
 }
 
 .feature-tab.active {
-    background: #FF4900;
-    border-color: #FF4900;
+    background: #ff4900;
+    border-color: #ff4900;
     color: white;
 }
 
@@ -706,4 +706,128 @@
         margin-left: 0;
         margin-top: 15px;
     }
+}
+
+/* ============================================================
+   UGAEATS PREMIUM PALETTE — Bootstrap utility overrides
+   Forces all semantic colours (success/warning/danger/info/primary)
+   used on premium pages into the brand palette:
+     orange (#ff4900 / #ff6b35 / #cc3a00 / #fff8f5)
+     black  (#212529)
+     gray   (#6c757d / #adb5bd / #dee2e6 / #e9ecef / #f8f9fa)
+     white  (#ffffff)
+   ============================================================ */
+
+/* Text utilities */
+.text-success,
+.text-warning,
+.text-info,
+.text-primary { color: #ff4900 !important; }
+.text-danger  { color: #212529 !important; }
+
+/* Background utilities */
+.bg-success,
+.bg-warning,
+.bg-info,
+.bg-primary { background-color: #ff4900 !important; color: #ffffff !important; }
+.bg-danger  { background-color: #212529 !important; color: #ffffff !important; }
+
+/* Solid buttons */
+.btn-success,
+.btn-warning,
+.btn-info,
+.btn-primary {
+    background-color: #ff4900 !important;
+    border-color: #ff4900 !important;
+    color: #ffffff !important;
+}
+.btn-success:hover,  .btn-success:focus,
+.btn-warning:hover,  .btn-warning:focus,
+.btn-info:hover,     .btn-info:focus,
+.btn-primary:hover,  .btn-primary:focus {
+    background-color: #cc3a00 !important;
+    border-color: #cc3a00 !important;
+    color: #ffffff !important;
+}
+.btn-danger {
+    background-color: #212529 !important;
+    border-color: #212529 !important;
+    color: #ffffff !important;
+}
+.btn-danger:hover, .btn-danger:focus {
+    background-color: #000000 !important;
+    border-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* Outline buttons */
+.btn-outline-success,
+.btn-outline-warning,
+.btn-outline-info,
+.btn-outline-primary {
+    color: #ff4900 !important;
+    border-color: #ff4900 !important;
+    background-color: transparent !important;
+}
+.btn-outline-success:hover,
+.btn-outline-warning:hover,
+.btn-outline-info:hover,
+.btn-outline-primary:hover {
+    background-color: #ff4900 !important;
+    color: #ffffff !important;
+}
+.btn-outline-danger {
+    color: #212529 !important;
+    border-color: #212529 !important;
+    background-color: transparent !important;
+}
+.btn-outline-danger:hover {
+    background-color: #212529 !important;
+    color: #ffffff !important;
+}
+
+/* Badges */
+.badge.bg-success,
+.badge.bg-warning,
+.badge.bg-info,
+.badge.bg-primary,
+.badge-success, .badge-warning, .badge-info, .badge-primary {
+    background-color: #ff4900 !important;
+    color: #ffffff !important;
+}
+.badge.bg-danger, .badge-danger {
+    background-color: #212529 !important;
+    color: #ffffff !important;
+}
+
+/* Alerts */
+.alert-success, .alert-warning, .alert-info, .alert-primary {
+    background-color: #fff8f5 !important;
+    border-color: #ffe5d9 !important;
+    color: #cc3a00 !important;
+}
+.alert-danger {
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+    color: #212529 !important;
+}
+
+/* Borders */
+.border-success,
+.border-warning,
+.border-info,
+.border-primary { border-color: #ff4900 !important; }
+.border-danger  { border-color: #212529 !important; }
+
+/* Spinners */
+.spinner-border.text-success,
+.spinner-border.text-warning,
+.spinner-border.text-info,
+.spinner-border.text-primary { color: #ff4900 !important; }
+.spinner-border.text-danger  { color: #212529 !important; }
+
+/* Form validation tweaks — keep red invalid for accessibility but tone toward black */
+.was-validated .form-control:invalid,
+.form-control.is-invalid {
+    border-color: #212529 !important;
 }

@@ -9,11 +9,10 @@ return [
     |
     | The `chain` provider is special, in that it will run all configured
     | providers in the sequence listed, should the previous provider fail.
-    | Using nominatim until Google Geocoding API is enabled in Cloud Console.
-    | Set GEOCODER_PROVIDER=google in .env once you enable the Google Geocoding API.
+    | We default to Google Maps now that the Geocoding API is enabled.
     |
     */
-    'default' => env('GEOCODER_PROVIDER', 'nominatim'),
+    'default' => env('GEOCODER_PROVIDER', 'google'),
 
     /*
     |---------------------------------------------------------------------------
@@ -56,7 +55,7 @@ return [
 
     'cache' => [
         'store' => null,
-        'duration' => 86400, // 24 hours - cache results to reduce API calls
+        'duration' => 300, // 5 minutes — short so stale/wrong reverse-geocode results expire fast
     ],
 
     'precision' => 8,

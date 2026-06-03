@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\OrderTracking;
+use App\Models\Rider;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 
 class OrderTrackingController extends Controller
@@ -203,14 +206,19 @@ class OrderTrackingController extends Controller
     }
 
     /**
-     * Assign rider to order (for admin)
+     * Assign rider to order. Accepts either an existing delivery staff
+     * (`rider_id` pointing at `admin_users.user_id`) or a free-form name/phone
+     * snapshot. When a staff user is supplied we also mark them as busy so
+     * they stop appearing in `availableRiders` and the rider dashboard can
+     * pick the assignment up via `assigned_rider_id`.
      */
     public function assignRider(Request $request, int $orderId): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'rider_name' => 'required|string|max:255',
-            'rider_phone' => 'required|string|max:20',
-            'rider_photo' => 'nullable|string|url',
+            'rider_id' => 'nullable|integer',
+            'rider_name' => 'required_without:rider_id|string|max:255',
+            'rider_phone' => 'required_without:rider_id|string|max:32',
+            'rider_photo' => 'nullable|string|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -225,14 +233,100 @@ class OrderTrackingController extends Controller
             ['status' => OrderTracking::STATUS_CONFIRMED]
         );
 
-        $tracking->rider_name = $request->rider_name;
-        $tracking->rider_phone = $request->rider_phone;
-        $tracking->rider_photo = $request->rider_photo;
-        $tracking->save();
+        if ($request->filled('rider_id')) {
+            $staff = Rider::deliveryStaff()
+                ->where('admin_users.user_id', (int) $request->rider_id)
+                ->first();
+
+            if (!$staff) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Rider not found or not a delivery staff member.',
+                ], 404);
+            }
+
+            $tracking->assigned_rider_id = $staff->user_id;
+            $tracking->rider_name = $staff->name ?? $request->input('rider_name');
+            $tracking->rider_phone = $staff->telephone ?? $request->input('rider_phone');
+            $tracking->rider_photo = $request->input('rider_photo');
+            $tracking->rider_rejected_at = null;
+            $tracking->save();
+
+            // Best-effort: mark the staff user as busy so the dispatcher UI
+            // won't keep offering them. Columns are added by the alignment
+            // migration; guard via Schema::hasColumn so tests on older
+            // databases don't blow up.
+            if (Schema::hasColumn('admin_users', 'current_order_id')) {
+                DB::table('admin_users')
+                    ->where('user_id', $staff->user_id)
+                    ->update([
+                        'is_available' => 0,
+                        'current_order_id' => $orderId,
+                    ]);
+            }
+        } else {
+            $tracking->assigned_rider_id = null;
+            $tracking->rider_name = $request->rider_name;
+            $tracking->rider_phone = $request->rider_phone;
+            $tracking->rider_photo = $request->rider_photo;
+            $tracking->save();
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Rider assigned successfully',
+            'tracking' => $this->formatTrackingResponse($tracking),
+        ]);
+    }
+
+    /**
+     * List delivery staff that are currently available to take an order.
+     */
+    public function availableRiders(): JsonResponse
+    {
+        if (!Schema::hasTable('admin_user_roles')) {
+            return response()->json([
+                'success' => true,
+                'riders' => [],
+            ]);
+        }
+
+        $riders = Rider::deliveryStaff()->available()->get()->map(function ($r) {
+            return [
+                'id' => $r->user_id,
+                'name' => $r->name,
+                'phone' => $r->telephone,
+                'email' => $r->email,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'count' => $riders->count(),
+            'riders' => $riders,
+        ]);
+    }
+
+    /**
+     * Mark order as picked up by the rider.
+     */
+    public function markPickedUp(int $orderId): JsonResponse
+    {
+        $tracking = OrderTracking::byOrder($orderId)->first();
+
+        if (!$tracking) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Tracking not found',
+            ], 404);
+        }
+
+        $tracking->status = OrderTracking::STATUS_PICKED_UP;
+        $tracking->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order marked as picked up',
             'tracking' => $this->formatTrackingResponse($tracking),
         ]);
     }
@@ -277,7 +371,8 @@ class OrderTrackingController extends Controller
     }
 
     /**
-     * Mark order as delivered
+     * Mark order as delivered. Frees up the rider on `admin_users` so the
+     * dispatcher can route them to the next order.
      */
     public function markDelivered(int $orderId): JsonResponse
     {
@@ -293,6 +388,15 @@ class OrderTrackingController extends Controller
         $tracking->status = OrderTracking::STATUS_DELIVERED;
         $tracking->eta_minutes = 0;
         $tracking->save();
+
+        if ($tracking->assigned_rider_id && Schema::hasColumn('admin_users', 'current_order_id')) {
+            DB::table('admin_users')
+                ->where('user_id', $tracking->assigned_rider_id)
+                ->update([
+                    'is_available' => 1,
+                    'current_order_id' => null,
+                ]);
+        }
 
         return response()->json([
             'success' => true,

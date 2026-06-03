@@ -42,6 +42,11 @@ class Payment extends Model
     // Payment types
     const TYPE_ORDER = 'order';
     const TYPE_SUBSCRIPTION = 'subscription';
+    const TYPE_RESERVATION = 'reservation';
+    const TYPE_GROUP_SHARE = 'group_share';
+    const TYPE_SCHEDULED_ORDER = 'scheduled_order';
+    const TYPE_WALLET_DEPOSIT = 'wallet_deposit';
+    const TYPE_WALLET_WITHDRAWAL = 'wallet_withdrawal';
     
     // Payment methods
     const METHOD_MTN = 'mtn';

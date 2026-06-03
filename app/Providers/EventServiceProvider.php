@@ -27,7 +27,11 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        // Wire the Igniter Cart lifecycle events into our local track-order
+        // subsystem so a tracking row is created on payment and kept in sync
+        // when an admin advances the order status.
+        Event::listen('admin.order.paymentProcessed', [\App\Listeners\SyncOrderTracking::class, 'onPaymentProcessed']);
+        Event::listen('igniter.cart.orderStatusAdded', [\App\Listeners\SyncOrderTracking::class, 'onStatusAdded']);
     }
 
     /**

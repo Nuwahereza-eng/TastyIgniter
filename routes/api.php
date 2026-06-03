@@ -99,8 +99,10 @@ Route::prefix('tracking')->group(function () {
     Route::put('/{orderId}/status', [OrderTrackingController::class, 'updateStatus']);
     Route::post('/{orderId}/assign-rider', [OrderTrackingController::class, 'assignRider']);
     Route::put('/{orderId}/location', [OrderTrackingController::class, 'updateLocation']);
+    Route::post('/{orderId}/picked-up', [OrderTrackingController::class, 'markPickedUp']);
     Route::post('/{orderId}/delivered', [OrderTrackingController::class, 'markDelivered']);
     Route::get('/active', [OrderTrackingController::class, 'activeDeliveries']);
+    Route::get('/available-riders', [OrderTrackingController::class, 'availableRiders']);
 });
 
 // ==========================================

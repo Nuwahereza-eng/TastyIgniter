@@ -80,17 +80,31 @@ class SubscriptionController extends Controller
                 'meals_remaining' => $subscription->meals_remaining,
                 'meals_used_percentage' => $subscription->getMealsUsedPercentage(),
                 'auto_renew' => $subscription->auto_renew,
+                'served_orders' => $subscription->mealUsages()->limit(10)->get()->map(function ($u) {
+                    return [
+                        'order_id' => $u->order_id,
+                        'formatted_id' => 'UGA-' . str_pad((string) $u->order_id, 5, '0', STR_PAD_LEFT),
+                        'used_at' => $u->used_at,
+                    ];
+                }),
             ],
         ]);
     }
 
     /**
-     * Subscribe to a plan
+     * Subscribe to a plan.
+     *
+     * Flow:
+     *   1. Validate plan + payment fields.
+     *   2. Reject if customer already has an active subscription.
+     *   3. Initialize a Marz payment (subscription type) via PaymentController::initialize().
+     *   4. Return tx_ref + (optional) redirect_url. The Subscription is activated
+     *      on Marz webhook / callback success by PaymentController::activateSubscription().
      */
     public function subscribe(Request $request): JsonResponse
     {
         $customerId = $this->getCustomerId();
-        
+
         if (!$customerId) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
@@ -98,6 +112,12 @@ class SubscriptionController extends Controller
         $validator = Validator::make($request->all(), [
             'plan_id' => 'required|integer|exists:subscription_plans,id',
             'auto_renew' => 'boolean',
+            'payment_method' => 'required|in:mtn,airtel,card,marz',
+            'phone' => 'nullable|string',
+            'email' => 'nullable|email',
+            'name' => 'nullable|string',
+            'delivery_address' => 'nullable|string',
+            'preferred_delivery_time' => 'nullable|string|max:10',
         ]);
 
         if ($validator->fails()) {
@@ -107,7 +127,6 @@ class SubscriptionController extends Controller
             ], 422);
         }
 
-        // Check if customer already has an active subscription
         $existingSubscription = Subscription::byCustomer($customerId)
             ->active()
             ->first();
@@ -128,29 +147,65 @@ class SubscriptionController extends Controller
             ], 400);
         }
 
-        // Calculate expiration based on billing period
-        $expiresAt = match($plan->billing_period) {
-            SubscriptionPlan::PERIOD_WEEKLY => now()->addWeek(),
-            SubscriptionPlan::PERIOD_MONTHLY => now()->addMonth(),
-            SubscriptionPlan::PERIOD_YEARLY => now()->addYear(),
-            default => now()->addMonth(),
-        };
+        // Pull email/name from the authenticated customer when not supplied.
+        $customer = null;
+        if (class_exists(\Igniter\User\Facades\Auth::class)) {
+            $customer = \Igniter\User\Facades\Auth::customer();
+        }
+        $email = $request->input('email') ?: ($customer->email ?? null);
+        $name = $request->input('name')
+            ?: trim((string) (($customer->first_name ?? '') . ' ' . ($customer->last_name ?? '')))
+            ?: 'Customer';
 
-        $subscription = Subscription::create([
-            'customer_id' => $customerId,
+        if (!$email) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Email is required to start a subscription.',
+            ], 422);
+        }
+
+        // Stash subscription preferences in Payment metadata so the webhook
+        // can rebuild the Subscription row on successful capture.
+        $paymentRequest = Request::create('/ajax/payments/initialize', 'POST', [
+            'amount' => (float) $plan->price,
+            'email' => $email,
+            'phone' => $request->input('phone'),
+            'name' => $name,
+            'type' => \App\Models\Payment::TYPE_SUBSCRIPTION,
             'plan_id' => $plan->id,
-            'status' => Subscription::STATUS_ACTIVE,
-            'started_at' => now(),
-            'expires_at' => $expiresAt,
-            'meals_remaining' => $plan->meals_per_period,
-            'auto_renew' => $request->auto_renew ?? true,
+            'payment_method' => $request->input('payment_method'),
         ]);
+        $paymentRequest->setLaravelSession($request->session());
+        $paymentRequest->setUserResolver(fn() => $request->user());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Successfully subscribed to ' . $plan->name . ' plan',
-            'subscription' => $subscription->load('plan'),
-        ], 201);
+        /** @var \App\Http\Controllers\PaymentController $paymentController */
+        $paymentController = app(\App\Http\Controllers\PaymentController::class);
+        $response = $paymentController->initialize($paymentRequest);
+        $payload = json_decode($response->getContent(), true) ?: [];
+
+        // Persist subscription preferences (auto_renew, delivery prefs) so the
+        // webhook activator can apply them when creating the Subscription row.
+        if (!empty($payload['payment_id'])) {
+            $payment = \App\Models\Payment::find($payload['payment_id']);
+            if ($payment) {
+                $payment->metadata = array_merge($payment->metadata ?? [], [
+                    'plan_id' => $plan->id,
+                    'auto_renew' => (bool) ($request->input('auto_renew', true)),
+                    'delivery_address' => $request->input('delivery_address'),
+                    'preferred_delivery_time' => $request->input('preferred_delivery_time'),
+                ]);
+                $payment->save();
+            }
+        }
+
+        return response()->json(array_merge($payload, [
+            'plan' => [
+                'id' => $plan->id,
+                'name' => $plan->name,
+                'price' => (float) $plan->price,
+                'billing_period' => $plan->billing_period,
+            ],
+        ]), $response->getStatusCode());
     }
 
     /**
@@ -334,9 +389,32 @@ class SubscriptionController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Also surface every subscription-related payment so the user has a
+        // full audit trail (renewals, simulated, failed, refunded, etc.) — not
+        // just the single active Subscription row.
+        $payments = \App\Models\Payment::where('customer_id', $customerId)
+            ->where('payment_type', \App\Models\Payment::TYPE_SUBSCRIPTION)
+            ->orderByDesc('created_at')
+            ->limit(50)
+            ->get()
+            ->map(function ($p) {
+                return [
+                    'id' => $p->id,
+                    'tx_ref' => $p->tx_ref,
+                    'amount' => (float) $p->amount,
+                    'currency' => $p->currency,
+                    'status' => $p->status,
+                    'provider' => $p->provider,
+                    'payment_method' => $p->payment_method,
+                    'simulated' => (bool) ($p->metadata['simulated'] ?? false),
+                    'created_at' => $p->created_at,
+                ];
+            });
+
         return response()->json([
             'success' => true,
             'subscriptions' => $subscriptions,
+            'payments' => $payments,
         ]);
     }
 

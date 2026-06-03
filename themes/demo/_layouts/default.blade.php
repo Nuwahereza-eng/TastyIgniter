@@ -135,8 +135,12 @@ description: Default layout
     <nav class="navbar navbar-expand-md py-2">
         <div class="container">
             <a class="navbar-brand d-flex align-items-end" href="{{ page_url('home') }}">
-                <img class="img-logo" alt="TastyIgniter" src="/storage/media/uploads/tastyigniter-logo-only.svg" style="height: 50px; width: auto;">
-                <span class="fw-bold text-white d-none d-sm-inline" style="font-size: 1.1rem; margin-left: 6px; line-height: 1; padding-bottom: 2px;">TastyIgniter</span>
+                @if(($this->page->bodyClass ?? '') === 'home-page')
+                    <img class="img-logo" alt="TastyIgniter" src="/storage/media/uploads/tastyigniter-logo-only.svg" style="height: 50px; width: auto;">
+                    <span class="fw-bold d-none d-sm-inline" style="font-size: 1.1rem; margin-left: 6px; line-height: 1; padding-bottom: 2px; color: #FF4900;">TastyIgniter</span>
+                @else
+                    <img class="img-logo" alt="TastyIgniter" src="{{ asset('themes/demo/assets/images/tastyigniter-white-logo.svg') }}" style="height: 50px; width: auto;">
+                @endif
             </a>
             
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMainHeader">

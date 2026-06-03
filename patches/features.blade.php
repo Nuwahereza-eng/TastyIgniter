@@ -300,7 +300,7 @@ security: customer
                                         <div class="row">
                                             <div class="col-md-8">
                                                 <label class="form-label">Enter Order Number</label>
-                                                <input type="text" class="form-control form-control-lg" id="trackingOrderId" placeholder="e.g., UGA-2026-12345">
+                                                <input type="text" class="form-control form-control-lg" id="trackingOrderId" placeholder="e.g., UGA-00042, 42, or your order hash">
                                             </div>
                                             <div class="col-md-4 d-flex align-items-end">
                                                 <button class="btn btn-primary btn-lg w-100" onclick="trackOrder()">
@@ -1281,26 +1281,47 @@ async function cancelSubscription() {
 }
 
 // ============ ORDER TRACKING FUNCTIONS ============
+// Accepts any of: bare numeric order_id, UGA-NNNNN, UGA-YYYY-NNNNN, or the order hash.
+function buildTrackPayload(raw) {
+    const trimmed = (raw || '').trim();
+    if (!trimmed) return null;
+    const upper = trimmed.toUpperCase();
+    if (upper.startsWith('UGA')) {
+        const groups = upper.match(/\d+/g);
+        if (groups && groups.length) {
+            const num = parseInt(groups[groups.length - 1], 10);
+            if (!isNaN(num) && num > 0) return { order_id: num };
+        }
+    }
+    if (/^\d+$/.test(trimmed)) return { order_id: parseInt(trimmed, 10) };
+    if (/^[A-Za-z0-9_-]{8,}$/.test(trimmed)) return { order_hash: trimmed };
+    return null;
+}
+
 async function trackOrder() {
-    const orderId = document.getElementById('trackingOrderId').value.trim();
-    
-    if (!orderId) {
+    const raw = document.getElementById('trackingOrderId').value.trim();
+
+    if (!raw) {
         alert('Please enter an order number');
         return;
     }
-    
+
+    const payload = buildTrackPayload(raw);
+    if (!payload) {
+        alert('Invalid order number. Enter the number shown on your receipt (e.g. UGA-00042, 42, or the order hash from your confirmation email).');
+        return;
+    }
+
     const btn = event.target;
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Tracking...';
-    
+
     try {
-        const response = await apiCall('/tracking/track', 'POST', {
-            order_id: orderId,
-        });
-        
+        const response = await apiCall('/tracking/track', 'POST', payload);
+
         // Show tracking result
         document.getElementById('trackingResult').classList.remove('d-none');
-        
+
         // Update the UI with real data
         if (response.tracking) {
             updateTrackingUI(response.tracking, response.order);
@@ -1446,7 +1467,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 .tracking-map {
     height: 300px;
-    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
     border-radius: 0.5rem;
     position: relative;
 }
@@ -1462,7 +1483,7 @@ document.addEventListener('DOMContentLoaded', function() {
     position: absolute;
     bottom: 40%;
     left: 60%;
-    background: #28a745;
+    background: #ff4900;
     color: white;
     width: 40px;
     height: 40px;
@@ -1492,10 +1513,10 @@ document.addEventListener('DOMContentLoaded', function() {
     padding-bottom: 0;
 }
 .timeline-item.completed {
-    border-left-color: #28a745;
+    border-left-color: #ff4900;
 }
 .timeline-item.active {
-    border-left-color: #28a745;
+    border-left-color: #ff4900;
 }
 .timeline-marker {
     position: absolute;
@@ -1508,7 +1529,7 @@ document.addEventListener('DOMContentLoaded', function() {
     border: 3px solid white;
 }
 .timeline-item.completed .timeline-marker {
-    background: #28a745;
+    background: #ff4900;
 }
 .timeline-item.active .timeline-marker {
     background: var(--bs-primary);

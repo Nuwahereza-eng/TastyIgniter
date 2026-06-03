@@ -131,6 +131,68 @@ class GroupOrder extends Model
     }
 
     /**
+     * Compute each participant's share according to the split method.
+     * Returns an array keyed by participant id: [participantId => share_amount].
+     */
+    public function computeShares(): array
+    {
+        $participants = $this->participants()->get();
+        $total = (float) $this->calculateTotal();
+        $shares = [];
+
+        switch ($this->split_method) {
+            case self::SPLIT_HOST_PAYS:
+                foreach ($participants as $p) {
+                    $shares[$p->id] = $p->is_host ? round($total, 2) : 0.0;
+                }
+                break;
+
+            case self::SPLIT_EQUAL:
+                $count = max(1, $participants->count());
+                $per = round($total / $count, 2);
+                foreach ($participants as $p) {
+                    $shares[$p->id] = $per;
+                }
+                break;
+
+            case self::SPLIT_BY_ITEM:
+            default:
+                foreach ($participants as $p) {
+                    $shares[$p->id] = round((float) $p->subtotal, 2);
+                }
+                break;
+        }
+
+        return $shares;
+    }
+
+    /**
+     * Persist the computed shares to each participant row.
+     */
+    public function applyShares(): void
+    {
+        $shares = $this->computeShares();
+        foreach ($shares as $participantId => $amount) {
+            GroupOrderParticipant::where('id', $participantId)
+                ->update(['share_amount' => $amount]);
+        }
+        $this->total_amount = $this->calculateTotal();
+        $this->save();
+    }
+
+    /**
+     * True when every participant with a non-zero share has paid.
+     */
+    public function isFullyPaid(): bool
+    {
+        $remaining = $this->participants()
+            ->where('share_amount', '>', 0)
+            ->where('has_paid', false)
+            ->count();
+        return $remaining === 0;
+    }
+
+    /**
      * Get share link
      */
     public function getShareLink(): string

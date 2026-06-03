@@ -83,20 +83,23 @@ class GroupOrderWebController extends Controller
             ], 401);
         }
 
-        // Get orders where user is host
+        // Surface both OPEN (still collecting / accepting) and CLOSED
+        // (collection done, awaiting outstanding shares) so users can act on
+        // groups that need their attention.
+        $visibleStates = [GroupOrder::STATUS_OPEN, GroupOrder::STATUS_CLOSED];
+
         $hosted = GroupOrder::where('host_customer_id', $customerId)
-            ->where('status', GroupOrder::STATUS_OPEN)
+            ->whereIn('status', $visibleStates)
             ->with('participants')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Get orders where user is participant (not host)
         $participantIds = GroupOrderParticipant::where('customer_id', $customerId)
             ->pluck('group_order_id');
-            
+
         $participating = GroupOrder::whereIn('id', $participantIds)
             ->where('host_customer_id', '!=', $customerId)
-            ->where('status', GroupOrder::STATUS_OPEN)
+            ->whereIn('status', $visibleStates)
             ->with('participants')
             ->orderBy('created_at', 'desc')
             ->get();

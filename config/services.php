@@ -53,4 +53,20 @@ return [
         'base_url' => env('FLUTTERWAVE_BASE_URL', 'https://api.flutterwave.com/v3'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Marz Wallet (MarzPay) Provider
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for Marz Wallet integration. Get credentials from
+    | https://wallet.wearemarz.com/developer
+    |
+    */
+    'marz' => [
+        'base_url' => env('MARZ_BASE_URL', 'https://wallet.wearemarz.com/api/v1'),
+        'api_key' => env('MARZ_API_KEY', ''),
+        'public_key' => env('MARZ_PUBLIC_KEY', ''),
+        'secret_key' => env('MARZ_SECRET_KEY', ''),
+    ],
+
 ];

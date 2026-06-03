@@ -21,7 +21,7 @@ permalink: /track-order
                         <div class="col-md-8">
                             <label class="form-label fw-bold">Order Number</label>
                             <input type="text" class="form-control form-control-lg" id="trackingOrderId" 
-                                   placeholder="e.g., UGA-2026-12345" autofocus>
+                                   placeholder="e.g., UGA-00042, 42, or your order hash" autofocus>
                         </div>
                         <div class="col-md-4 d-flex align-items-end mt-3 mt-md-0">
                             <button class="btn btn-primary btn-lg w-100" onclick="trackOrderPublic()">
@@ -68,7 +68,7 @@ permalink: /track-order
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-primary text-white">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0"><i class="fa fa-receipt me-2"></i>Order <span id="displayOrderId">UGA-2026-12345</span></h5>
+                            <h5 class="mb-0"><i class="fa fa-receipt me-2"></i>Order <span id="displayOrderId">UGA-00042</span></h5>
                             <span class="badge bg-warning text-dark" id="orderStatusBadge">Out for Delivery</span>
                         </div>
                     </div>
@@ -273,7 +273,7 @@ permalink: /track-order
 <style>
 .tracking-map-public {
     height: 250px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-radius: 1rem;
     display: flex;
     align-items: center;
@@ -313,12 +313,12 @@ permalink: /track-order
 }
 
 .map-point.restaurant i {
-    background: #28a745;
+    background: #ff4900;
     color: white;
 }
 
 .map-point.rider i {
-    background: #ff6600;
+    background: #ff4900;
     color: white;
     animation: pulse 2s infinite;
 }
@@ -341,7 +341,7 @@ permalink: /track-order
 .map-route-line {
     flex: 1;
     height: 4px;
-    background: #28a745;
+    background: #ff4900;
     position: relative;
 }
 
@@ -357,7 +357,7 @@ permalink: /track-order
 }
 
 .eta-banner {
-    background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
     color: white;
     padding: 1rem;
     border-radius: 0.5rem;
@@ -390,11 +390,11 @@ permalink: /track-order
 }
 
 .tracking-timeline-public .timeline-item.completed:not(:last-child)::after {
-    background: #28a745;
+    background: #ff4900;
 }
 
 .tracking-timeline-public .timeline-item.active:not(:last-child)::after {
-    background: linear-gradient(to bottom, #28a745 50%, #dee2e6 50%);
+    background: linear-gradient(to bottom, #ff4900 50%, #dee2e6 50%);
 }
 
 .tracking-timeline-public .timeline-marker {
@@ -411,12 +411,12 @@ permalink: /track-order
 }
 
 .tracking-timeline-public .timeline-item.completed .timeline-marker {
-    background: #28a745;
+    background: #ff4900;
     color: white;
 }
 
 .tracking-timeline-public .timeline-item.active .timeline-marker {
-    background: #ff6600;
+    background: #ff4900;
     color: white;
 }
 
@@ -443,7 +443,7 @@ permalink: /track-order
     display: flex;
     justify-content: space-between;
     padding: 0.5rem 0;
-    border-bottom: 1px solid #f1f1f1;
+    border-bottom: 1px solid #f8f9fa;
 }
 
 .order-detail-item:last-child {
@@ -452,7 +452,7 @@ permalink: /track-order
 
 .order-detail-item.total {
     font-size: 1.1rem;
-    color: #ff6600;
+    color: #ff4900;
 }
 
 .order-detail-label {
@@ -487,25 +487,45 @@ permalink: /track-order
 const API_BASE = '/ajax';
 const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
-// Parse order ID from UGA-XXXXX format
-function parseOrderId(orderId) {
-    if (!orderId) return null;
-    
-    // Remove any spaces and convert to uppercase
-    orderId = orderId.trim().toUpperCase();
-    
-    // If it's in UGA-XXXXX format, extract the number
-    const ugaMatch = orderId.match(/^UGA-?(\d+)$/);
-    if (ugaMatch) {
-        return parseInt(ugaMatch[1], 10);
+// Parse the order number entered by the customer. The TastyIgniter checkout
+// surfaces three things customers might paste in:
+//   1. The bare numeric `order_id` (e.g. 42)
+//   2. The display form `UGA-00042` (zero-padded, what our controller emits)
+//   3. A multi-segment label like `UGA-2026-00042` (legacy/example format)
+//   4. The order `hash` (long alphanumeric, used by /checkout/success/:hash)
+// We return a payload ready to POST to /ajax/tracking/track which accepts
+// either `order_id` or `order_hash`.
+function parseOrderInput(raw) {
+    if (!raw) return null;
+    const trimmed = raw.trim();
+    const upper = trimmed.toUpperCase();
+
+    // UGA-... — take the LAST numeric run (handles UGA-00042 and UGA-2026-00042)
+    if (upper.startsWith('UGA')) {
+        const groups = upper.match(/\d+/g);
+        if (groups && groups.length) {
+            const num = parseInt(groups[groups.length - 1], 10);
+            if (!isNaN(num) && num > 0) return { order_id: num };
+        }
     }
-    
-    // If it's just a number, return it
-    if (/^\d+$/.test(orderId)) {
-        return parseInt(orderId, 10);
+
+    // Bare numeric → order_id
+    if (/^\d+$/.test(trimmed)) {
+        return { order_id: parseInt(trimmed, 10) };
     }
-    
+
+    // Anything else → treat as the order hash and let the server look it up
+    if (/^[A-Za-z0-9_-]{8,}$/.test(trimmed)) {
+        return { order_hash: trimmed };
+    }
+
     return null;
+}
+
+// Legacy compatibility: callers that only wanted the numeric id.
+function parseOrderId(orderId) {
+    const parsed = parseOrderInput(orderId);
+    return parsed && parsed.order_id ? parsed.order_id : null;
 }
 
 // Format order ID to UGA-XXXXX format
@@ -544,10 +564,10 @@ async function trackOrderPublic() {
         return;
     }
     
-    const orderId = parseOrderId(rawOrderId);
+    const payload = parseOrderInput(rawOrderId);
     
-    if (!orderId) {
-        alert('Invalid order number format. Please enter a valid order ID (e.g., UGA-00001 or 1)');
+    if (!payload) {
+        alert('Invalid order number. Enter the number shown on your receipt (e.g. UGA-00042, 42, or the order hash from your confirmation email).');
         document.getElementById('trackingOrderId').focus();
         return;
     }
@@ -563,15 +583,15 @@ async function trackOrderPublic() {
     btn.disabled = true;
     
     try {
-        const response = await apiCall('/tracking/track', 'POST', {
-            order_id: orderId,
-        });
+        const response = await apiCall('/tracking/track', 'POST', payload);
         
         btn.innerHTML = originalText;
         btn.disabled = false;
         
         if (response.success && response.tracking) {
-            showOrderTrackingReal(formatOrderId(orderId), response.tracking, response.order, response.location);
+            const displayId = (response.order && response.order.formatted_id)
+                || (payload.order_id ? formatOrderId(payload.order_id) : rawOrderId);
+            showOrderTrackingReal(displayId, response.tracking, response.order, response.location);
         } else if (response.success === false && response.error) {
             showNoOrderFound(response.error);
         } else {

@@ -81,21 +81,24 @@ class WalletController extends Controller
     }
 
     /**
-     * Deposit money into wallet
+     * Deposit money into wallet via MarzPay (or simulated when Marz is
+     * not configured / in demo mode). Reuses PaymentController::initialize
+     * so collect-money + webhook completion are shared with order flows.
      */
     public function deposit(Request $request): JsonResponse
     {
         $customer = Auth::customer();
-        
+
         if (!$customer) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
         $validator = Validator::make($request->all(), [
             'amount' => 'required|numeric|min:1000|max:5000000',
-            'payment_method' => 'required|in:mobilemoney,flutterwave',
-            'phone_number' => 'required_if:payment_method,mobilemoney|string',
-            'provider' => 'required_if:payment_method,mobilemoney|in:mtn,airtel',
+            'payment_method' => 'required|in:mtn,airtel,card,mobilemoney,flutterwave',
+            'phone_number' => 'nullable|string',
+            'phone' => 'nullable|string',
+            'provider' => 'nullable|in:mtn,airtel',
         ]);
 
         if ($validator->fails()) {
@@ -103,51 +106,75 @@ class WalletController extends Controller
         }
 
         try {
-            DB::beginTransaction();
-
             $wallet = TastyWallet::getOrCreateForCustomer($customer->customer_id);
             $amount = floatval($request->amount);
-            $paymentMethod = $request->payment_method;
 
-            // In test mode, simulate successful payment
-            $externalRef = 'TEST_' . TastyWallet::generateReference('DEP');
+            $method = $request->payment_method;
+            if ($method === 'mobilemoney') {
+                $method = $request->input('provider', 'mtn');
+            } elseif ($method === 'flutterwave') {
+                $method = 'card';
+            }
+            $phone = $request->input('phone') ?? $request->input('phone_number');
 
-            $transaction = $wallet->deposit(
-                $amount,
-                $paymentMethod,
-                $externalRef,
-                'Deposit via ' . ucfirst($paymentMethod)
-            );
+            $pending = $wallet->transactions()->create([
+                'type' => 'deposit',
+                'amount' => $amount,
+                'balance_before' => $wallet->balance,
+                'balance_after' => $wallet->balance,
+                'reference' => TastyWallet::generateReference('DEP-PEND'),
+                'description' => in_array($method, ['mtn', 'airtel'], true)
+                    ? 'Wallet top-up via ' . strtoupper($method) . ' Mobile Money'
+                    : 'Wallet top-up via Card',
+                'payment_method' => $method,
+                'status' => 'pending',
+            ]);
 
-            DB::commit();
+            $sub = Request::create('/payment/initialize', 'POST', [
+                'amount' => $amount,
+                'email' => $customer->email,
+                'phone' => $phone,
+                'name' => trim($customer->full_name ?? $customer->first_name ?? 'Customer'),
+                'type' => \App\Models\Payment::TYPE_WALLET_DEPOSIT,
+                'payment_method' => $method,
+            ]);
+
+            $jsonResponse = app(\App\Http\Controllers\PaymentController::class)->initialize($sub);
+            $body = json_decode($jsonResponse->getContent(), true) ?: [];
+
+            if (empty($body['success'])) {
+                $pending->update(['status' => 'failed']);
+                return response()->json(['error' => $body['message'] ?? 'Top-up initialization failed'], 400);
+            }
+
+            $pending->update(['reference' => $body['tx_ref']]);
+            $wallet->refresh();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Deposit successful!',
-                'transaction' => [
-                    'reference' => $transaction->reference,
-                    'amount' => $transaction->amount,
-                    'formatted_amount' => $transaction->getFormattedAmount(),
-                ],
+                'message' => $body['message'] ?? 'Top-up initiated.',
+                'tx_ref' => $body['tx_ref'],
+                'payment_id' => $body['payment_id'] ?? null,
+                'redirect_url' => $body['redirect_url'] ?? null,
+                'pending' => !empty($body['pending']),
                 'wallet' => [
-                    'balance' => $wallet->fresh()->balance,
-                    'formatted_balance' => $wallet->fresh()->getFormattedBalance(),
+                    'balance' => $wallet->balance,
+                    'formatted_balance' => $wallet->getFormattedBalance(),
                 ],
             ]);
-
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
     /**
-     * Withdraw money from wallet
+     * Withdraw money from wallet via MarzPay payout (or queued for manual
+     * fulfilment when Marz disbursement is not configured).
      */
     public function withdraw(Request $request): JsonResponse
     {
         $customer = Auth::customer();
-        
+
         if (!$customer) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
@@ -163,46 +190,98 @@ class WalletController extends Controller
             return response()->json(['error' => $validator->errors()->first()], 422);
         }
 
+        $wallet = TastyWallet::getOrCreateForCustomer($customer->customer_id);
+        $amount = floatval($request->amount);
+
+        if (!$wallet->hasSufficientBalance($amount)) {
+            return response()->json(['error' => 'Insufficient wallet balance'], 422);
+        }
+
+        $phone = '+256' . $request->phone_number;
+        $provider = $request->provider;
+        $reference = TastyWallet::generateReference('WTH');
+
         try {
-            DB::beginTransaction();
-
-            $wallet = TastyWallet::getOrCreateForCustomer($customer->customer_id);
-            $amount = floatval($request->amount);
-
-            if (!$wallet->hasSufficientBalance($amount)) {
-                return response()->json(['error' => 'Insufficient wallet balance'], 422);
-            }
-
-            $paymentMethod = $request->provider . '_mobilemoney';
-            $phoneNumber = '+256' . $request->phone_number;
-
-            // In test mode, simulate successful withdrawal
-            $transaction = $wallet->withdraw(
+            $debit = $wallet->withdraw(
                 $amount,
-                $paymentMethod,
-                $phoneNumber,
-                'Withdrawal to ' . $phoneNumber
+                $provider . '_mobilemoney',
+                $phone,
+                'Withdrawal to ' . $phone
             );
+            $debit->update(['status' => 'pending', 'reference' => $reference]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 422);
+        }
 
-            DB::commit();
+        $service = app(\App\Services\PaymentService::class);
+        $payout = $service->sendMarzPayout([
+            'amount' => $amount,
+            'phone' => $phone,
+            'reference' => $reference,
+            'description' => 'UgaEats wallet withdrawal to ' . strtoupper($provider),
+        ]);
 
+        if (empty($payout['configured'])) {
+            $debit->update([
+                'metadata' => array_merge((array) $debit->metadata, [
+                    'requires_manual_payout' => true,
+                ]),
+            ]);
             return response()->json([
                 'success' => true,
-                'message' => 'Withdrawal successful! Funds sent to ' . $phoneNumber,
+                'status' => 'pending',
+                'message' => 'Withdrawal request received. Funds will be sent to ' . $phone . ' within 24 hours.',
                 'transaction' => [
-                    'reference' => $transaction->reference,
-                    'amount' => $transaction->amount,
-                    'formatted_amount' => $transaction->getFormattedAmount(),
+                    'reference' => $debit->reference,
+                    'amount' => $debit->amount,
+                    'formatted_amount' => $debit->getFormattedAmount(),
                 ],
                 'wallet' => [
                     'balance' => $wallet->fresh()->balance,
                     'formatted_balance' => $wallet->fresh()->getFormattedBalance(),
                 ],
             ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['error' => $e->getMessage()], 500);
         }
+
+        if (empty($payout['success'])) {
+            $wallet->refresh();
+            $wallet->update(['balance' => $wallet->balance + $amount]);
+            $debit->update([
+                'status' => 'failed',
+                'balance_after' => $wallet->balance,
+                'metadata' => array_merge((array) $debit->metadata, [
+                    'payout_error' => $payout['message'] ?? 'Unknown error',
+                ]),
+            ]);
+            return response()->json([
+                'success' => false,
+                'error' => $payout['message'] ?? 'Withdrawal failed. Your balance has been restored.',
+            ], 502);
+        }
+
+        $debit->update([
+            'status' => !empty($payout['completed']) ? 'completed' : 'pending',
+            'external_reference' => $phone,
+            'metadata' => array_merge((array) $debit->metadata, [
+                'marz' => $payout['data'] ?? null,
+                'marz_tx_ref' => $payout['tx_ref'] ?? null,
+            ]),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'status' => $debit->status,
+            'message' => 'Withdrawal of UGX ' . number_format($amount) . ' to ' . $phone . ' '
+                . ($debit->status === 'completed' ? 'completed!' : 'is being processed.'),
+            'transaction' => [
+                'reference' => $debit->reference,
+                'amount' => $debit->amount,
+                'formatted_amount' => $debit->getFormattedAmount(),
+            ],
+            'wallet' => [
+                'balance' => $wallet->fresh()->balance,
+                'formatted_balance' => $wallet->fresh()->getFormattedBalance(),
+            ],
+        ]);
     }
 }

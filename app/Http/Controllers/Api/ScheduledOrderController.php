@@ -41,7 +41,13 @@ class ScheduledOrderController extends Controller
     }
 
     /**
-     * Create a new scheduled order
+     * Create a new scheduled order.
+     *
+     * If the cart carries a non-zero total AND a payment_method is supplied,
+     * we route the customer through Marz: the ScheduledOrder is created in
+     * PENDING state and a Marz payment is initialized. The order is moved
+     * to CONFIRMED in PaymentController::markScheduledOrderPaid() once Marz
+     * reports the capture (either via /payment/marz-webhook or /verify).
      */
     public function store(Request $request): JsonResponse
     {
@@ -60,6 +66,10 @@ class ScheduledOrderController extends Controller
             'cart_data' => 'nullable|array',
             'cart_data.items' => 'nullable|array',
             'cart_data.total' => 'nullable|numeric|min:0',
+            'payment_method' => 'nullable|in:mtn,airtel,card,marz',
+            'phone' => 'nullable|string',
+            'email' => 'nullable|email',
+            'name' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -84,6 +94,50 @@ class ScheduledOrderController extends Controller
         if ($scheduledOrder->is_recurring) {
             $scheduledOrder->next_occurrence = $scheduledOrder->calculateNextOccurrence();
             $scheduledOrder->save();
+        }
+
+        // Initiate Marz payment when there is something to charge.
+        $total = (float) ($request->input('cart_data.total') ?? 0);
+        $paymentMethod = $request->input('payment_method');
+
+        if ($total > 0 && $paymentMethod) {
+            $customer = null;
+            if (class_exists(\Igniter\User\Facades\Auth::class)) {
+                $customer = \Igniter\User\Facades\Auth::customer();
+            }
+            $email = $request->input('email') ?: ($customer->email ?? null);
+            $name = $request->input('name')
+                ?: trim((string) (($customer->first_name ?? '') . ' ' . ($customer->last_name ?? '')))
+                ?: 'Customer';
+
+            if (!$email) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Email is required to pay for a scheduled order.',
+                ], 422);
+            }
+
+            $paymentRequest = Request::create('/ajax/payments/initialize', 'POST', [
+                'amount' => $total,
+                'email' => $email,
+                'phone' => $request->input('phone'),
+                'name' => $name,
+                'type' => \App\Models\Payment::TYPE_SCHEDULED_ORDER,
+                'reference_id' => $scheduledOrder->id,
+                'payment_method' => $paymentMethod,
+            ]);
+            $paymentRequest->setLaravelSession($request->session());
+            $paymentRequest->setUserResolver(fn() => $request->user());
+
+            /** @var \App\Http\Controllers\PaymentController $paymentController */
+            $paymentController = app(\App\Http\Controllers\PaymentController::class);
+            $response = $paymentController->initialize($paymentRequest);
+            $payload = json_decode($response->getContent(), true) ?: [];
+
+            return response()->json(array_merge([
+                'success' => $payload['success'] ?? false,
+                'scheduled_order' => $scheduledOrder->load('location'),
+            ], $payload), $response->getStatusCode());
         }
 
         return response()->json([

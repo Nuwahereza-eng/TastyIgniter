@@ -3,6 +3,8 @@ title: 'Order Management'
 layout: account
 permalink: /account/order-management
 ---
+
+<link rel="stylesheet" href="{{ asset('themes/demo/assets/css/features.css') }}">
 <style>
 .order-card {
     transition: all 0.2s ease;
@@ -11,13 +13,13 @@ permalink: /account/order-management
 .order-card:hover {
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
-.order-card.status-pending { border-left-color: #ffc107; }
-.order-card.status-confirmed { border-left-color: #17a2b8; }
-.order-card.status-preparing { border-left-color: #fd7e14; }
-.order-card.status-ready { border-left-color: #20c997; }
-.order-card.status-picked_up { border-left-color: #6f42c1; }
-.order-card.status-on_the_way { border-left-color: #ff6600; }
-.order-card.status-delivered { border-left-color: #28a745; }
+.order-card.status-pending { border-left-color: #ff4900; }
+.order-card.status-confirmed { border-left-color: #ff4900; }
+.order-card.status-preparing { border-left-color: #ff6b35; }
+.order-card.status-ready { border-left-color: #ff4900; }
+.order-card.status-picked_up { border-left-color: #212529; }
+.order-card.status-on_the_way { border-left-color: #ff4900; }
+.order-card.status-delivered { border-left-color: #ff4900; }
 
 .status-badge {
     font-size: 0.75rem;
@@ -38,9 +40,9 @@ permalink: /account/order-management
     padding: 0.5rem 1rem;
 }
 .filter-tabs .nav-link.active {
-    color: #ff6600;
+    color: #ff4900;
     font-weight: 600;
-    border-bottom: 2px solid #ff6600;
+    border-bottom: 2px solid #ff4900;
 }
 .order-time {
     font-size: 0.875rem;

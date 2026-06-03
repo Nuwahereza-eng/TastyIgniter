@@ -98,6 +98,50 @@ class Subscription extends Model
     }
 
     /**
+     * Record that a delivered order consumed one meal from this subscription.
+     *
+     * Idempotent: a second call with the same order id is a no-op so the
+     * status pipeline can safely fire `delivered` multiple times.
+     */
+    public function recordOrderDelivery(int $orderId): bool
+    {
+        if (!$orderId) {
+            return false;
+        }
+
+        // Already recorded? short-circuit.
+        if (SubscriptionMealUsage::where('subscription_id', $this->id)
+            ->where('order_id', $orderId)
+            ->exists()) {
+            return false;
+        }
+
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($orderId) {
+            SubscriptionMealUsage::create([
+                'subscription_id' => $this->id,
+                'order_id' => $orderId,
+                'used_at' => now(),
+            ]);
+
+            if ($this->meals_remaining > 0) {
+                $this->decrement('meals_remaining');
+            }
+            $this->increment('meals_used');
+
+            return true;
+        });
+    }
+
+    /**
+     * All orders that have been served by this subscription, most recent first.
+     */
+    public function mealUsages()
+    {
+        return $this->hasMany(SubscriptionMealUsage::class, 'subscription_id')
+            ->orderByDesc('used_at');
+    }
+
+    /**
      * Get days until expiration
      */
     public function getDaysUntilExpiration(): int

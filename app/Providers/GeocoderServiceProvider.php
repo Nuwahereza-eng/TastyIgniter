@@ -21,12 +21,31 @@ class GeocoderServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Register custom Nominatim provider that fixes User-Agent issue
-        $this->app->resolving('geocoder', function ($geocoder) {
+        // Force the geocoder to use Google Maps with the .env-provided API key.
+        // TastyIgniter's System ServiceProvider also writes to this config
+        // namespace from the admin settings table, so we re-apply here on
+        // resolve to guarantee the .env values win.
+        $this->app->resolving('geocoder', function ($geocoder, $app) {
+            $provider = env('GEOCODER_PROVIDER', 'google');
+            $apiKey = env('GOOGLE_MAPS_API_KEY');
+
+            $app['config']->set('igniter-geocoder.default', $provider);
+            if ($apiKey) {
+                $app['config']->set('igniter-geocoder.providers.google.apiKey', $apiKey);
+            }
+            $app['config']->set('igniter-geocoder.providers.google.region', 'UG');
+            $app['config']->set('igniter-geocoder.providers.google.locale', 'en-UG');
+
+            // Short cache duration so wrong / stale reverse-geocodes can't
+            // linger after the user moves or after we switch providers.
+            $app['config']->set('igniter-geocoder.cache.duration', 300);
+
+            // Keep the custom Nominatim provider available as a fallback
+            // (e.g. when using the chain provider in dev).
             $geocoder->extend('nominatim', function ($app) {
                 return new CustomNominatimProvider(
                     new \GuzzleHttp\Client(),
-                    $app['config']->get('geocoder.providers.nominatim', [])
+                    $app['config']->get('igniter-geocoder.providers.nominatim', [])
                 );
             });
         });

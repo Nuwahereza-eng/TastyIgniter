@@ -21,7 +21,7 @@ permalink: /track-order
                         <div class="col-md-8">
                             <label class="form-label fw-bold">Order Number</label>
                             <input type="text" class="form-control form-control-lg" id="trackingOrderId" 
-                                   placeholder="e.g., UGA-2026-12345" autofocus>
+                                   placeholder="e.g., UGA-00042, 42, or your order hash" autofocus>
                         </div>
                         <div class="col-md-4 d-flex align-items-end mt-3 mt-md-0">
                             <button class="btn btn-primary btn-lg w-100" onclick="trackOrderPublic()">
@@ -68,7 +68,7 @@ permalink: /track-order
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-primary text-white">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0"><i class="fa fa-receipt me-2"></i>Order <span id="displayOrderId">UGA-2026-12345</span></h5>
+                            <h5 class="mb-0"><i class="fa fa-receipt me-2"></i>Order <span id="displayOrderId">UGA-00042</span></h5>
                             <span class="badge bg-warning text-dark" id="orderStatusBadge">Out for Delivery</span>
                         </div>
                     </div>
@@ -475,25 +475,42 @@ const API_BASE = '/ajax';
 console.log('API_BASE:', API_BASE);
 const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
-// Parse order ID from UGA-XXXXX format
-function parseOrderId(orderId) {
-    if (!orderId) return null;
-    
-    // Remove any spaces and convert to uppercase
-    orderId = orderId.trim().toUpperCase();
-    
-    // If it's in UGA-XXXXX format, extract the number
-    const ugaMatch = orderId.match(/^UGA-?(\d+)$/);
-    if (ugaMatch) {
-        return parseInt(ugaMatch[1], 10);
+// Parse the order number entered by the customer. The TastyIgniter checkout
+// surfaces three things customers might paste in:
+//   1. The bare numeric `order_id` (e.g. 42)
+//   2. The display form `UGA-00042` (zero-padded, what our controller emits)
+//   3. A multi-segment label like `UGA-2026-00042` (legacy/example format)
+//   4. The order `hash` (long alphanumeric, used by /checkout/success/:hash)
+// We return a payload ready to POST to /ajax/tracking/track which accepts
+// either `order_id` or `order_hash`.
+function parseOrderInput(raw) {
+    if (!raw) return null;
+    const trimmed = raw.trim();
+    const upper = trimmed.toUpperCase();
+
+    if (upper.startsWith('UGA')) {
+        const groups = upper.match(/\d+/g);
+        if (groups && groups.length) {
+            const num = parseInt(groups[groups.length - 1], 10);
+            if (!isNaN(num) && num > 0) return { order_id: num };
+        }
     }
-    
-    // If it's just a number, return it
-    if (/^\d+$/.test(orderId)) {
-        return parseInt(orderId, 10);
+
+    if (/^\d+$/.test(trimmed)) {
+        return { order_id: parseInt(trimmed, 10) };
     }
-    
+
+    if (/^[A-Za-z0-9_-]{8,}$/.test(trimmed)) {
+        return { order_hash: trimmed };
+    }
+
     return null;
+}
+
+// Legacy compatibility shim used by other helpers below.
+function parseOrderId(orderId) {
+    const parsed = parseOrderInput(orderId);
+    return parsed && parsed.order_id ? parsed.order_id : null;
 }
 
 // Format order ID to UGA-XXXXX format
@@ -537,10 +554,10 @@ async function trackOrderPublic() {
         return;
     }
     
-    const orderId = parseOrderId(rawOrderId);
+    const payload = parseOrderInput(rawOrderId);
     
-    if (!orderId) {
-        alert('Invalid order number format. Please enter a valid order ID (e.g., UGA-00001 or 1)');
+    if (!payload) {
+        alert('Invalid order number. Enter the number shown on your receipt (e.g. UGA-00042, 42, or the order hash from your confirmation email).');
         document.getElementById('trackingOrderId').focus();
         return;
     }
@@ -557,23 +574,23 @@ async function trackOrderPublic() {
     
     try {
         const fullUrl = API_BASE + '/tracking/track';
-        console.log('Making API call to:', fullUrl, 'with order_id:', orderId);
-        const response = await apiCall('/tracking/track', 'POST', {
-            order_id: orderId,
-        });
+        console.log('Making API call to:', fullUrl, 'with payload:', payload);
+        const response = await apiCall('/tracking/track', 'POST', payload);
         
         btn.innerHTML = originalText;
         btn.disabled = false;
         
         console.log('API Response:', response);
         if (response.success && response.tracking) {
+            const displayId = (response.order && response.order.formatted_id)
+                || (payload.order_id ? formatOrderId(payload.order_id) : rawOrderId);
             console.log('Calling showOrderTrackingReal with:', {
-                orderId: formatOrderId(orderId),
+                orderId: displayId,
                 tracking: response.tracking,
                 order: response.order,
                 location: response.location
             });
-            showOrderTrackingReal(formatOrderId(orderId), response.tracking, response.order, response.location);
+            showOrderTrackingReal(displayId, response.tracking, response.order, response.location);
         } else if (response.success === false && response.error) {
             showNoOrderFound(response.error);
         } else {

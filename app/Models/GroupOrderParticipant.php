@@ -16,15 +16,20 @@ class GroupOrderParticipant extends Model
         'guest_email',
         'is_host',
         'subtotal',
+        'share_amount',
         'has_paid',
+        'payment_tx_ref',
+        'paid_at',
         'cart_items',
     ];
 
     protected $casts = [
         'cart_items' => 'array',
         'subtotal' => 'decimal:2',
+        'share_amount' => 'decimal:2',
         'is_host' => 'boolean',
         'has_paid' => 'boolean',
+        'paid_at' => 'datetime',
     ];
 
     /**

@@ -12,6 +12,10 @@ class PaymentService
     protected string $secretKey;
     protected string $publicKey;
     protected string $encryptionKey;
+    protected string $marzBaseUrl;
+    protected string $marzSecretKey;
+    protected string $marzPublicKey;
+    protected string $marzApiKey;
     
     public function __construct()
     {
@@ -19,6 +23,11 @@ class PaymentService
         $this->secretKey = config('services.flutterwave.secret_key', env('FLUTTERWAVE_SECRET_KEY', ''));
         $this->publicKey = config('services.flutterwave.public_key', env('FLUTTERWAVE_PUBLIC_KEY', ''));
         $this->encryptionKey = config('services.flutterwave.encryption_key', env('FLUTTERWAVE_ENCRYPTION_KEY', ''));
+        // Marz Wallet config (MarzPay API v1)
+        $this->marzBaseUrl = rtrim(config('services.marz.base_url', env('MARZ_BASE_URL', 'https://wallet.wearemarz.com/api/v1')), '/');
+        $this->marzSecretKey = config('services.marz.secret_key', env('MARZ_SECRET_KEY', ''));
+        $this->marzPublicKey = config('services.marz.public_key', env('MARZ_PUBLIC_KEY', ''));
+        $this->marzApiKey = config('services.marz.api_key', env('MARZ_API_KEY', ''));
     }
     
     /**
@@ -301,6 +310,255 @@ class PaymentService
                 'message' => 'Service temporarily unavailable',
             ];
         }
+    }
+
+    /**
+     * Build the Basic auth credentials string for MarzPay.
+     *
+     * MarzPay uses HTTP Basic auth: base64(api_key:api_secret).
+     * If MARZ_PUBLIC_KEY already contains a pre-encoded credential, use it as-is.
+     */
+    protected function marzAuthCredentials(): string
+    {
+        // If a pre-encoded credential is provided as the "public key" use it directly.
+        if (!empty($this->marzPublicKey) && !str_contains($this->marzPublicKey, ':') && strlen($this->marzPublicKey) > 30) {
+            return $this->marzPublicKey;
+        }
+
+        $apiKey = $this->marzApiKey ?: $this->marzPublicKey;
+        if (empty($apiKey) || empty($this->marzSecretKey)) {
+            return '';
+        }
+
+        return base64_encode($apiKey . ':' . $this->marzSecretKey);
+    }
+
+    /**
+     * Initialize a Marz Wallet (MarzPay) collection.
+     *
+     * Supports method=card (returns a redirect_url) and method=mobile_money (USSD push).
+     */
+    public function initializeMarzPayment(array $data): array
+    {
+        $credentials = $this->marzAuthCredentials();
+
+        if (empty($credentials)) {
+            // Fallback to simulation when no Marz credentials configured.
+            return $this->simulatePayment($data);
+        }
+
+        // MarzPay requires a UUID reference; generate one per request.
+        $reference = (string) Str::uuid();
+
+        $method = $data['method'] ?? null;
+        if (!$method) {
+            $method = !empty($data['phone']) ? 'mobile_money' : 'card';
+        }
+
+        $payload = [
+            'amount' => (int) round((float) $data['amount']),
+            'country' => $data['country'] ?? 'UG',
+            'reference' => $reference,
+            'method' => $method,
+            'description' => $data['description'] ?? ($data['title'] ?? 'Payment'),
+            'callback_url' => $data['redirect_url'] ?? route('payment.callback'),
+        ];
+
+        if ($method === 'mobile_money' && !empty($data['phone'])) {
+            $payload['phone_number'] = $this->normalizeUgandaPhone($data['phone']);
+        }
+
+        try {
+            $response = Http::withHeaders([
+                    'Authorization' => 'Basic ' . $credentials,
+                    'Accept' => 'application/json',
+                ])
+                ->acceptJson()
+                ->asJson()
+                ->timeout(30)
+                ->post("{$this->marzBaseUrl}/collect-money", $payload);
+
+            $body = $response->json() ?? [];
+            Log::info('MarzPay collect-money response', [
+                'status' => $response->status(),
+                'body' => $body,
+                'payload' => $payload,
+            ]);
+
+            if ($response->successful() && ($body['status'] ?? null) === 'success') {
+                $dataResp = $body['data'] ?? [];
+                $tx = $dataResp['transaction'] ?? [];
+
+                return [
+                    'success' => true,
+                    'tx_ref' => $reference,
+                    'transaction_uuid' => $tx['uuid'] ?? null,
+                    'status' => $tx['status'] ?? 'pending',
+                    'link' => $dataResp['redirect_url'] ?? null,
+                    'data' => $dataResp,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => $body['message'] ?? 'Marz initialization failed',
+                'errors' => $body['errors'] ?? null,
+                'data' => $body,
+            ];
+        } catch (\Exception $e) {
+            Log::error('Marz payment initialization error', ['error' => $e->getMessage(), 'payload' => $payload]);
+            return [
+                'success' => false,
+                'message' => 'Payment service temporarily unavailable',
+            ];
+        }
+    }
+
+    /**
+     * Verify a MarzPay collection by reference (UUID) or transaction uuid.
+     */
+    public function verifyMarzTransaction(string $reference): array
+    {
+        $credentials = $this->marzAuthCredentials();
+        if (empty($credentials)) {
+            return ['success' => false, 'message' => 'Marz not configured'];
+        }
+
+        try {
+            $response = Http::withHeaders([
+                    'Authorization' => 'Basic ' . $credentials,
+                    'Accept' => 'application/json',
+                ])
+                ->acceptJson()
+                ->timeout(20)
+                ->get("{$this->marzBaseUrl}/collect-money/{$reference}");
+
+            $body = $response->json() ?? [];
+
+            if ($response->successful() && ($body['status'] ?? null) === 'success') {
+                $dataResp = $body['data'] ?? [];
+                $tx = $dataResp['transaction'] ?? [];
+                $collection = $dataResp['collection'] ?? [];
+                $status = strtolower($tx['status'] ?? '');
+                $isSuccess = in_array($status, ['successful', 'completed', 'success'], true);
+
+                return [
+                    'success' => $isSuccess,
+                    'status' => $status,
+                    'amount' => $collection['amount']['raw'] ?? null,
+                    'tx_ref' => $tx['reference'] ?? $reference,
+                    'data' => $dataResp,
+                ];
+            }
+
+            return ['success' => false, 'message' => $body['message'] ?? 'Verification failed', 'data' => $body];
+        } catch (\Exception $e) {
+            Log::error('Marz verification error', ['error' => $e->getMessage()]);
+            return ['success' => false, 'message' => 'Verification service temporarily unavailable'];
+        }
+    }
+
+    /**
+     * Send a Marz Wallet payout (disbursement) to a mobile-money number.
+     * Used by the Tasty Wallet withdrawal flow. When Marz credentials are
+     * missing the call short-circuits with success=false so the caller can
+     * fall back to a "pending admin approval" queue.
+     */
+    public function sendMarzPayout(array $data): array
+    {
+        $credentials = $this->marzAuthCredentials();
+        if (empty($credentials)) {
+            return [
+                'success' => false,
+                'configured' => false,
+                'message' => 'Marz payout not configured',
+            ];
+        }
+
+        $reference = $data['reference'] ?? (string) Str::uuid();
+        $payload = [
+            'amount' => (int) round((float) $data['amount']),
+            'country' => $data['country'] ?? 'UG',
+            'reference' => $reference,
+            'method' => 'mobile_money',
+            'description' => $data['description'] ?? 'UgaEats wallet withdrawal',
+            'phone_number' => $this->normalizeUgandaPhone($data['phone']),
+        ];
+
+        try {
+            $response = Http::withHeaders([
+                    'Authorization' => 'Basic ' . $credentials,
+                    'Accept' => 'application/json',
+                ])
+                ->acceptJson()
+                ->asJson()
+                ->timeout(30)
+                ->post("{$this->marzBaseUrl}/send-money", $payload);
+
+            $body = $response->json() ?? [];
+            Log::info('MarzPay send-money response', [
+                'status' => $response->status(),
+                'body' => $body,
+                'payload' => array_merge($payload, ['phone_number' => '***']),
+            ]);
+
+            if ($response->successful() && ($body['status'] ?? null) === 'success') {
+                $dataResp = $body['data'] ?? [];
+                $tx = $dataResp['transaction'] ?? [];
+                $status = strtolower($tx['status'] ?? 'pending');
+
+                return [
+                    'success' => true,
+                    'configured' => true,
+                    'tx_ref' => $reference,
+                    'transaction_uuid' => $tx['uuid'] ?? null,
+                    'status' => $status,
+                    'completed' => in_array($status, ['successful', 'completed', 'success'], true),
+                    'data' => $dataResp,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'configured' => true,
+                'message' => $body['message'] ?? 'Payout initialization failed',
+                'errors' => $body['errors'] ?? null,
+                'data' => $body,
+            ];
+        } catch (\Exception $e) {
+            Log::error('Marz payout error', ['error' => $e->getMessage()]);
+            return [
+                'success' => false,
+                'configured' => true,
+                'message' => 'Payout service temporarily unavailable',
+            ];
+        }
+    }
+
+    /**
+     * Returns true when MarzPay collection/payout API credentials are configured.
+     */
+    public function hasMarzCredentials(): bool
+    {
+        return $this->marzAuthCredentials() !== '';
+    }
+
+    /**
+     * Normalize a Ugandan phone number to +256xxxxxxxxx format expected by MarzPay.
+     */
+    protected function normalizeUgandaPhone(string $phone): string
+    {
+        $digits = preg_replace('/\D+/', '', $phone);
+        if (str_starts_with($digits, '256')) {
+            return '+' . $digits;
+        }
+        if (str_starts_with($digits, '0')) {
+            return '+256' . substr($digits, 1);
+        }
+        if (strlen($digits) === 9) {
+            return '+256' . $digits;
+        }
+        return '+' . $digits;
     }
     
     /**

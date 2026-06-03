@@ -75,6 +75,12 @@ Route::prefix('ajax/group-orders')->middleware(['web', 'igniter'])->group(functi
     Route::post('/{id}/finalize', [GroupOrderWebController::class, 'finalize']);
     Route::post('/{id}/cancel', [GroupOrderWebController::class, 'cancel']);
     Route::post('/{id}/leave', [GroupOrderWebController::class, 'leave']);
+
+    // Split-payment (Marz) endpoints
+    Route::get('/{id}/payment-summary', [\App\Http\Controllers\Web\GroupOrderPaymentController::class, 'summary']);
+    Route::post('/{id}/pay-share', [\App\Http\Controllers\Web\GroupOrderPaymentController::class, 'payShare']);
+    Route::get('/{id}/share-status/{participantId}', [\App\Http\Controllers\Web\GroupOrderPaymentController::class, 'shareStatus']);
+    Route::post('/{id}/place-order', [\App\Http\Controllers\Web\GroupOrderPaymentController::class, 'placeOrder']);
 });
 
 // Payment routes - using web middleware only, auth handled in controller
@@ -88,6 +94,8 @@ Route::prefix('ajax/payments')->middleware(['web'])->group(function () {
 // Payment callback and webhook (public routes)
 Route::get('/payment/callback', [PaymentController::class, 'callback'])->name('payment.callback');
 Route::post('/payment/webhook', [PaymentController::class, 'webhook'])->name('payment.webhook');
+// Marz Wallet webhook
+Route::post('/payment/marz-webhook', [PaymentController::class, 'webhookMarz'])->name('payment.marz-webhook');
 
 // Tasty Wallet routes
 Route::prefix('ajax/wallet')->middleware(['web'])->group(function () {

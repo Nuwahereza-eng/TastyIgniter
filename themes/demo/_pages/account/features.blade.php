@@ -326,6 +326,21 @@ security: customer
                                         <p class="small">Subscribe to save up to 20% on your weekly food orders!</p>
                                     </div>
                                 </div>
+                                
+                                <!-- Subscription History -->
+                                <div class="card mt-4" id="subscriptionHistory">
+                                    <div class="card-header" style="background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%); color: white;">
+                                        <h6 class="mb-0"><i class="fa fa-history me-2"></i>Subscription History</h6>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <div id="subscriptionHistoryList">
+                                            <div class="text-center py-4">
+                                                <span class="spinner-border spinner-border-sm" style="color: #ff4900;"></span>
+                                                <span class="ms-2">Loading history...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
@@ -333,8 +348,8 @@ security: customer
                         <div class="tab-pane fade" id="order-tracking" role="tabpanel">
                             <div class="tracking-container">
                                 <div class="tracking-header">
-                                    <h4><i class="fa fa-motorcycle me-2" style="color: #FF4900;"></i>Track Your Order</h4>
-                                    <p class="text-muted mb-0">Real-time updates on your order status and delivery location</p>
+                                    <h4><i class="fa fa-motorcycle me-2" style="color: #ff4900;"></i>Track Your Order</h4>
+                                    <p class="tracking-subtitle mb-0">Real-time updates on your order status and delivery location</p>
                                 </div>
                                 
                                 <!-- Order Search -->
@@ -343,10 +358,10 @@ security: customer
                                         <div class="row">
                                             <div class="col-md-8">
                                                 <label class="form-label">Enter Order Number</label>
-                                                <input type="text" class="form-control form-control-lg" id="trackingOrderId" placeholder="e.g., UGA-2026-12345">
+                                                <input type="text" class="form-control form-control-lg" id="trackingOrderId" placeholder="e.g., UGA-00042, 42, or your order hash">
                                             </div>
                                             <div class="col-md-4 d-flex align-items-end">
-                                                <button class="btn btn-lg w-100" style="background-color: #FF4900; border-color: #FF4900; color: white;" onclick="trackOrder()">
+                                                <button class="btn btn-lg w-100" style="background-color: #ff4900; border-color: #ff4900; color: white;" onclick="trackOrder()">
                                                     <i class="fa fa-search me-2"></i>Track Order
                                                 </button>
                                             </div>
@@ -429,7 +444,7 @@ security: customer
                                                             <div class="timeline-content">
                                                                 <h6>Out for Delivery</h6>
                                                                 <small class="text-muted">2:55 PM</small>
-                                                                <p class="mb-0 mt-1 small" style="color: #FF4900;">
+                                                                <p class="mb-0 mt-1 small" style="color: #ff4900;">
                                                                     <i class="fa fa-clock"></i> ETA: 15 mins
                                                                 </p>
                                                             </div>
@@ -543,26 +558,26 @@ security: customer
     </div>
 </div>
 
-<!-- Lusaniya (Split Payment) Modal -->
-<div class="modal fade" id="lusaniyaModal" tabindex="-1">
+<!-- Split Bill Modal -->
+<div class="modal fade" id="splitBillModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-gradient-orange text-white">
                 <h5 class="modal-title">
-                    <i class="fa fa-cut me-2"></i>Lusaniya - Payment Breakdown
+                    <i class="fa fa-cut me-2"></i>Split Bill - Payment Breakdown
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <!-- Group Order Summary -->
-                <div class="lusaniya-summary mb-4">
+                <div class="split-bill-summary mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="mb-0" id="lusaniyaGroupName">Group Order</h6>
-                        <span class="badge bg-success" id="lusaniyaStatus">Ready</span>
+                        <h6 class="mb-0" id="splitBillGroupName">Group Order</h6>
+                        <span class="badge bg-success" id="splitBillStatus">Ready</span>
                     </div>
                     <div class="total-amount-box text-center p-4 rounded bg-light mb-3">
                         <small class="text-muted d-block">Total Group Amount</small>
-                        <h2 class="mb-0 text-warning" id="lusaniyaTotalAmount">UGX 0</h2>
+                        <h2 class="mb-0 text-warning" id="splitBillTotalAmount">UGX 0</h2>
                     </div>
                 </div>
                 
@@ -601,7 +616,7 @@ security: customer
                 <div class="participant-breakdown-section mb-4">
                     <h6 class="mb-3"><i class="fa fa-money-bill-wave me-2 text-success"></i>Who Pays What</h6>
                     <p class="text-muted small mb-3">Each participant's share based on the split method selected above</p>
-                    <div id="lusaniyaParticipants" class="participant-list">
+                    <div id="splitBillParticipants" class="participant-list">
                         <!-- Will be populated dynamically -->
                     </div>
                 </div>
@@ -629,118 +644,131 @@ security: customer
 
 <!-- Subscription Confirmation Modal -->
 <div class="modal fade" id="subscriptionModal" tabindex="-1" aria-labelledby="subscriptionModalLabel" style="display: none;">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title" id="subscriptionModalLabel"><i class="fa fa-crown me-2"></i>Subscribe to Meal Plan</h5>
-                <button type="button" class="btn-close" onclick="closeSubscriptionModalManual()" aria-label="Close"></button>
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="border: none; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%); border-radius: 16px 16px 0 0; padding: 1.25rem 1.5rem;">
+                <h5 class="modal-title text-white" id="subscriptionModalLabel"><i class="fa fa-crown me-2"></i>Subscribe to Meal Plan</h5>
+                <button type="button" class="btn-close btn-close-white" onclick="closeSubscriptionModalManual()" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="text-center mb-4">
+            <div class="modal-body" style="padding: 1.5rem; background: #ffffff;">
+                <div class="text-center mb-4 p-3" style="background: #fff8f5; border-radius: 12px; border: 1px solid #ffe5d9;">
                     <div class="subscription-selected-plan mb-3">
-                        <span id="selectedPlanBadge" class="badge bg-warning fs-5 px-4 py-2">Premium Plan</span>
+                        <span id="selectedPlanBadge" class="badge fs-5 px-4 py-2" style="background: linear-gradient(135deg, #ff4900, #ff6b35); color: white;">Premium Plan</span>
                     </div>
-                    <h3 id="selectedPlanPrice" class="text-success fw-bold">UGX 280,000/week</h3>
-                    <p class="text-muted small">Billed weekly. Cancel anytime.</p>
+                    <h3 id="selectedPlanPrice" class="fw-bold" style="color: #ff4900;">UGX 280,000/week</h3>
+                    <p class="text-muted small mb-0">Billed weekly. Cancel anytime.</p>
                 </div>
                 
-                <div class="row">
+                <div class="row g-4">
                     <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold"><i class="fa fa-map-marker-alt text-danger me-2"></i>Delivery Address</label>
-                            <textarea class="form-control" rows="2" id="subscriptionAddress" placeholder="e.g., Ntinda Shopping Center, Kampala"></textarea>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label fw-bold"><i class="fa fa-clock text-warning me-2"></i>Preferred Delivery Time</label>
-                            <select class="form-select" id="subscriptionTime">
-                                <option value="12:00">12:00 PM - Lunch</option>
-                                <option value="13:00">1:00 PM</option>
-                                <option value="18:00">6:00 PM - Dinner</option>
-                                <option value="19:00">7:00 PM</option>
-                                <option value="20:00">8:00 PM</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label fw-bold"><i class="fa fa-calendar me-2"></i>Start Date</label>
-                            <input type="date" class="form-control" id="subscriptionStartDate" min="">
+                        <div class="p-3" style="background: #f8f9fa; border-radius: 12px; border: 1px solid #e9ecef; height: 100%;">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold"><i class="fa fa-map-marker-alt me-2" style="color: #212529;"></i>Delivery Address</label>
+                                <textarea class="form-control" rows="2" id="subscriptionAddress" placeholder="e.g., Ntinda Shopping Center, Kampala" style="border-radius: 8px; background: white;"></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold"><i class="fa fa-clock me-2" style="color: #ff4900;"></i>Preferred Delivery Time</label>
+                                <select class="form-select" id="subscriptionTime" style="border-radius: 8px; background: white;">
+                                    <option value="12:00">12:00 PM - Lunch</option>
+                                    <option value="13:00">1:00 PM</option>
+                                    <option value="18:00">6:00 PM - Dinner</option>
+                                    <option value="19:00">7:00 PM</option>
+                                    <option value="20:00">8:00 PM</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-0">
+                                <label class="form-label fw-bold"><i class="fa fa-calendar me-2" style="color: #ff4900;"></i>Start Date</label>
+                                <input type="date" class="form-control" id="subscriptionStartDate" min="" style="border-radius: 8px; background: white;">
+                            </div>
                         </div>
                     </div>
                     
                     <div class="col-md-6">
-                        <label class="form-label fw-bold"><i class="fa fa-credit-card text-warning me-2"></i>Payment Method</label>
-                        
-                        <!-- Mobile Money Options -->
-                        <div class="payment-methods">
-                            <div class="form-check payment-option mb-2" onclick="selectPayment('mtn')">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="payMTN" value="mtn" checked>
-                                <label class="form-check-label d-flex align-items-center" for="payMTN">
-                                    <span class="payment-icon bg-warning text-dark rounded me-2 px-2 py-1 fw-bold" style="font-size: 0.75rem;">MTN</span>
-                                    MTN Mobile Money
-                                </label>
-                            </div>
+                        <div class="p-3" style="background: #f8f9fa; border-radius: 12px; border: 1px solid #e9ecef; height: 100%;">
+                            <label class="form-label fw-bold"><i class="fa fa-credit-card me-2" style="color: #ff4900;"></i>Payment Method</label>
                             
-                            <div class="form-check payment-option mb-2" onclick="selectPayment('airtel')">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="payAirtel" value="airtel">
-                                <label class="form-check-label d-flex align-items-center" for="payAirtel">
-                                    <span class="payment-icon bg-danger text-white rounded me-2 px-2 py-1 fw-bold" style="font-size: 0.75rem;">Airtel</span>
-                                    Airtel Money
-                                </label>
-                            </div>
-                            
-                            <div class="form-check payment-option mb-2" onclick="selectPayment('card')">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="payCard" value="card">
-                                <label class="form-check-label d-flex align-items-center" for="payCard">
-                                    <i class="fa fa-credit-card text-warning me-2"></i>
-                                    Visa / Mastercard
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <!-- Phone Number for Mobile Money -->
-                        <div class="mt-3" id="mobileMoneyInput">
-                            <label class="form-label">Mobile Money Number</label>
-                            <div class="input-group">
-                                <span class="input-group-text">+256</span>
-                                <input type="tel" class="form-control" id="mobileMoneyNumber" placeholder="7XX XXX XXX" maxlength="9">
-                            </div>
-                            <small class="text-muted">You will receive a payment prompt on this number</small>
-                        </div>
-                        
-                        <!-- Card Input (hidden by default) -->
-                        <div class="mt-3 d-none" id="cardInput">
-                            <div class="mb-2">
-                                <label class="form-label">Card Number</label>
-                                <input type="text" class="form-control" id="cardNumber" placeholder="4242 4242 4242 4242">
-                            </div>
-                            <div class="row">
-                                <div class="col-6">
-                                    <label class="form-label">Expiry</label>
-                                    <input type="text" class="form-control" id="cardExpiry" placeholder="MM/YY">
+                            <!-- Mobile Money Options -->
+                            <div class="payment-methods">
+                                <div class="form-check payment-option mb-2 p-3 rounded" style="background: #fff8f5; cursor: pointer; border: 2px solid #ff4900;" onclick="selectPayment('mtn')">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="payMTN" value="mtn" checked>
+                                    <label class="form-check-label d-flex align-items-center" for="payMTN" style="cursor: pointer;">
+                                        <img src="/images/payments/mtn.png" alt="MTN" style="height: 28px; width: auto; margin-right: 10px;">
+                                        MTN Mobile Money
+                                    </label>
                                 </div>
-                                <div class="col-6">
-                                    <label class="form-label">CVV</label>
-                                    <input type="text" class="form-control" id="cardCvv" placeholder="123">
+                                
+                                <div class="form-check payment-option mb-2 p-3 rounded" style="background: white; cursor: pointer; border: 1px solid #e9ecef;" onclick="selectPayment('airtel')">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="payAirtel" value="airtel">
+                                    <label class="form-check-label d-flex align-items-center" for="payAirtel" style="cursor: pointer;">
+                                        <img src="/images/payments/airtel.png" alt="Airtel" style="height: 28px; width: auto; margin-right: 10px;">
+                                        Airtel Money
+                                    </label>
+                                </div>
+                                
+                                    <div class="form-check payment-option mb-2 p-3 rounded" style="background: white; cursor: pointer; border: 1px solid #e9ecef;" onclick="selectPayment('card')">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="payCard" value="card">
+                                    <label class="form-check-label d-flex align-items-center" for="payCard" style="cursor: pointer;">
+                                        <i class="fa fa-credit-card me-2" style="color: #ff4900; font-size: 1.2rem;"></i>
+                                        Visa / Mastercard
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Marz Mobile Money UGX 200,000 limit notice -->
+                            <div id="momoLimitNotice" class="alert alert-warning d-none mt-2 mb-0 py-2 px-3"
+                                 style="font-size: 0.85rem; border-radius: 8px;">
+                                <i class="fa fa-exclamation-triangle me-1"></i>
+                                Mobile Money is capped at <strong>UGX 200,000</strong> per transaction.
+                                Please use <a href="#" onclick="selectPayment('card');return false;" class="alert-link">Visa / Mastercard</a>
+                                instead, or contact support to raise your MoMo limit.
+                            </div>
+                            
+                            <!-- Phone Number for Mobile Money -->
+                            <div class="mt-3" id="mobileMoneyInput">
+                                <label class="form-label">Mobile Money Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text" style="background: #ff4900; color: white; border: none;">+256</span>
+                                    <input type="tel" class="form-control" id="mobileMoneyNumber" placeholder="7XX XXX XXX" maxlength="9" style="border-radius: 0 8px 8px 0; background: white;">
+                                </div>
+                                <small class="text-muted">You will receive a payment prompt on this number</small>
+                            </div>
+                            
+                            <!-- Card Input (hidden by default) -->
+                            <div class="mt-3 d-none" id="cardInput">
+                                <div class="mb-2">
+                                    <label class="form-label">Card Number</label>
+                                    <input type="text" class="form-control" id="cardNumber" placeholder="4242 4242 4242 4242" style="border-radius: 8px; background: white;">
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label class="form-label">Expiry</label>
+                                        <input type="text" class="form-control" id="cardExpiry" placeholder="MM/YY" style="border-radius: 8px; background: white;">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">CVV</label>
+                                        <input type="text" class="form-control" id="cardCvv" placeholder="123" style="border-radius: 8px; background: white;">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="alert alert-success mt-3">
+                <div class="alert mt-4 mb-0" style="background: #fff8f5; border: 1px solid #fff8f5; border-radius: 12px;">
                     <div class="d-flex align-items-center">
-                        <i class="fa fa-shield-alt fa-2x me-3 text-success"></i>
+                        <i class="fa fa-shield-alt fa-2x me-3" style="color: #ff4900;"></i>
                         <div>
-                            <strong>Secure Payment</strong>
-                            <p class="mb-0 small">Your payment is protected. Cancel anytime with no fees.</p>
+                            <strong style="color: #ff4900;">Secure Payment</strong>
+                            <p class="mb-0 small" style="color: #cc3a00;">Your payment is protected. Cancel anytime with no fees.</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" style="background: #f8f9fa; border-radius: 0 0 16px 16px; border-top: 1px solid #e9ecef; padding: 1rem 1.5rem;">
                 <button type="button" class="btn btn-outline-secondary" onclick="closeSubscriptionModalManual()">Cancel</button>
-                <button type="button" class="btn btn-success btn-lg" onclick="confirmSubscription()" id="subscribeBtn">
+                <button type="button" class="btn btn-lg" style="background: linear-gradient(135deg, #ff4900, #ff4900); border: none; color: white;" onclick="confirmSubscription()" id="subscribeBtn">
                     <i class="fa fa-check-circle me-2"></i>Subscribe Now
                 </button>
             </div>
@@ -759,6 +787,30 @@ function selectPayment(method) {
     } else {
         document.getElementById('mobileMoneyInput').classList.remove('d-none');
         document.getElementById('cardInput').classList.add('d-none');
+    }
+
+    // Warn when the selected plan exceeds the Marz Mobile-Money cap.
+    updateMomoLimitNotice();
+}
+
+/**
+ * Show or hide an inline notice about the Marz Mobile Money UGX 200,000 cap.
+ * If the user picked MTN/Airtel but the plan price is above the cap we make
+ * it visible and suggest paying by card.
+ */
+const MARZ_MOMO_LIMIT = 200000;
+function updateMomoLimitNotice() {
+    const notice = document.getElementById('momoLimitNotice');
+    if (!notice) return;
+    const method = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    const priceText = document.getElementById('selectedPlanPrice')?.textContent || '';
+    const m = priceText.match(/[\d,]+/);
+    const amount = m ? parseInt(m[0].replace(/,/g, ''), 10) : 0;
+    const isMomo = method === 'mtn' || method === 'airtel';
+    if (isMomo && amount > MARZ_MOMO_LIMIT) {
+        notice.classList.remove('d-none');
+    } else {
+        notice.classList.add('d-none');
     }
 }
 
@@ -814,6 +866,8 @@ function closeSubscriptionModal() {
 @endphp
 window.ugaeatsCustomerEmail = '{{ $customer ? $customer->email : "" }}';
 window.ugaeatsCustomerName = '{{ $customer ? $customer->first_name . " " . $customer->last_name : "" }}';
+window.ugaeatsCustomerId = {{ $customer ? (int) $customer->customer_id : 0 }};
+window.ugaeatsCustomerPhone = '{{ $customer && isset($customer->telephone) ? $customer->telephone : "" }}';
 </script>
 
 <script>
@@ -861,6 +915,18 @@ document.addEventListener('DOMContentLoaded', function() {
     loadGroupOrders();
     loadSubscriptionPlans();
     updateSubscriptionStatus();
+    loadSubscriptionHistory();
+
+    // Poll group orders every 15s while the user is on this page so paid-status
+    // chips and "Place Order" buttons appear without manual refresh as soon as
+    // other participants finish paying.
+    setInterval(() => {
+        if (document.hidden) return;
+        const panel = document.getElementById('groupOrdersList');
+        if (panel && panel.offsetParent !== null) {
+            loadGroupOrders({ silent: true });
+        }
+    }, 15000);
     
     // Check URL hash for direct tab access
     const hash = window.location.hash;
@@ -1260,18 +1326,24 @@ async function joinGroupOrder() {
     }
 }
 
-async function loadGroupOrders() {
+async function loadGroupOrders(opts = {}) {
+    const silent = !!opts.silent;
     const container = document.getElementById('groupOrdersList');
-    container.innerHTML = '<div class="text-center py-4"><span class="spinner-border spinner-border-sm text-warning"></span> <span class="ms-2">Loading your group orders...</span></div>';
-    
+    const hasContent = container && container.querySelector('.group-order-card, .empty-groups');
+    // Only show the spinner on first load; silent refreshes (polling) should
+    // not blank the panel — that's what caused the visible page "blink".
+    if (!silent && !hasContent) {
+        container.innerHTML = '<div class="text-center py-4"><span class="spinner-border spinner-border-sm text-warning"></span> <span class="ms-2">Loading your group orders...</span></div>';
+    }
+
     try {
         const response = await groupOrderCall('/');
         const hosted = response.hosted || [];
         const participating = response.participating || [];
-        
+
         if (hosted.length === 0 && participating.length === 0) {
             container.innerHTML = `
-                <div class="card border-0 bg-light">
+                <div class="empty-groups card border-0 bg-light">
                     <div class="card-body text-center py-5">
                         <div class="mb-3">
                             <i class="fa fa-users fa-3x text-muted"></i>
@@ -1343,8 +1415,21 @@ function renderGroupCard(group, isHost) {
     const isExpired = deadline && deadline < new Date();
     const participantCount = group.participants?.length || 0;
     const totalAmount = Number(group.total_amount || 0);
+
+    // Streamlined payment-status snapshot used throughout the card.
+    const participants = group.participants || [];
+    const shareCount = participants.filter(p => Number(p.share_amount || 0) > 0).length;
+    const paidCount  = participants.filter(p => p.has_paid).length;
+    const allPaid    = shareCount > 0 && paidCount >= shareCount;
+    const me         = participants.find(p => Number(p.customer_id) === Number(window.ugaeatsCustomerId || 0));
+    const myShare    = Number(me?.share_amount || 0);
+    const myPaid     = !!(me && me.has_paid);
+    const showPayBtn = !!me && !myPaid && myShare > 0 && ['open', 'closed'].includes(group.status);
+
     const statusColors = {
         'open': 'success',
+        'closed': 'primary',
+        'ordered': 'secondary',
         'finalized': 'primary',
         'completed': 'secondary',
         'cancelled': 'danger'
@@ -1352,7 +1437,7 @@ function renderGroupCard(group, isHost) {
     const statusColor = isExpired ? 'danger' : (statusColors[group.status] || 'secondary');
     
     return `
-        <div class="col-12">
+        <div class="col-12 col-md-6">
             <div class="card group-order-card h-100 ${isExpired ? 'border-danger' : ''}">
                 <div class="card-header bg-white py-3">
                     <div class="d-flex justify-content-between align-items-center">
@@ -1423,35 +1508,50 @@ function renderGroupCard(group, isHost) {
                     <!-- Participants -->
                     ${participantCount > 0 ? `
                         <div class="participants-section mb-3">
-                            <small class="text-muted d-block mb-2"><i class="fa fa-users me-1"></i>Participants</small>
+                            <small class="text-muted d-block mb-2"><i class="fa fa-users me-1"></i>Participants
+                                <span class="ms-2 text-success">(${paidCount}/${shareCount} paid)</span>
+                            </small>
                             <div class="d-flex flex-wrap gap-2">
-                                ${(group.participants || []).map(p => `
-                                    <div class="participant-chip ${p.status === 'ready' ? 'ready' : ''}">
+                                ${(group.participants || []).map(p => {
+                                    const paid = !!p.has_paid;
+                                    const share = Number(p.share_amount || 0);
+                                    const ready = p.status === 'ready';
+                                    return `
+                                    <div class="participant-chip ${ready ? 'ready' : ''}" title="${paid ? 'Paid ' + formatCurrency(share) : (share > 0 ? 'Owes ' + formatCurrency(share) : 'Not in split')}">
                                         <span class="participant-avatar">${p.name.charAt(0).toUpperCase()}</span>
-                                        <span class="participant-name">${p.name}</span>
-                                        ${p.status === 'ready' ? '<i class="fa fa-check-circle text-success ms-1"></i>' : ''}
+                                        <span class="participant-name">${p.name}${p.is_host ? ' <i class="fa fa-crown text-warning ms-1"></i>' : ''}</span>
+                                        ${paid ? '<i class="fa fa-check-circle text-success ms-1" title="Paid"></i>' :
+                                          (share > 0 ? '<i class="fa fa-hourglass-half text-warning ms-1" title="Owes ' + formatCurrency(share) + '"></i>' :
+                                          (ready ? '<i class="fa fa-check text-muted ms-1"></i>' : ''))}
                                     </div>
-                                `).join('')}
+                                `;}).join('')}
                             </div>
                         </div>
                     ` : ''}
                 </div>
                 
                 <div class="card-footer bg-white border-top py-3">
-                    <div class="d-flex align-items-center gap-2 flex-nowrap">
+                    <div class="d-flex align-items-center gap-2 flex-nowrap flex-wrap">
                         ${!isExpired && group.status === 'open' ? `
                             <button class="btn btn-warning btn-sm" onclick="goToMenuForGroup(${group.id})">
                                 <i class="fa fa-plus me-1"></i>Add Items
                             </button>
                         ` : ''}
-                        ${isHost && group.status === 'open' ? `
-                            <button class="btn btn-warning btn-sm" onclick="openLusaniyaModal(${group.id})" title="Split payment between participants">
-                                <i class="fa fa-cut me-1"></i>Lusaniya
+                        ${isHost && group.status === 'open' && totalAmount > 0 ? `
+                            <button class="btn btn-warning btn-sm" onclick="openSplitBillModal(${group.id})" title="Split payment between participants">
+                                <i class="fa fa-cut me-1"></i>Split Bill
                             </button>
                         ` : ''}
-                        ${isHost && group.status === 'closed' ? `
-                            <button class="btn btn-success btn-sm" onclick="proceedToGroupCheckout(${group.id})">
-                                <i class="fa fa-credit-card me-1"></i>Pay Now
+                        ${showPayBtn ? `
+                            <button class="btn btn-success btn-sm" onclick="payMyShareModal(${group.id})" title="Pay your share via Marz (MTN, Airtel or Card)">
+                                <i class="fa fa-mobile-alt me-1"></i>Pay My Share (${formatCurrency(myShare)})
+                            </button>
+                        ` : (myPaid ? `
+                            <span class="badge bg-success px-3 py-2"><i class="fa fa-check-circle me-1"></i>Your share is paid</span>
+                        ` : '')}
+                        ${isHost && group.status === 'closed' && allPaid ? `
+                            <button class="btn btn-outline-success btn-sm" onclick="proceedToGroupCheckout(${group.id})">
+                                <i class="fa fa-receipt me-1"></i>Place Order
                             </button>
                         ` : ''}
                         <div class="flex-grow-1"></div>
@@ -1535,8 +1635,8 @@ async function goToMenuForGroup(groupOrderId) {
     window.location.href = MENU_PAGE_URL + separator + 'group_order=' + groupOrderId;
 }
 
-// Open Lusaniya (Split Payment) Modal
-async function openLusaniyaModal(groupOrderId) {
+// Open Split Bill Modal
+async function openSplitBillModal(groupOrderId) {
     currentGroupOrderId = groupOrderId;
     
     try {
@@ -1550,21 +1650,21 @@ async function openLusaniyaModal(groupOrderId) {
         currentGroupOrderData = response;
         
         // Populate modal
-        document.getElementById('lusaniyaGroupName').textContent = response.group_order?.title || 'Group Order';
-        document.getElementById('lusaniyaTotalAmount').textContent = 'UGX ' + formatNumberWithCommas(response.total || 0);
+        document.getElementById('splitBillGroupName').textContent = response.group_order?.title || 'Group Order';
+        document.getElementById('splitBillTotalAmount').textContent = 'UGX ' + formatNumberWithCommas(response.total || 0);
         
         // Render participants
-        renderLusaniyaParticipants(response.participant_breakdown, response.group_order?.split_method || 'individual');
+        renderSplitBillParticipants(response.participant_breakdown, response.group_order?.split_method || 'individual');
         
         // Select the current split method
         selectSplitMethod(response.group_order?.split_method || 'individual');
         
         // Show modal
-        const modal = new bootstrap.Modal(document.getElementById('lusaniyaModal'));
+        const modal = new bootstrap.Modal(document.getElementById('splitBillModal'));
         modal.show();
         
     } catch (error) {
-        console.error('Error opening Lusaniya modal:', error);
+        console.error('Error opening Split Bill modal:', error);
         alert('Failed to load group order details: ' + error.message);
     }
 }
@@ -1613,8 +1713,8 @@ function updateSplitAmounts(method, data) {
     });
 }
 
-function renderLusaniyaParticipants(participants, splitMethod) {
-    const container = document.getElementById('lusaniyaParticipants');
+function renderSplitBillParticipants(participants, splitMethod) {
+    const container = document.getElementById('splitBillParticipants');
     
     if (!participants || participants.length === 0) {
         container.innerHTML = '<p class="text-muted text-center py-3">No participants yet</p>';
@@ -1683,70 +1783,204 @@ async function sendPaymentRequests() {
     const btn = document.getElementById('sendPaymentRequests');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
-    
-    // Simulate sending payment requests via WhatsApp/SMS
-    const participants = currentGroupOrderData?.participant_breakdown || [];
-    const splitMethod = document.querySelector('input[name="splitMethod"]:checked')?.value || 'individual';
-    
-    for (let i = 0; i < participants.length; i++) {
-        const p = participants[i];
-        if (p.is_host) continue; // Skip host
-        
-        const amountEl = document.getElementById(`participant-amount-${i}`);
-        const amount = amountEl?.dataset.amount || 0;
-        
-        // Update status to "Requested"
-        const statusEl = document.getElementById(`participant-status-${i}`);
-        if (statusEl) {
-            statusEl.innerHTML = '<span class="badge bg-warning text-dark">Requested</span>';
-        }
+
+    try {
+        // Persist the chosen split server-side so every participant sees the
+        // same share amounts when they open their account.
+        const splitMethod = document.querySelector('input[name="splitMethod"]:checked')?.value || 'individual';
+
+        // Hit the summary endpoint — this recomputes & persists per-participant shares.
+        await fetch(`/ajax/group-orders/${currentGroupOrderId}/payment-summary?split_method=${encodeURIComponent(splitMethod)}`, {
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/json' },
+        });
+
+        // Reflect "requested" badges in the modal.
+        const participants = currentGroupOrderData?.participant_breakdown || [];
+        participants.forEach((p, i) => {
+            if (p.is_host) return;
+            const statusEl = document.getElementById(`participant-status-${i}`);
+            if (statusEl) statusEl.innerHTML = '<span class="badge bg-warning text-dark">Requested</span>';
+        });
+        const section = document.getElementById('paymentStatusSection');
+        if (section) section.style.display = 'block';
+
+        alert('Each participant now has a “Pay My Share” button on their group order card. Tell them to open Account → Premium Features.');
+    } catch (e) {
+        console.error('sendPaymentRequests error', e);
+        alert('Could not send payment requests. Please try again.');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-paper-plane me-2"></i>Resend Requests';
     }
-    
-    // Show payment status section
-    document.getElementById('paymentStatusSection').style.display = 'block';
-    
-    alert('Payment requests sent to all participants! They will receive notifications to pay their share.');
-    
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa fa-paper-plane me-2"></i>Resend Requests';
+}
+
+/**
+ * Open the per-user share payment picker (MTN / Airtel / Card via Marz).
+ * Used by the "Pay My Share" button on every group order card.
+ */
+async function payMyShareModal(groupOrderId) {
+    let summary;
+    try {
+        const r = await fetch(`/ajax/group-orders/${groupOrderId}/payment-summary`, {
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/json' },
+        });
+        summary = await r.json();
+    } catch (e) {
+        alert('Could not load your share. Please try again.');
+        return;
+    }
+    if (!summary.success || !summary.me) {
+        alert('You are not a participant in this group order.');
+        return;
+    }
+    if (summary.me.has_paid) {
+        alert('You have already paid your share. Thank you!');
+        return;
+    }
+    if (!summary.me.share_amount || summary.me.share_amount <= 0) {
+        alert('There is no amount due for your share.');
+        return;
+    }
+
+    const amount = Math.round(summary.me.share_amount);
+    const formatted = 'UGX ' + amount.toLocaleString('en-US');
+
+    let overlay = document.getElementById('shareOverlay');
+    if (overlay) overlay.remove();
+    overlay = document.createElement('div');
+    overlay.id = 'shareOverlay';
+    overlay.innerHTML = `
+      <div style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;">
+        <div style="background:#ffffff;border-radius:12px;max-width:480px;width:100%;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,.25);">
+          <h5 class="mb-1"><i class="fa fa-mobile-alt me-2 text-primary"></i>Pay your share</h5>
+          <p class="text-muted mb-3">You owe <strong>${formatted}</strong> for <em>${summary.group_order.name || ('group order #' + summary.group_order.id)}</em>.</p>
+          <div class="mb-2"><strong>Choose a payment method</strong></div>
+          <div class="d-grid gap-2 mb-3">
+            <button type="button" class="btn btn-outline-warning text-start share-pm" data-pm="mtn">
+              <img src="/images/payments/mtn.png" style="height:22px;vertical-align:middle" class="me-2"> MTN Mobile Money
+            </button>
+            <button type="button" class="btn btn-outline-danger text-start share-pm" data-pm="airtel">
+              <img src="/images/payments/airtel.png" style="height:22px;vertical-align:middle" class="me-2"> Airtel Money
+            </button>
+            <button type="button" class="btn btn-outline-primary text-start share-pm" data-pm="card">
+              <i class="fa fa-credit-card me-2"></i>Visa / Mastercard
+            </button>
+          </div>
+          <div id="sharePhoneWrap" style="display:none" class="mb-3">
+            <label class="form-label">Mobile Money number</label>
+            <input id="sharePhone" type="tel" class="form-control" placeholder="07XX XXX XXX" value="${(window.ugaeatsCustomerPhone||'').replace(/^\\+?256/, '0')}">
+          </div>
+          <div class="d-flex gap-2">
+            <button type="button" id="sharePay" class="btn btn-primary flex-grow-1" disabled>
+              <i class="fa fa-lock me-2"></i>Pay ${formatted}
+            </button>
+            <button type="button" id="shareCancel" class="btn btn-link">Cancel</button>
+          </div>
+          <div id="shareStatusMsg" class="small text-muted mt-2"></div>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    let chosen = null;
+    overlay.querySelectorAll('.share-pm').forEach(b => {
+        b.addEventListener('click', () => {
+            chosen = b.dataset.pm;
+            overlay.querySelectorAll('.share-pm').forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+            const isMomo = chosen === 'mtn' || chosen === 'airtel';
+            document.getElementById('sharePhoneWrap').style.display = isMomo ? 'block' : 'none';
+            document.getElementById('sharePay').disabled = false;
+        });
+    });
+
+    document.getElementById('shareCancel').addEventListener('click', () => overlay.remove());
+
+    document.getElementById('sharePay').addEventListener('click', async () => {
+        if (!chosen) return;
+        const phone = (document.getElementById('sharePhone')?.value || '').trim();
+        const isMomo = chosen === 'mtn' || chosen === 'airtel';
+        if (isMomo && !phone) { alert('Please enter your Mobile Money number'); return; }
+
+        const payBtn = document.getElementById('sharePay');
+        payBtn.disabled = true;
+        payBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+        try {
+            const r = await fetch(`/ajax/group-orders/${groupOrderId}/pay-share`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                body: JSON.stringify({ payment_method: chosen, phone: isMomo ? phone : null }),
+            });
+            const j = await r.json();
+            if (!j.success) { alert(j.error || j.message || 'Payment failed'); payBtn.disabled = false; payBtn.innerHTML = `<i class="fa fa-lock me-2"></i>Pay ${formatted}`; return; }
+
+            if (j.simulated || j.auto_paid) {
+                document.getElementById('shareStatusMsg').innerHTML = '<span class="text-success"><i class="fa fa-check-circle me-1"></i>Share paid.</span>';
+                setTimeout(() => { overlay.remove(); loadGroupOrders(); }, 800);
+                return;
+            }
+
+            if (j.redirect_url) {
+                window.location.href = j.redirect_url;
+                return;
+            }
+
+            // Mobile money pending → poll until success or failure.
+            document.getElementById('shareStatusMsg').innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>' + (j.message || 'Waiting for confirmation…');
+            pollShareStatus(groupOrderId, summary.me.participant_id, overlay);
+        } catch (e) {
+            console.error(e);
+            alert('Payment failed: ' + e.message);
+            payBtn.disabled = false;
+            payBtn.innerHTML = `<i class="fa fa-lock me-2"></i>Pay ${formatted}`;
+        }
+    });
+}
+
+function pollShareStatus(groupOrderId, participantId, overlay) {
+    let attempts = 0;
+    const maxAttempts = 60;
+    const tick = () => {
+        attempts++;
+        fetch(`/ajax/group-orders/${groupOrderId}/share-status/${participantId}`, {
+            credentials: 'same-origin', headers: { 'Accept': 'application/json' },
+        })
+        .then(r => r.json())
+        .then(j => {
+            if (j.success && j.has_paid) {
+                document.getElementById('shareStatusMsg').innerHTML = '<span class="text-success"><i class="fa fa-check-circle me-1"></i>Share paid. Thanks!</span>';
+                setTimeout(() => { overlay.remove(); loadGroupOrders(); }, 1000);
+                return;
+            }
+            const ps = (j.payment_status || '').toLowerCase();
+            if (ps === 'failed' || ps === 'cancelled') {
+                document.getElementById('shareStatusMsg').innerHTML = '<span class="text-danger"><i class="fa fa-times-circle me-1"></i>Payment ' + ps + '.</span>';
+                const payBtn = document.getElementById('sharePay');
+                if (payBtn) { payBtn.disabled = false; payBtn.innerHTML = '<i class="fa fa-lock me-2"></i>Try again'; }
+                return;
+            }
+            if (attempts < maxAttempts) setTimeout(tick, 2500);
+            else document.getElementById('shareStatusMsg').textContent = 'Still waiting… you can close this and check again later.';
+        })
+        .catch(() => { if (attempts < maxAttempts) setTimeout(tick, 3000); });
+    };
+    setTimeout(tick, 2500);
 }
 
 async function proceedToGroupPayment() {
+    // Persist the chosen split method, then open the host's share picker.
     const splitMethod = document.querySelector('input[name="splitMethod"]:checked')?.value || 'individual';
-    const participants = currentGroupOrderData?.participant_breakdown || [];
-    const total = parseFloat(currentGroupOrderData?.total) || 0;
-    
-    // Calculate host's amount
-    let hostAmount = 0;
-    if (splitMethod === 'host') {
-        hostAmount = total;
-    } else if (splitMethod === 'equal') {
-        hostAmount = total / participants.length;
-    } else {
-        // Individual - find host's subtotal
-        const host = participants.find(p => p.is_host);
-        hostAmount = parseFloat(host?.subtotal) || 0;
-    }
-    
-    if (hostAmount <= 0) {
-        alert('No amount to pay. Make sure items have been added to the group order.');
-        return;
-    }
-    
-    // Close modal and redirect to payment
-    bootstrap.Modal.getInstance(document.getElementById('lusaniyaModal'))?.hide();
-    
-    // Store payment context
-    localStorage.setItem('ugaeats_group_payment', JSON.stringify({
-        group_order_id: currentGroupOrderId,
-        amount: hostAmount,
-        split_method: splitMethod,
-        total: total
-    }));
-    
-    // Redirect to checkout or show payment modal
-    // For now, redirect to checkout page
-    window.location.href = '/checkout?group_order=' + currentGroupOrderId;
+    try {
+        await fetch(`/ajax/group-orders/${currentGroupOrderId}/payment-summary?split_method=${encodeURIComponent(splitMethod)}`, {
+            credentials: 'same-origin', headers: { 'Accept': 'application/json' },
+        });
+    } catch (e) { /* non-fatal */ }
+
+    bootstrap.Modal.getInstance(document.getElementById('splitBillModal'))?.hide();
+    payMyShareModal(currentGroupOrderId);
 }
 
 async function finalizeGroupOrder(groupOrderId) {
@@ -1769,8 +2003,8 @@ async function finalizeGroupOrder(groupOrderId) {
             return;
         }
         
-        // Open Lusaniya modal instead of direct finalize
-        openLusaniyaModal(groupOrderId);
+        // Open Split Bill modal instead of direct finalize
+        openSplitBillModal(groupOrderId);
         
     } catch (error) {
         console.error('Error finalizing group order:', error);
@@ -1820,15 +2054,24 @@ function deleteGroup(id) {
 
 // Proceed directly to checkout for a finalized group order
 async function proceedToGroupCheckout(groupOrderId) {
-    // Store group order context
-    localStorage.setItem('ugaeats_group_payment', JSON.stringify({
-        group_order_id: groupOrderId,
-        timestamp: Date.now()
-    }));
-    
-    // Set active and redirect to checkout
-    await setActiveGroupOrder(groupOrderId);
-    window.location.href = '/checkout?group_order=' + groupOrderId;
+    if (!confirm('Place the group order now? Every participant has paid their share.')) return;
+    try {
+        const resp = await fetch(`/ajax/group-orders/${groupOrderId}/place-order`, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+            credentials: 'same-origin',
+        });
+        const data = await resp.json();
+        if (!resp.ok || !data.success) {
+            alert(data.error || data.message || 'Could not place the order.');
+            return;
+        }
+        alert(data.message || 'Order placed!');
+        try { localStorage.removeItem('ugaeats_active_group_order'); } catch (e) {}
+        loadGroupOrders();
+    } catch (e) {
+        alert('Network error placing order. Please retry.');
+    }
 }
 
 // Sync cart items to group order when on menu page
@@ -1922,9 +2165,9 @@ async function loadSubscriptionPlans() {
     } catch (error) {
         console.log('Using default subscription plans');
         subscriptionPlans = {
-            basic: { name: 'Basic Plan', price: 'UGX 150,000/week', badge: 'bg-secondary' },
-            premium: { name: 'Premium Plan', price: 'UGX 280,000/week', badge: 'bg-warning' },
-            family: { name: 'Family Plan', price: 'UGX 450,000/week', badge: 'bg-success' }
+            basic: { id: 1, name: 'Basic Plan', price: 'UGX 150,000/week', badge: 'bg-secondary' },
+            premium: { id: 3, name: 'Premium Plan', price: 'UGX 280,000/week', badge: 'bg-warning' },
+            family: { id: 2, name: 'Family Plan', price: 'UGX 450,000/week', badge: 'bg-success' }
         };
     }
 }
@@ -1933,9 +2176,9 @@ function selectPlan(plan) {
     console.log('selectPlan called with:', plan);
     
     const plans = subscriptionPlans.basic ? subscriptionPlans : {
-        basic: { name: 'Basic Plan', price: 'UGX 150,000/week', badge: 'bg-secondary' },
-        premium: { name: 'Premium Plan', price: 'UGX 280,000/week', badge: 'bg-warning' },
-        family: { name: 'Family Plan', price: 'UGX 450,000/week', badge: 'bg-success' }
+        basic: { id: 1, name: 'Basic Plan', price: 'UGX 150,000/week', badge: 'bg-secondary' },
+        premium: { id: 3, name: 'Premium Plan', price: 'UGX 280,000/week', badge: 'bg-warning' },
+        family: { id: 2, name: 'Family Plan', price: 'UGX 450,000/week', badge: 'bg-success' }
     };
     
     const selected = plans[plan];
@@ -1944,6 +2187,8 @@ function selectPlan(plan) {
     document.getElementById('selectedPlanPrice').textContent = selected.price;
     document.getElementById('selectedPlanBadge').dataset.planId = selected.id || plan;
     document.getElementById('selectedPlanBadge').dataset.planSlug = plan;
+    // Re-evaluate the Marz MoMo limit notice whenever the plan changes.
+    if (typeof updateMomoLimitNotice === 'function') updateMomoLimitNotice();
     
     // Get modal element
     const modalElement = document.getElementById('subscriptionModal');
@@ -2058,8 +2303,16 @@ async function confirmSubscription() {
     }
     
     const planSlug = document.getElementById('selectedPlanBadge').dataset.planSlug;
-    const planId = parseInt(document.getElementById('selectedPlanBadge').dataset.planId, 10);
+    const planIdRaw = document.getElementById('selectedPlanBadge').dataset.planId;
+    const planId = parseInt(planIdRaw, 10);
     const planPrice = document.getElementById('selectedPlanPrice').textContent;
+    
+    // Validate plan_id
+    if (!planId || isNaN(planId)) {
+        alert('Please select a valid plan');
+        console.error('Invalid plan_id:', planIdRaw);
+        return;
+    }
     
     // Extract amount from price (e.g., "UGX 280,000/week" -> 280000)
     const amountMatch = planPrice.match(/[\d,]+/);
@@ -2067,6 +2320,15 @@ async function confirmSubscription() {
     
     if (!amount) {
         alert('Invalid plan price');
+        return;
+    }
+
+    // Pre-flight: Marz mobile-money cap is UGX 200,000. Stop before hitting
+    // the API so the user gets a clear, actionable message.
+    if ((paymentMethod === 'mtn' || paymentMethod === 'airtel') && amount > MARZ_MOMO_LIMIT) {
+        alert('Mobile Money payments are limited to UGX ' + MARZ_MOMO_LIMIT.toLocaleString()
+            + ' per transaction.\n\nPlease pay with Visa / Mastercard instead, or contact support to raise your MoMo limit.');
+        selectPayment('card');
         return;
     }
     
@@ -2144,17 +2406,31 @@ async function confirmSubscription() {
         
         if (paymentData.success) {
             if (paymentData.redirect_url) {
-                // Card payment - redirect to payment page
+                // Card / Marz hosted checkout
                 window.location.href = paymentData.redirect_url;
                 return;
             }
-            
-            // Mobile money or demo payment - show success
+
+            const methodName = paymentMethod === 'mtn' ? 'MTN Mobile Money' :
+                               paymentMethod === 'airtel' ? 'Airtel Money' :
+                               paymentMethod === 'marz' ? 'Marz Wallet' : 'Card';
+
+            // Pending Mobile Money (Marz USSD push). Poll the payment record
+            // until it resolves so the user sees a real confirmation instead
+            // of a misleading "success" toast.
+            if (paymentData.pending && paymentData.tx_ref) {
+                closeSubscriptionModalManual();
+                pollSubscriptionPayment(paymentData.tx_ref, {
+                    plan: document.getElementById('selectedPlanBadge').textContent,
+                    price: planPrice,
+                    paymentMethod: methodName,
+                    message: paymentData.message,
+                });
+                return;
+            }
+
+            // Demo / instantly-successful payment
             closeSubscriptionModalManual();
-            
-            const methodName = paymentMethod === 'mtn' ? 'MTN Mobile Money' : 
-                               paymentMethod === 'airtel' ? 'Airtel Money' : 'Card';
-            
             showPaymentSuccess({
                 txRef: paymentData.tx_ref,
                 plan: document.getElementById('selectedPlanBadge').textContent,
@@ -2162,8 +2438,9 @@ async function confirmSubscription() {
                 paymentMethod: methodName,
                 message: paymentData.message,
             });
-            
+
             updateSubscriptionStatus();
+            loadSubscriptionHistory();
         } else {
             throw new Error(paymentData.message || paymentData.error || 'Payment processing failed');
         }
@@ -2174,6 +2451,66 @@ async function confirmSubscription() {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa fa-check-circle me-2"></i>Subscribe Now';
     }
+}
+
+function pollSubscriptionPayment(txRef, ctx) {
+    let overlay = document.getElementById('subPollOverlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'subPollOverlay';
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:1080;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;';
+        overlay.innerHTML = `
+            <div style="background:#ffffff;border-radius:14px;padding:28px 32px;max-width:380px;width:90%;text-align:center;box-shadow:0 18px 40px rgba(0,0,0,0.25);">
+                <div class="spinner-border text-warning mb-3" role="status"></div>
+                <h5 class="mb-2">Confirm on your phone</h5>
+                <p class="text-muted mb-2" style="font-size:0.92rem;">${(ctx.message || 'Enter your Mobile Money PIN to authorise the payment.').replace(/</g,'&lt;')}</p>
+                <p class="small text-muted mb-3">Ref: <code>${txRef}</code></p>
+                <button id="subPollCancel" class="btn btn-sm btn-outline-secondary">Cancel</button>
+            </div>`;
+        document.body.appendChild(overlay);
+        document.getElementById('subPollCancel').onclick = () => overlay.remove();
+    }
+
+    let attempts = 0;
+    const maxAttempts = 60;
+
+    const tick = async () => {
+        if (!document.body.contains(overlay)) return;
+        attempts++;
+        try {
+            const resp = await fetch(`/ajax/payments/verify?tx_ref=${encodeURIComponent(txRef)}`, {
+                credentials: 'same-origin',
+                headers: { 'Accept': 'application/json' },
+            });
+            const data = await resp.json();
+            if (data.success && data.status === 'successful') {
+                overlay.remove();
+                showPaymentSuccess({
+                    txRef,
+                    plan: ctx.plan,
+                    price: ctx.price,
+                    paymentMethod: ctx.paymentMethod,
+                    message: 'Payment confirmed.',
+                });
+                updateSubscriptionStatus();
+                loadSubscriptionHistory();
+                return;
+            }
+            if (['failed', 'cancelled'].includes((data.status || '').toLowerCase())) {
+                overlay.remove();
+                alert(`Payment ${data.status}. Please try again.`);
+                return;
+            }
+        } catch (e) { /* network blip */ }
+
+        if (attempts >= maxAttempts) {
+            overlay.remove();
+            alert('Still waiting for confirmation. We will update your subscription once Marz confirms the payment.');
+            return;
+        }
+        setTimeout(tick, 2500);
+    };
+    setTimeout(tick, 2500);
 }
 
 function showPaymentSuccess(data) {
@@ -2225,31 +2562,78 @@ async function updateSubscriptionStatus() {
         
         if (response.has_subscription && response.subscription) {
             const sub = response.subscription;
+            const pct = Math.max(0, Math.min(100, Number(sub.meals_used_percentage || 0)));
             container.innerHTML = `
-                <div class="card-header bg-success text-white">
-                    <h6 class="mb-0"><i class="fa fa-check-circle me-2"></i>Active Subscription</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p class="mb-1"><strong>Plan:</strong> ${sub.plan.name}</p>
-                            <p class="mb-1"><strong>Meals Remaining:</strong> ${sub.meals_remaining}</p>
-                            <p class="mb-1"><strong>Days Left:</strong> ${sub.days_remaining}</p>
-                            <p class="mb-0"><strong>Auto-Renew:</strong> ${sub.auto_renew ? 'Yes' : 'No'}</p>
+                <div class="card-body p-3 active-sub-card">
+                    <div class="d-flex align-items-start justify-content-between mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="active-sub-icon me-3">
+                                <i class="fa fa-utensils"></i>
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <h6 class="mb-0 fw-bold">${sub.plan.name}</h6>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                        <i class="fa fa-circle me-1" style="font-size:.5rem;"></i>Active
+                                    </span>
+                                </div>
+                                <small class="text-muted">Auto-renew: ${sub.auto_renew ? 'On' : 'Off'}</small>
+                            </div>
                         </div>
-                        <div class="col-md-6 text-end">
-                            <button class="btn btn-outline-warning mb-2" onclick="pauseSubscription()">
-                                <i class="fa fa-pause me-1"></i>Pause
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="More actions">
+                                <i class="fa fa-ellipsis-v"></i>
                             </button>
-                            <button class="btn btn-outline-danger" onclick="cancelSubscription()">
-                                Cancel Subscription
-                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li>
+                                    <button type="button" class="dropdown-item" onclick="pauseSubscription()">
+                                        <i class="fa fa-pause text-warning me-2"></i>Pause subscription
+                                    </button>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <button type="button" class="dropdown-item text-danger" onclick="cancelSubscription()">
+                                        <i class="fa fa-times me-2"></i>Cancel subscription
+                                    </button>
+                                </li>
+                            </ul>
                         </div>
                     </div>
-                    <div class="progress mt-3" style="height: 10px;">
-                        <div class="progress-bar bg-warning" style="width: ${sub.meals_used_percentage}%"></div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <div class="active-sub-stat">
+                                <div class="fw-bold">${sub.meals_remaining}</div>
+                                <small class="text-muted">Meals left</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="active-sub-stat">
+                                <div class="fw-bold">${sub.days_remaining}</div>
+                                <small class="text-muted">Days left</small>
+                            </div>
+                        </div>
                     </div>
-                    <small class="text-muted">${sub.meals_used_percentage}% of meals used</small>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-warning" style="width: ${pct}%"></div>
+                    </div>
+                    <small class="text-muted d-block mt-1">${pct}% of meals used</small>
+                    ${(sub.served_orders && sub.served_orders.length) ? `
+                        <hr class="my-3">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <small class="text-muted fw-bold"><i class="fa fa-utensils me-1"></i>Recently served</small>
+                            <small class="text-muted">${sub.served_orders.length} ${sub.served_orders.length === 1 ? 'order' : 'orders'}</small>
+                        </div>
+                        <ul class="list-unstyled mb-0 small served-orders-list">
+                            ${sub.served_orders.slice(0,5).map(o => `
+                                <li class="d-flex justify-content-between py-1 border-bottom">
+                                    <a href="/track-order?order=${encodeURIComponent(o.order_id)}" class="text-decoration-none text-dark">
+                                        <i class="fa fa-check-circle text-success me-1"></i>${o.formatted_id}
+                                    </a>
+                                    <span class="text-muted">${new Date(o.used_at).toLocaleDateString('en-UG', { month: 'short', day: 'numeric' })}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : ''}
                 </div>
             `;
         } else {
@@ -2261,20 +2645,33 @@ async function updateSubscriptionStatus() {
         
         if (sub && sub.status === 'active') {
             container.innerHTML = `
-                <div class="card-header bg-success text-white">
-                    <h6 class="mb-0"><i class="fa fa-check-circle me-2"></i>Active Subscription</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p class="mb-1"><strong>Plan:</strong> ${sub.plan}</p>
-                            <p class="mb-1"><strong>Price:</strong> ${sub.price}</p>
-                            <p class="mb-0"><strong>Delivery Time:</strong> ${sub.deliveryTime}</p>
+                <div class="card-body p-3 active-sub-card">
+                    <div class="d-flex align-items-start justify-content-between mb-2">
+                        <div class="d-flex align-items-center">
+                            <div class="active-sub-icon me-3">
+                                <i class="fa fa-utensils"></i>
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <h6 class="mb-0 fw-bold">${sub.plan}</h6>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                        <i class="fa fa-circle me-1" style="font-size:.5rem;"></i>Active
+                                    </span>
+                                </div>
+                                <small class="text-muted">${sub.price} · Delivery ${sub.deliveryTime}</small>
+                            </div>
                         </div>
-                        <div class="col-md-6 text-end">
-                            <button class="btn btn-outline-danger" onclick="cancelSubscription()">
-                                Cancel Subscription
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="More actions">
+                                <i class="fa fa-ellipsis-v"></i>
                             </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li>
+                                    <button type="button" class="dropdown-item text-danger" onclick="cancelSubscription()">
+                                        <i class="fa fa-times me-2"></i>Cancel subscription
+                                    </button>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -2314,6 +2711,7 @@ async function cancelSubscription() {
         await apiCall('/subscriptions/cancel', 'POST');
         alert('Subscription cancelled');
         updateSubscriptionStatus();
+        loadSubscriptionHistory();
     } catch (error) {
         // Fallback
         localStorage.removeItem('ugaeats_subscription');
@@ -2321,27 +2719,212 @@ async function cancelSubscription() {
     }
 }
 
-// ============ ORDER TRACKING FUNCTIONS ============
-async function trackOrder() {
-    const orderId = document.getElementById('trackingOrderId').value.trim();
-    
-    if (!orderId) {
-        alert('Please enter an order number');
+// ============ SUBSCRIPTION HISTORY ============
+async function loadSubscriptionHistory() {
+    console.log('[Subscriptions] Loading subscription history...');
+    const container = document.getElementById('subscriptionHistoryList');
+    if (!container) {
+        console.log('[Subscriptions] Container not found');
         return;
     }
     
+    // Check if user is logged in
+    if (!window.ugaeatsCustomerEmail) {
+        console.log('[Subscriptions] User not logged in');
+        container.innerHTML = `
+            <div class="text-center py-4" style="background: #f8f9fa;">
+                <i class="fa fa-sign-in-alt fa-2x mb-2" style="color: #ff4900;"></i>
+                <p class="mb-0 text-muted">Please log in to view your subscription history</p>
+            </div>
+        `;
+        return;
+    }
+    
+    try {
+        console.log('[Subscriptions] Calling API...');
+        const response = await apiCall('/subscriptions/history');
+        console.log('[Subscriptions] API Response:', response);
+        
+        // Handle both 'history' and 'subscriptions' response keys
+        const history = response.history || response.subscriptions || [];
+        
+        if (response.success && history.length > 0) {
+            let html = '<div class="table-responsive"><table class="table table-hover mb-0">';
+            html += `
+                <thead style="background: #f8f9fa;">
+                    <tr>
+                        <th style="border: none; padding: 12px;">Plan</th>
+                        <th style="border: none; padding: 12px;">Period</th>
+                        <th style="border: none; padding: 12px;">Amount</th>
+                        <th style="border: none; padding: 12px;">Status</th>
+                        <th style="border: none; padding: 12px;">Meals Used</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            history.forEach(sub => {
+                const statusBadge = getStatusBadge(sub.status);
+                const startDate = sub.start_date ? new Date(sub.start_date).toLocaleDateString('en-UG', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
+                const endDate = sub.end_date ? new Date(sub.end_date).toLocaleDateString('en-UG', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Ongoing';
+                const planName = sub.plan?.name || sub.plan_name || 'Meal Plan';
+                const amount = sub.plan?.price || sub.amount || 0;
+                const mealsUsed = sub.meals_used || 0;
+                const mealsTotal = sub.plan?.meals_per_week || sub.meals_total || 10;
+                const mealsPercentage = mealsTotal > 0 ? Math.round((mealsUsed / mealsTotal) * 100) : 0;
+                
+                html += `
+                    <tr>
+                        <td style="padding: 12px; vertical-align: middle;">
+                            <span class="fw-bold">${planName}</span>
+                        </td>
+                        <td style="padding: 12px; vertical-align: middle;">
+                            <small>${startDate} - ${endDate}</small>
+                        </td>
+                        <td style="padding: 12px; vertical-align: middle;">
+                            <span style="color: #ff4900; font-weight: 600;">UGX ${Number(amount).toLocaleString()}</span>
+                        </td>
+                        <td style="padding: 12px; vertical-align: middle;">
+                            ${statusBadge}
+                        </td>
+                        <td style="padding: 12px; vertical-align: middle;">
+                            <div class="d-flex align-items-center">
+                                <div class="progress flex-grow-1" style="height: 8px; background: #e9ecef; border-radius: 4px;">
+                                    <div class="progress-bar" style="width: ${mealsPercentage}%; background: linear-gradient(135deg, #ff4900, #ff6b35);"></div>
+                                </div>
+                                <small class="ms-2 text-muted">${mealsUsed}/${mealsTotal}</small>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table></div>';
+
+            // Append a separate "Payments" list so the user sees every
+            // subscription-related transaction (renewals, simulated, failed),
+            // not just the canonical Subscription rows.
+            const payments = response.payments || [];
+            if (payments.length) {
+                html += `
+                    <div class="mt-4">
+                        <h6 class="mb-2"><i class="fa fa-receipt me-1 text-warning"></i>Payments
+                            <small class="text-muted">(${payments.length})</small>
+                        </h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm mb-0">
+                                <thead style="background:#f8f9fa;">
+                                    <tr>
+                                        <th style="border:none;padding:8px;">Date</th>
+                                        <th style="border:none;padding:8px;">Reference</th>
+                                        <th style="border:none;padding:8px;">Method</th>
+                                        <th style="border:none;padding:8px;">Amount</th>
+                                        <th style="border:none;padding:8px;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                ${payments.map(p => {
+                                    const when = p.created_at ? new Date(p.created_at).toLocaleString('en-UG', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : '-';
+                                    const ok = p.status === 'successful';
+                                    const fail = ['failed','cancelled'].includes((p.status||'').toLowerCase());
+                                    const colour = ok ? '#28a745' : (fail ? '#dc3545' : '#6c757d');
+                                    return `
+                                        <tr>
+                                            <td style="padding:8px;"><small>${when}</small></td>
+                                            <td style="padding:8px;"><code class="small">${p.tx_ref}</code></td>
+                                            <td style="padding:8px;"><small>${(p.payment_method||'-').toUpperCase()}</small></td>
+                                            <td style="padding:8px;"><small>UGX ${Number(p.amount).toLocaleString()}</small></td>
+                                            <td style="padding:8px;">
+                                                <span class="badge" style="background:${colour};">${p.status}</span>
+                                                ${p.simulated ? '<span class="badge ms-1" style="background:#6c757d;">demo</span>' : ''}
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+            console.log('[Subscriptions] Rendered', history.length, 'subscriptions');
+        } else {
+            console.log('[Subscriptions] No subscriptions found');
+            container.innerHTML = `
+                <div class="text-center py-4" style="background: #f8f9fa;">
+                    <i class="fa fa-inbox fa-2x mb-2" style="color: #dee2e6;"></i>
+                    <p class="text-muted mb-0">No subscription history yet</p>
+                    <small class="text-muted">Subscribe to a meal plan to see your history here</small>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('[Subscriptions] Error loading history:', error);
+        container.innerHTML = `
+            <div class="text-center py-4" style="background: #f8f9fa;">
+                <i class="fa fa-exclamation-triangle fa-2x mb-2" style="color: #ff4900;"></i>
+                <p class="mb-0 text-muted">Could not load subscription history</p>
+                <small class="text-muted">${error.message || 'Please try again later'}</small>
+            </div>
+        `;
+    }
+}
+
+function getStatusBadge(status) {
+    const statusMap = {
+        'active': '<span class="badge" style="background: #ff4900;">Active</span>',
+        'paused': '<span class="badge" style="background: #6c757d;">Paused</span>',
+        'cancelled': '<span class="badge" style="background: #6c757d;">Cancelled</span>',
+        'expired': '<span class="badge" style="background: #6c757d;">Expired</span>',
+        'completed': '<span class="badge" style="background: #ff4900;">Completed</span>',
+    };
+    return statusMap[status] || '<span class="badge" style="background: #6c757d;">' + (status || 'Unknown') + '</span>';
+}
+
+// ============ ORDER TRACKING FUNCTIONS ============
+// Accepts any of: bare numeric order_id, UGA-NNNNN, UGA-YYYY-NNNNN, or the order hash.
+function buildTrackPayload(raw) {
+    const trimmed = (raw || '').trim();
+    if (!trimmed) return null;
+    const upper = trimmed.toUpperCase();
+    if (upper.startsWith('UGA')) {
+        const groups = upper.match(/\d+/g);
+        if (groups && groups.length) {
+            const num = parseInt(groups[groups.length - 1], 10);
+            if (!isNaN(num) && num > 0) return { order_id: num };
+        }
+    }
+    if (/^\d+$/.test(trimmed)) return { order_id: parseInt(trimmed, 10) };
+    if (/^[A-Za-z0-9_-]{8,}$/.test(trimmed)) return { order_hash: trimmed };
+    return null;
+}
+
+async function trackOrder() {
+    const raw = document.getElementById('trackingOrderId').value.trim();
+
+    if (!raw) {
+        alert('Please enter an order number');
+        return;
+    }
+
+    const payload = buildTrackPayload(raw);
+    if (!payload) {
+        alert('Invalid order number. Enter the number shown on your receipt (e.g. UGA-00042, 42, or the order hash from your confirmation email).');
+        return;
+    }
+
     const btn = event.target;
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Tracking...';
-    
+
     try {
-        const response = await apiCall('/tracking/track', 'POST', {
-            order_id: orderId,
-        });
-        
+        const response = await apiCall('/tracking/track', 'POST', payload);
+
         // Show tracking result
         document.getElementById('trackingResult').classList.remove('d-none');
-        
+
         // Update the UI with real data
         if (response.tracking) {
             updateTrackingUI(response.tracking, response.order);
@@ -2423,11 +3006,36 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
+/* ============================================================
+   UGAEATS UNIFIED PALETTE
+   Use these tokens for any new styles. Existing inline styles
+   have been normalized to the same hex values below.
+   ============================================================ */
+:root {
+    /* Brand (orange) */
+    --uga-brand:            #ff4900; /* primary orange */
+    --uga-brand-accent:     #ff6b35; /* lighter orange (gradients) */
+    --uga-brand-dark:       #cc3a00; /* darker orange (hover / emphasis) */
+    --uga-brand-tint:       #fff8f5; /* very pale orange bg (success / info states) */
+    --uga-brand-tint-bd:    #ffe5d9; /* pale orange border */
+
+    /* Black / white / gray only */
+    --uga-black:            #212529;
+    --uga-ink:              #212529; /* alias */
+    --uga-gray-700:         #495057;
+    --uga-muted:            #6c757d;
+    --uga-muted-2:          #adb5bd;
+    --uga-line:             #dee2e6;
+    --uga-bg-soft:          #e9ecef;
+    --uga-bg-softer:        #f8f9fa;
+    --uga-white:            #ffffff;
+}
+
 /* Additional inline styles for this page */
 
 /* Premium Feature Banner */
 .premium-feature-banner {
-    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 50%, #FFB347 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 50%, #ff6b35 100%);
     border-radius: 20px;
     padding: 30px 35px;
     color: white;
@@ -2473,7 +3081,7 @@ document.addEventListener('DOMContentLoaded', function() {
     border: 1px solid rgba(255,255,255,0.3);
 }
 .premium-badge i {
-    color: #FFD700;
+    color: #ff4900;
 }
 .premium-banner-decoration {
     position: absolute;
@@ -2492,7 +3100,7 @@ document.addEventListener('DOMContentLoaded', function() {
     padding: 35px 30px;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 2px solid #f0f0f0;
+    border: 2px solid #f8f9fa;
     overflow: hidden;
     height: 100%;
 }
@@ -2513,12 +3121,12 @@ document.addEventListener('DOMContentLoaded', function() {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #FF4900, #FF6B35);
+    background: linear-gradient(90deg, #ff4900, #ff6b35);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 .join-card .action-card-glow {
-    background: linear-gradient(90deg, #28a745, #20c997);
+    background: linear-gradient(90deg, #ff4900, #ff4900);
 }
 .premium-action-card:hover .action-card-glow {
     opacity: 1;
@@ -2536,7 +3144,7 @@ document.addEventListener('DOMContentLoaded', function() {
     width: 70px;
     height: 70px;
     border-radius: 20px;
-    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
     color: white;
     display: flex;
     align-items: center;
@@ -2547,7 +3155,7 @@ document.addEventListener('DOMContentLoaded', function() {
     transition: transform 0.3s ease;
 }
 .join-card .action-icon {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff4900 100%);
 }
 .premium-action-card:hover .action-icon {
     transform: scale(1.1);
@@ -2572,11 +3180,11 @@ document.addEventListener('DOMContentLoaded', function() {
 .premium-action-card h4 {
     font-size: 1.4rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #212529;
     margin-bottom: 10px;
 }
 .premium-action-card > .action-card-content > p {
-    color: #666;
+    color: #6c757d;
     font-size: 0.95rem;
     margin-bottom: 20px;
     line-height: 1.5;
@@ -2591,21 +3199,21 @@ document.addEventListener('DOMContentLoaded', function() {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #555;
+    color: #495057;
     font-size: 0.9rem;
 }
 .action-features i {
-    color: #FF4900;
+    color: #ff4900;
     font-size: 0.85rem;
 }
 .join-card .action-features i {
-    color: #28a745;
+    color: #ff4900;
 }
 .action-btn {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
     color: white;
     padding: 14px 28px;
     border-radius: 12px;
@@ -2615,7 +3223,7 @@ document.addEventListener('DOMContentLoaded', function() {
     box-shadow: 0 4px 15px rgba(255, 73, 0, 0.3);
 }
 .action-btn.join {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff4900 100%);
     box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
 }
 .premium-action-card:hover .action-btn {
@@ -2638,26 +3246,27 @@ document.addEventListener('DOMContentLoaded', function() {
     justify-content: space-between;
     align-items: center;
     background: #f8f9fa;
-    padding: 20px 25px;
-    border-radius: 16px;
-    margin-bottom: 20px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
     border: 1px solid #e9ecef;
 }
 .active-groups-icon {
-    width: 45px;
-    height: 45px;
-    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);
-    border-radius: 12px;
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 1.2rem;
-    margin-right: 15px;
+    font-size: 1rem;
+    margin-right: 12px;
 }
 .active-groups-header h5 {
     font-weight: 600;
-    color: #1a1a1a;
+    color: #212529;
+    font-size: 0.95rem;
 }
 
 /* Refresh Icon */
@@ -2670,13 +3279,13 @@ document.addEventListener('DOMContentLoaded', function() {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #999;
+    color: #adb5bd;
     cursor: pointer;
     transition: color 0.2s ease;
     z-index: 10;
 }
 .refresh-icon:hover {
-    color: #FF4900;
+    color: #ff4900;
 }
 .refresh-icon i {
     font-size: 0.9rem;
@@ -2693,27 +3302,47 @@ document.addEventListener('DOMContentLoaded', function() {
 /* Group Order Cards */
 .group-order-card {
     transition: all 0.3s ease;
-    border: 1px solid #e5e5e5;
+    border: 1px solid #e9ecef;
     border-radius: 12px;
     overflow: hidden;
 }
 .group-order-card:hover {
-    border-color: #FF4900;
+    border-color: #ff4900;
     box-shadow: 0 8px 25px rgba(255, 73, 0, 0.15);
     transform: translateY(-3px);
 }
 .group-order-card .card-header {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f8f9fa;
+    padding: 0.75rem 1rem !important;
+}
+.group-order-card .card-body {
+    padding: 0.9rem 1rem;
 }
 .group-order-card .card-footer {
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid #f8f9fa;
+    padding: 0.6rem 1rem !important;
+}
+.group-order-card .group-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    font-size: 1rem;
+}
+.group-order-card .invite-code-box {
+    padding: 8px 12px;
+}
+.group-order-card .stat-box {
+    padding: 6px 4px !important;
+}
+.group-order-card .stat-box i {
+    font-size: 0.95rem;
 }
 
 .group-avatar {
     width: 45px;
     height: 45px;
     border-radius: 12px;
-    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
     color: white;
     display: flex;
     align-items: center;
@@ -2739,19 +3368,19 @@ document.addEventListener('DOMContentLoaded', function() {
 .participant-chip {
     display: inline-flex;
     align-items: center;
-    background: #f0f0f0;
+    background: #f8f9fa;
     padding: 5px 10px 5px 5px;
     border-radius: 20px;
     font-size: 0.85rem;
 }
 .participant-chip.ready {
-    background: #d4edda;
+    background: #fff8f5;
 }
 .participant-avatar {
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: #FF4900;
+    background: #ff4900;
     color: white;
     display: inline-flex;
     align-items: center;
@@ -2764,12 +3393,48 @@ document.addEventListener('DOMContentLoaded', function() {
     font-weight: 500;
 }
 
-/* Lusaniya (Split Payment) Styles */
+/* Active Subscription compact card */
+.active-sub-card { background: #fff; }
+.active-sub-icon {
+    width: 42px; height: 42px; border-radius: 10px;
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+}
+.active-sub-stat {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 8px 10px;
+    text-align: center;
+    line-height: 1.2;
+}
+.active-sub-stat .fw-bold { font-size: 1rem; }
+
+/* Track Order header */
+.tracking-header {
+    background: linear-gradient(135deg, #fff5f0 0%, #ffffff 100%);
+    border: 1px solid #ffe0d2;
+    border-radius: 12px;
+    padding: 18px 22px;
+}
+.tracking-header h4 {
+    margin-bottom: 6px;
+    color: #212529;
+    font-weight: 700;
+}
+.tracking-subtitle {
+    color: #495057;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* Split Bill (Split Payment) Styles */
 .bg-gradient-orange {
-    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
 }
 .total-amount-box {
-    border: 2px dashed #FF4900;
+    border: 2px dashed #ff4900;
 }
 .split-option-card {
     background: white;
@@ -2782,11 +3447,11 @@ document.addEventListener('DOMContentLoaded', function() {
     height: 100%;
 }
 .split-option-card:hover {
-    border-color: #FF4900;
+    border-color: #ff4900;
     transform: translateY(-3px);
 }
 .split-option-card.active {
-    border-color: #FF4900;
+    border-color: #ff4900;
     background: rgba(255, 73, 0, 0.05);
     box-shadow: 0 4px 15px rgba(255, 73, 0, 0.2);
 }
@@ -2794,7 +3459,7 @@ document.addEventListener('DOMContentLoaded', function() {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
     color: white;
     display: inline-flex;
     align-items: center;
@@ -2816,7 +3481,7 @@ document.addEventListener('DOMContentLoaded', function() {
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
     color: white;
     display: flex;
     align-items: center;
@@ -2837,7 +3502,7 @@ document.addEventListener('DOMContentLoaded', function() {
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
     padding: 12px 20px;
     z-index: 1050;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
@@ -2869,7 +3534,7 @@ document.addEventListener('DOMContentLoaded', function() {
     transition: all 0.3s ease;
 }
 .date-option:hover, .date-option.selected {
-    border-color: #FF4900;
+    border-color: #ff4900;
     background: rgba(255, 73, 0, 0.1);
 }
 .date-option .date-num {
@@ -2893,9 +3558,9 @@ document.addEventListener('DOMContentLoaded', function() {
     background: #e9ecef;
 }
 .time-slot.selected {
-    background: #FF4900;
+    background: #ff4900;
     color: white;
-    border-color: #FF4900;
+    border-color: #ff4900;
 }
 .time-slot.unavailable {
     opacity: 0.5;
@@ -2904,7 +3569,7 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 .tracking-map {
     height: 300px;
-    background: linear-gradient(135deg, #FF4900 0%, #FF6B35 100%);
+    background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
     border-radius: 0.5rem;
     position: relative;
 }
@@ -2920,7 +3585,7 @@ document.addEventListener('DOMContentLoaded', function() {
     position: absolute;
     bottom: 40%;
     left: 60%;
-    background: #28a745;
+    background: #ff4900;
     color: white;
     width: 40px;
     height: 40px;
@@ -2950,10 +3615,10 @@ document.addEventListener('DOMContentLoaded', function() {
     padding-bottom: 0;
 }
 .timeline-item.completed {
-    border-left-color: #28a745;
+    border-left-color: #ff4900;
 }
 .timeline-item.active {
-    border-left-color: #28a745;
+    border-left-color: #ff4900;
 }
 .timeline-marker {
     position: absolute;
@@ -2966,10 +3631,10 @@ document.addEventListener('DOMContentLoaded', function() {
     border: 3px solid white;
 }
 .timeline-item.completed .timeline-marker {
-    background: #28a745;
+    background: #ff4900;
 }
 .timeline-item.active .timeline-marker {
-    background: #FF4900;
+    background: #ff4900;
 }
 .timeline-marker.pulse {
     animation: pulse 1.5s infinite;
