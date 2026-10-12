@@ -14,7 +14,7 @@ return new class extends Migration
         // Tasty Wallet table
         Schema::create('ti_tasty_wallets', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('customer_id')->unique();
+            $table->unsignedInteger('customer_id')->unique();
             $table->decimal('balance', 15, 2)->default(0);
             $table->string('currency', 3)->default('UGX');
             $table->boolean('is_active')->default(true);

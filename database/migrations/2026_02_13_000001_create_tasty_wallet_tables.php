@@ -11,7 +11,7 @@ return new class extends Migration
         // Tasty Wallets table
         Schema::create('tasty_wallets', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('customer_id')->unique();
+            $table->unsignedInteger('customer_id')->unique();
             $table->decimal('balance', 15, 2)->default(0);
             $table->boolean('is_active')->default(true);
             $table->string('pin')->nullable(); // For wallet security
