@@ -11,10 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // The wallet tables are created by 2026_02_13_000001_create_tasty_wallet_tables
+        // (used by App\Models\TastyWallet and WalletTransaction). Skip this duplicate
+        // definition when they already exist.
+        if (Schema::hasTable('tasty_wallets') || Schema::hasTable('tasty_wallet_transactions')) {
+            return;
+        }
+
         // Tasty Wallet table
         Schema::create('ti_tasty_wallets', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('customer_id')->unique();
+            // Must match customers.customer_id (int unsigned)
+            $table->unsignedInteger('customer_id')->unique();
             $table->decimal('balance', 15, 2)->default(0);
             $table->string('currency', 3)->default('UGX');
             $table->boolean('is_active')->default(true);
