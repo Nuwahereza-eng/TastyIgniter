@@ -104,7 +104,49 @@ php artisan cache:clear 2>&1 || echo "cache:clear done"
 php artisan view:clear 2>&1 || echo "view:clear done"
 php artisan route:clear 2>&1 || echo "route:clear done"
 
-# Run migrations
+# Install TastyIgniter's schema on first deploy.
+# `php artisan migrate` alone does not create the schema; it is created by
+# `igniter:install`. Only run it when the schema is missing so restarts do not
+# re-install or touch existing data. Schema::hasTable() applies the connection's
+# table prefix (ti_) automatically, so the unprefixed name is checked here.
+echo "=== Checking TastyIgniter installation ==="
+SCHEMA_STATE=$(php artisan tinker --execute="echo \Illuminate\Support\Facades\Schema::hasTable('settings') ? 'installed' : 'missing';" 2>&1 || true)
+echo "Schema check: ${SCHEMA_STATE}"
+if echo "${SCHEMA_STATE}" | grep -q "missing"; then
+    echo "=== Schema missing, running igniter:install ==="
+    php artisan igniter:install --no-interaction 2>&1 || echo "igniter install failed"
+
+    # Optionally create the initial super admin. Skipped unless both
+    # ADMIN_EMAIL and ADMIN_PASSWORD are set. Values are read from the
+    # environment inside PHP so they are never interpolated into the command.
+    if [ -n "${ADMIN_EMAIL:-}" ] && [ -n "${ADMIN_PASSWORD:-}" ]; then
+        echo "=== Creating admin account for ${ADMIN_EMAIL} ==="
+        php artisan tinker --execute="
+\$email = getenv('ADMIN_EMAIL');
+\$user = \Igniter\User\Models\User::where('email', \$email)->first();
+if (!\$user) {
+    \$user = new \Igniter\User\Models\User();
+    \$user->forceFill([
+        'name' => getenv('ADMIN_NAME') ?: 'Administrator',
+        'email' => \$email,
+        'username' => getenv('ADMIN_USERNAME') ?: 'admin',
+        'password' => getenv('ADMIN_PASSWORD'),
+        'super_user' => true,
+        'is_activated' => true,
+    ])->save();
+    echo 'Admin account created';
+} else {
+    echo 'Admin account already exists';
+}
+" 2>&1 || echo "admin setup done"
+    else
+        echo "ADMIN_EMAIL/ADMIN_PASSWORD not set; skipping admin account creation"
+    fi
+else
+    echo "TastyIgniter schema already present; skipping install"
+fi
+
+# Run migrations (keeps later upgrades applying new migrations)
 php artisan migrate --force 2>&1 || echo "migrate done"
 
 # Theme setup
