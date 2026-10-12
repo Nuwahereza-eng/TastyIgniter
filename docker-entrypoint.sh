@@ -77,7 +77,9 @@ echo "Cleared storage caches"
 # Configure Nginx port BEFORE starting services
 PORT=${PORT:-80}
 echo "PORT is: $PORT"
-sed -i "s/listen 80/listen $PORT/g" /etc/nginx/conf.d/default.conf 2>/dev/null || true
+# Match any existing port so this is idempotent across container restarts,
+# where the same filesystem (and an already-rewritten config) is reused.
+sed -i -E "s/listen [0-9]+ default_server;/listen ${PORT} default_server;/" /etc/nginx/conf.d/default.conf 2>/dev/null || true
 
 # Create a simple health file that nginx can serve immediately
 echo '{"status":"ok","service":"ugaeats"}' > /var/www/html/public/health.json
