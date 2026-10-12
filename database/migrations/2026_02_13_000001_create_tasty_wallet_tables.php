@@ -9,9 +9,22 @@ return new class extends Migration
     public function up(): void
     {
         // Tasty Wallets table
+        if (!Schema::hasTable('tasty_wallets')) {
+            $this->createWalletsTable();
+        }
+
+        // Wallet Transactions table
+        if (!Schema::hasTable('tasty_wallet_transactions')) {
+            $this->createWalletTransactionsTable();
+        }
+    }
+
+    protected function createWalletsTable(): void
+    {
         Schema::create('tasty_wallets', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('customer_id')->unique();
+            // Must match customers.customer_id (int unsigned) for the foreign key to be valid on MySQL
+            $table->unsignedInteger('customer_id')->unique();
             $table->decimal('balance', 15, 2)->default(0);
             $table->boolean('is_active')->default(true);
             $table->string('pin')->nullable(); // For wallet security
@@ -19,8 +32,10 @@ return new class extends Migration
             
             $table->foreign('customer_id')->references('customer_id')->on('customers')->onDelete('cascade');
         });
-        
-        // Wallet Transactions table
+    }
+
+    protected function createWalletTransactionsTable(): void
+    {
         Schema::create('tasty_wallet_transactions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('wallet_id');
