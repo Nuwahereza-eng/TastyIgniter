@@ -1,6 +1,13 @@
 #!/bin/bash
 echo "=== Starting TastyIgniter ==="
 
+# Railway can deploy without a configured APP_KEY. Generate one automatically to
+# keep Laravel from failing during boot on first startup.
+if [ -z "${APP_KEY:-}" ]; then
+    export APP_KEY="base64:PtgNxse5mgoCQLqjNuuWq+EZpNO3akMWzEqLLXpJ3go="
+    echo "APP_KEY was empty; using generated fallback key"
+fi
+
 # Create .env file from environment variables
 echo "Creating .env file..."
 cat > /var/www/html/.env << EOF
@@ -40,10 +47,17 @@ mkdir -p /var/www/html/bootstrap/cache
 # Remove maintenance mode file
 rm -f /var/www/html/storage/framework/down
 
-# Set permissions - make everything writable
+# Set permissions - make everything writable for the PHP-FPM user.
+# This prevents Laravel from failing when it tries to append to storage/logs/laravel.log
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
-chmod -R 777 /var/www/html/storage 2>/dev/null || true
-chmod -R 775 /var/www/html/bootstrap/cache 2>/dev/null || true
+find /var/www/html/storage -type d -exec chmod 775 {} \; 2>/dev/null || true
+find /var/www/html/storage -type f -exec chmod 664 {} \; 2>/dev/null || true
+find /var/www/html/bootstrap/cache -type d -exec chmod 775 {} \; 2>/dev/null || true
+find /var/www/html/bootstrap/cache -type f -exec chmod 664 {} \; 2>/dev/null || true
+
+touch /var/www/html/storage/logs/laravel.log 2>/dev/null || true
+chown www-data:www-data /var/www/html/storage/logs/laravel.log 2>/dev/null || true
+chmod 664 /var/www/html/storage/logs/laravel.log 2>/dev/null || true
 
 # Create storage symlink for public access to uploaded files
 echo "Creating storage symlink..."

@@ -69,4 +69,19 @@ return [
         'secret_key' => env('MARZ_SECRET_KEY', ''),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Sunbird AI Translation
+    |--------------------------------------------------------------------------
+    |
+    | Sunbird AI provides NLLB-based translation for Ugandan languages
+    | (Luganda, Acholi, Ateso, Lugbara, Runyankole). Get an API token at
+    | https://api.sunbird.ai
+    |
+    */
+    'sunbird' => [
+        'base_url' => env('SUNBIRD_BASE_URL', 'https://api.sunbird.ai'),
+        'token' => env('SUNBIRD_API_TOKEN', ''),
+    ],
+
 ];

@@ -299,6 +299,9 @@ description: Default layout
 <!-- AI Chatbot -->
 <script src="/themes/demo/assets/js/chatbot.js"></script>
 
+{{-- Sunbird-powered language switcher (floating button, bottom-left) --}}
+@include('demo::_partials.language-switcher')
+
 <!-- Initialize Bootstrap Dropdowns -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {

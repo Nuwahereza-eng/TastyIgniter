@@ -6,6 +6,7 @@ use App\Http\Controllers\WalletController;
 use App\Http\Controllers\Api\LocationScheduleController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\OrderTrackingController;
+use App\Http\Controllers\Api\TranslationController;
 use App\Http\Controllers\Web\GroupOrderWebController;
 
 /*
@@ -52,6 +53,13 @@ Route::prefix('ajax/tracking')->group(function () {
     Route::post('/track', [OrderTrackingController::class, 'track']);
     Route::get('/status/{orderId}', [OrderTrackingController::class, 'status']);
     Route::get('/statuses', [OrderTrackingController::class, 'statuses']);
+});
+
+// Sunbird AI translation proxy (used by the in-page language switcher).
+Route::prefix('ajax/translate')->group(function () {
+    Route::get('/languages', [TranslationController::class, 'languages']);
+    Route::get('/dictionary/{lang}', [TranslationController::class, 'dictionary']);
+    Route::post('/', [TranslationController::class, 'translate']);
 });
 
 // Orders management routes
