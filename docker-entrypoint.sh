@@ -77,9 +77,15 @@ echo "Cleared storage caches"
 # Configure Nginx port BEFORE starting services
 PORT=${PORT:-80}
 echo "PORT is: $PORT"
+# Remove any stock/default server that may duplicate the app config when the
+# image is reused across restarts. There must be exactly one default listener.
+rm -f /etc/nginx/sites-enabled/default
 # Match any existing port so this is idempotent across container restarts,
 # where the same filesystem (and an already-rewritten config) is reused.
 sed -i -E "s/listen [0-9]+ default_server;/listen ${PORT} default_server;/" /etc/nginx/conf.d/default.conf 2>/dev/null || true
+
+# Fix the config before start so a duplicate default server never triggers a crash.
+nginx -t 2>/dev/null || true
 
 # Create a simple health file that nginx can serve immediately
 echo '{"status":"ok","service":"ugaeats"}' > /var/www/html/public/health.json
@@ -157,19 +163,29 @@ php artisan tinker --execute="\Igniter\Main\Models\Theme::syncAll();" 2>&1 || ec
 echo "=== Activating demo theme ==="
 php artisan tinker --execute="
 \$theme = \Igniter\Main\Models\Theme::where('code', 'demo')->first();
+\$hasIsActiveColumn = \Illuminate\Support\Facades\Schema::hasColumn('themes', 'is_active');
 if (\$theme) {
-    \$theme->update(['is_active' => true]);
-    \Igniter\Main\Models\Theme::where('code', '!=', 'demo')->update(['is_active' => false]);
-    echo 'Demo theme activated';
+    if (\$hasIsActiveColumn) {
+        \$theme->update(['is_active' => true]);
+        \Igniter\Main\Models\Theme::where('code', '!=', 'demo')->update(['is_active' => false]);
+        echo 'Demo theme activated';
+    } else {
+        echo 'Theme table missing is_active column; skipping activation flag update';
+    }
 } else {
     echo 'Demo theme not found, creating...';
-    \Igniter\Main\Models\Theme::create([
+    \$themeData = [
         'name' => 'UgaEats Demo Theme',
         'code' => 'demo',
         'description' => 'Uganda customizations theme',
-        'is_active' => true,
-    ]);
-    \Igniter\Main\Models\Theme::where('code', '!=', 'demo')->update(['is_active' => false]);
+    ];
+    if (\$hasIsActiveColumn) {
+        \$themeData['is_active'] = true;
+    }
+    \Igniter\Main\Models\Theme::create(\$themeData);
+    if (\$hasIsActiveColumn) {
+        \Igniter\Main\Models\Theme::where('code', '!=', 'demo')->update(['is_active' => false]);
+    }
 }
 \DB::table('settings')->updateOrInsert(
     ['item' => 'default_themes'],

@@ -87,7 +87,8 @@ RUN echo 'server { \n\
         deny all; \n\
     } \n\
 }' > /etc/nginx/conf.d/default.conf \
-    && rm -f /etc/nginx/sites-enabled/default
+    && rm -f /etc/nginx/sites-enabled/default \
+    && rm -f /etc/nginx/conf.d/default.conf.bak /etc/nginx/conf.d/*.bak
 
 # Configure Supervisor to run both nginx and php-fpm
 RUN echo '[supervisord] \n\
