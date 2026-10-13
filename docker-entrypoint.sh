@@ -87,6 +87,14 @@ sed -i -E "s/listen [0-9]+ default_server;/listen ${PORT} default_server;/" /etc
 # Fix the config before start so a duplicate default server never triggers a crash.
 nginx -t 2>/dev/null || true
 
+# Ensure there are no stale nginx/php-fpm processes left from a previous attempt
+# or a restarted container that reused the same runtime namespace.
+if [ -f /run/nginx.pid ] || pgrep -x nginx >/dev/null 2>&1; then
+    nginx -s quit 2>/dev/null || pkill -x nginx || true
+    rm -f /run/nginx.pid
+fi
+pgrep -x php-fpm >/dev/null 2>&1 && pkill -x php-fpm || true
+
 # Create a simple health file that nginx can serve immediately
 echo '{"status":"ok","service":"ugaeats"}' > /var/www/html/public/health.json
 chmod 644 /var/www/html/public/health.json
