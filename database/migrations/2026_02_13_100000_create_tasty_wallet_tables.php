@@ -14,7 +14,11 @@ return new class extends Migration
         // Tasty Wallet table
         Schema::create('tasty_wallets', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('customer_id')->unique();
+            // Must match ti_customers.customer_id (BIGINT UNSIGNED after the core
+            // make_primary_key_bigint_all_tables migration). No foreign key is declared here:
+            // this file may run before the core schema exists, and Laravel already applies the
+            // ti_ prefix to this table name.
+            $table->unsignedBigInteger('customer_id')->unique();
             $table->decimal('balance', 15, 2)->default(0);
             $table->string('currency', 3)->default('UGX');
             $table->boolean('is_active')->default(true);
