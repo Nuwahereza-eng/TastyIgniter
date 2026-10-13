@@ -119,15 +119,21 @@ php artisan view:clear 2>&1 || echo "view:clear done"
 php artisan route:clear 2>&1 || echo "route:clear done"
 
 # Install TastyIgniter's schema on first deploy.
-# `php artisan migrate` alone does not create the schema; it is created by
-# `igniter:install`. Only run it when the schema is missing so restarts do not
-# re-install or touch existing data. Schema::hasTable() applies the connection's
-# table prefix (ti_) automatically, so the unprefixed name is checked here.
+# `php artisan migrate` alone does not create the installed site data; it is
+# created by `igniter:install`. A table existing without rows is not a valid
+# installed state, so we check for real settings/theme data before skipping.
 echo "=== Checking TastyIgniter installation ==="
-SCHEMA_STATE=$(php artisan tinker --execute="echo \Illuminate\Support\Facades\Schema::hasTable('settings') ? 'installed' : 'missing';" 2>&1 || true)
+SCHEMA_STATE=$(php artisan tinker --execute="
+\$schema = \Illuminate\Support\Facades\Schema::class;
+\$db = \Illuminate\Support\Facades\DB::class;
+\$hasSettings = method_exists(\$schema, 'hasTable') && \$schema::hasTable('settings');
+\$hasThemes = method_exists(\$schema, 'hasTable') && \$schema::hasTable('themes');
+\$settingsCount = \$hasSettings ? \$db::table('settings')->count() : 0;
+\$themesCount = \$hasThemes ? \$db::table('themes')->count() : 0;
+echo (\$hasSettings && \$settingsCount > 0) || (\$hasThemes && \$themesCount > 0) ? 'installed' : 'missing';" 2>&1 || true)
 echo "Schema check: ${SCHEMA_STATE}"
 if echo "${SCHEMA_STATE}" | grep -q "missing"; then
-    echo "=== Schema missing, running igniter:install ==="
+    echo "=== Database appears empty, running igniter:install ==="
     php artisan igniter:install --no-interaction 2>&1 || echo "igniter install failed"
 
     # Optionally create the initial super admin. Skipped unless both
