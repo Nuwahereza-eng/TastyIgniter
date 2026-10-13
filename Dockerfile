@@ -60,7 +60,7 @@ RUN chown -R www-data:www-data /var/www/html \
 
 # Configure Nginx - write directly to conf.d for reliability
 RUN echo 'server { \n\
-    listen 80 default_server; \n\
+    listen 9000 default_server; \n\
     server_name _; \n\
     root /var/www/html/public; \n\
     index index.php index.html; \n\
@@ -108,6 +108,6 @@ autorestart=true' > /etc/supervisor/conf.d/supervisord.conf
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-EXPOSE 80
+EXPOSE 9000
 
 CMD ["/usr/local/bin/docker-entrypoint.sh"]

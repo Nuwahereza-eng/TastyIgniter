@@ -75,7 +75,7 @@ rm -rf /var/www/html/storage/igniter/cache/* 2>/dev/null || true
 echo "Cleared storage caches"
 
 # Configure Nginx port BEFORE starting services
-PORT=${PORT:-80}
+PORT=${PORT:-9000}
 echo "PORT is: $PORT"
 # Remove any stock/default server that may duplicate the app config when the
 # image is reused across restarts. There must be exactly one default listener.
