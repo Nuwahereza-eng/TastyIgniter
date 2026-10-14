@@ -50,6 +50,12 @@ class FrontendContentSeeder extends Seeder
             $media->addFromFile($path, 'images');
             $media->save();
             $slider->media()->save($media);
+
+            $media->getThumb([
+                'width' => 1920,
+                'height' => 800,
+                'fit' => 'contain',
+            ]);
         }
     }
 }

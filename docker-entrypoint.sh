@@ -40,6 +40,7 @@ echo ".env file created"
 mkdir -p /var/www/html/storage/framework/{sessions,views,cache}
 mkdir -p /var/www/html/storage/logs
 mkdir -p /var/www/html/storage/app/public
+mkdir -p /var/www/html/storage/app/public/media/attachments/public
 mkdir -p /var/www/html/storage/temp
 mkdir -p /var/www/html/storage/igniter/{combiner,uploads,media}
 mkdir -p /var/www/html/bootstrap/cache
@@ -52,6 +53,7 @@ rm -f /var/www/html/storage/framework/down
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
 find /var/www/html/storage -type d -exec chmod 775 {} \; 2>/dev/null || true
 find /var/www/html/storage -type f -exec chmod 664 {} \; 2>/dev/null || true
+find /var/www/html/storage/app/public/media -type d -exec chmod 775 {} \; 2>/dev/null || true
 find /var/www/html/bootstrap/cache -type d -exec chmod 775 {} \; 2>/dev/null || true
 find /var/www/html/bootstrap/cache -type f -exec chmod 664 {} \; 2>/dev/null || true
 
