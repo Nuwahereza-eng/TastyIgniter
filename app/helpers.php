@@ -33,11 +33,12 @@ if (!function_exists('media_thumb')) {
             return $path;
         }
         
-        // Try to return as media URL without Glide processing
-        // Build a simple path to the media file
-        $mediaPath = '/storage/app/public/' . ltrim($path, '/');
-        if (file_exists(dirname(__DIR__) . '/public' . $mediaPath)) {
-            return $mediaPath;
+        // Try to return as media URL without Glide processing.
+        // Let the core storage resolver build the public /storage/... URL.
+        try {
+            return media_url($path);
+        } catch (\Exception) {
+            // Fall through to the placeholder below.
         }
         
         // Fallback to placeholder

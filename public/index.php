@@ -17,15 +17,23 @@ define('LARAVEL_START', microtime(true));
 // Safe placeholder image path
 define('SAFE_PLACEHOLDER', '/vendor/igniter-orange/images/favicon.ico');
 
-// Override media_thumb - the main crasher
+// Override media_thumb - keep it lightweight and return the public storage URL.
 if (!function_exists('media_thumb')) {
     function media_thumb(?string $path, array $options = []): string
     {
-        return SAFE_PLACEHOLDER;
+        if (empty($path)) {
+            return SAFE_PLACEHOLDER;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        return '/storage/' . ltrim($path, '/');
     }
 }
 
-// Override resize - also uses Glide and can crash
+// Override resize - return the source URL without Glide processing.
 if (!function_exists('resize')) {
     function resize($url = null, $width = 0, $height = 0, $options = [])
     {
