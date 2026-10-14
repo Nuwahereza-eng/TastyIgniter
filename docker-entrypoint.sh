@@ -169,6 +169,9 @@ fi
 # Run migrations (keeps later upgrades applying new migrations)
 php artisan migrate --force 2>&1 || echo "migrate done"
 
+# Restore the homepage slider media on fresh or reset databases.
+php artisan db:seed --class="Database\\Seeders\\FrontendContentSeeder" --force 2>&1 || echo "frontend content seed done"
+
 # Theme setup
 echo "=== Syncing themes ==="
 php artisan tinker --execute="\Igniter\Main\Models\Theme::syncAll();" 2>&1 || echo "theme sync done"
