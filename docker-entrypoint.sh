@@ -8,6 +8,23 @@ if [ -z "${APP_KEY:-}" ]; then
     echo "APP_KEY was empty; using generated fallback key"
 fi
 
+# Normalise APP_URL. Image and asset URLs are built from it, so a value without
+# a scheme (e.g. APP_URL=${{RAILWAY_PUBLIC_DOMAIN}}) produces relative links like
+# "my-app.up.railway.app/storage/..." that 404 in the browser. Exported because
+# real environment variables take precedence over .env in Laravel.
+if [ -z "${APP_URL:-}" ] && [ -n "${RAILWAY_PUBLIC_DOMAIN:-}" ]; then
+    APP_URL="${RAILWAY_PUBLIC_DOMAIN}"
+fi
+if [ -n "${APP_URL:-}" ]; then
+    case "${APP_URL}" in
+        http://*|https://*) ;;
+        *) APP_URL="https://${APP_URL}" ;;
+    esac
+    APP_URL="${APP_URL%/}"
+    export APP_URL
+fi
+echo "APP_URL=${APP_URL:-<unset>}"
+
 # Create .env file from environment variables
 echo "Creating .env file..."
 cat > /var/www/html/.env << EOF
@@ -174,6 +191,9 @@ php artisan migrate --force 2>&1 || echo "migrate done"
 # Restore the homepage slider media on fresh or reset databases.
 php artisan db:seed --class="Database\\Seeders\\FrontendContentSeeder" --force 2>&1 || echo "frontend content seed done"
 
+# Restore the Ugandan dishes (and their images) if they are missing.
+php artisan db:seed --class="Database\\Seeders\\MenuContentSeeder" --force 2>&1 || echo "menu content seed done"
+
 # Theme setup
 echo "=== Syncing themes ==="
 php artisan tinker --execute="\Igniter\Main\Models\Theme::syncAll();" 2>&1 || echo "theme sync done"
@@ -242,6 +262,14 @@ fi
 
 # Final view clear
 php artisan view:clear 2>&1 || echo "view:clear done"
+
+# Re-apply storage ownership. The artisan commands above (migrate, seeders,
+# tinker) run as root and create root-owned files and folders, e.g. media
+# attachments, thumbnails and storage/temp/attachments. PHP-FPM runs as
+# www-data and must be able to write thumbnails there at request time.
+chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
+find /var/www/html/storage -type d -exec chmod 775 {} \; 2>/dev/null || true
+find /var/www/html/storage -type f -exec chmod 664 {} \; 2>/dev/null || true
 
 echo "=== Initialization complete ==="
 

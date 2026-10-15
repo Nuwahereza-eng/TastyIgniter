@@ -1,0 +1,154 @@
+@startuml sequence-group-order
+' Figure: Sequence diagram of a group order with split payment
+' Render: https://www.plantuml.com/plantuml  or  java -jar plantuml.jar -tpng sequence-group-order.puml
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam sequenceMessageAlign left
+skinparam responseMessageBelowArrow true
+skinparam sequence {
+  ParticipantBackgroundColor #F4F7FB
+  ParticipantBorderColor #004E89
+  LifeLineBorderColor #9FB3C8
+  GroupBorderColor #004E89
+}
+autonumber
+
+actor "Host\n(Customer)" as Host
+actor "Participant\n(Customer)" as Part
+participant "UgaEats Web UI" as UI
+participant "GroupOrder\nController" as GOC
+participant "GroupOrder /\nParticipant" as GO
+participant "Payment\nController" as PC
+participant "<<interface>>\nMobileMoneyGateway\n(MarzPayAdapter)" as GW
+participant "MTN / Airtel\nNetwork" as MNO
+participant "Branch\n(Restaurant)" as BR
+
+== 1. Cart creation ==
+Host -> UI : Start group order\n(branch, split method, deadline)
+UI -> GOC : POST /group-orders
+activate GOC
+GOC -> GO : create(status = OPEN)\ngenerateCode()
+activate GO
+GO -> GO : add host as participant\n(isHost = true)
+GO --> GOC : groupOrder, invite code
+deactivate GO
+GOC --> UI : invite code + share link
+deactivate GOC
+UI --> Host : Show code (e.g. ABCD-1234)
+Host -> Part : Share link via WhatsApp
+
+== 2. Participant pledges ==
+loop for each participant until deadline
+  Part -> UI : Open link / enter code
+  UI -> GOC : POST /group-orders/join {code}
+  activate GOC
+  GOC -> GO : isAcceptingParticipants()
+  alt open and deadline not passed
+    GO --> GOC : true
+    GOC -> GO : create participant (status = JOINED)
+    GOC --> UI : joined
+  else closed / expired
+    GOC --> UI : 400 "Group order no longer accepting"
+  end
+  deactivate GOC
+
+  Part -> UI : Add menu items (pledge)
+  UI -> GOC : PUT /group-orders/{id}/items
+  activate GOC
+  GOC -> GO : addItem(), calculateSubtotal()\nprices in UGX incl. VAT
+  GOC --> UI : updated shared cart
+  deactivate GOC
+  Part -> UI : Mark "ready"
+  UI -> GOC : markReady()
+  GOC -> GO : status = READY
+end
+
+== 3. Allocation of shares ==
+Host -> UI : Finalise group order
+UI -> GOC : POST /group-orders/{id}/finalize
+activate GOC
+GOC -> GO : all participants READY?
+alt some not ready
+  GOC --> UI : 400 not_ready_count
+else all ready
+  GOC -> GO : applyShares()
+  activate GO
+  GO -> GO : computeShares()
+  alt split = EQUAL
+    GO -> GO : share = total / n
+  else split = BY_ITEM
+    GO -> GO : share = participant subtotal
+  else split = HOST_PAYS
+    GO -> GO : host share = total, others = 0
+  end
+  GO -> GO : save shareAmount per participant\ntotalAmount = Σ subtotals
+  GO --> GOC : shares allocated
+  deactivate GO
+  GOC --> UI : shares per participant
+  UI --> Host : show allocation
+  UI --> Part : "Your share: UGX x"
+end
+deactivate GOC
+
+== 4. Individual Mobile Money collection ==
+loop for each participant with shareAmount > 0
+  Part -> UI : Pay share (MTN / Airtel, phone)
+  UI -> PC : POST /payments/initialize\n{type = group_share, reference_id = participant,\n amount, method, phone}
+  activate PC
+  PC -> PC : validate +256 phone,\ncheck UGX 200,000 limit
+  PC -> PC : create PaymentTransaction\n(status = PENDING, txRef)
+  PC -> GW : requestCollection(phone, amount, txRef)
+  activate GW
+  GW -> MNO : collection request
+  activate MNO
+  GW --> PC : accepted (pending)
+  deactivate GW
+  PC --> UI : "Approve the prompt on your phone"
+  deactivate PC
+  MNO -> Part : USSD / push prompt
+  Part -> MNO : enter Mobile Money PIN
+
+  MNO -> GW : collection result
+  deactivate MNO
+  activate GW
+  GW -> PC : POST /payments/webhook/marz\n{reference, status}
+  deactivate GW
+  activate PC
+  alt payment successful
+    PC -> PC : PaymentTransaction.status = SUCCESSFUL
+    PC -> GO : markGroupSharePaid()\nhasPaid = true, paidAt = now
+    activate GO
+    opt first share paid
+      GO -> GO : status OPEN -> CLOSED\n(cart locked)
+    end
+    GO --> PC : updated
+    deactivate GO
+    PC --> UI : share paid
+    UI --> Part : payment receipt
+  else failed / cancelled / timeout
+    PC -> PC : PaymentTransaction.status = FAILED
+    PC --> UI : payment failed
+    UI --> Part : retry or choose another method
+  end
+  deactivate PC
+end
+
+== 5. Order confirmation ==
+PC -> GO : isFullyPaid()
+activate GO
+alt every non-zero share paid
+  GO -> GO : status CLOSED -> ORDERED
+  GO -> BR : submit combined order
+  activate BR
+  BR --> GO : order confirmed (status = CONFIRMED)
+  deactivate BR
+  GO --> UI : order confirmed
+  deactivate GO
+  UI --> Host : confirmation + tracking link
+  UI --> Part : confirmation + tracking link
+else shares outstanding
+  UI --> Host : waiting for remaining payments
+end
+
+@enduml

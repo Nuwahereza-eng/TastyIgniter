@@ -1,0 +1,151 @@
+@startuml use-case
+' Figure: Use case diagram of the UgaEats platform
+' Render: https://www.plantuml.com/plantuml  or  java -jar plantuml.jar -tpng use-case.puml
+!pragma layout smetana
+left to right direction
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #F4F7FB
+  BorderColor #004E89
+}
+skinparam package {
+  BackgroundColor #FFFFFF
+  BorderColor #9FB3C8
+  FontColor #004E89
+}
+
+actor "Customer" as C
+actor "Restaurant\nManager" as M
+actor "Restaurant\nStaff" as S
+actor "Rider" as R
+actor "Administrator" as A
+actor "Mobile Money\nGateway\n(MTN / Airtel)" as G <<system>>
+
+rectangle "UgaEats Online Food Ordering Platform" {
+
+  package "F1 · Group Ordering & Split Payment" {
+    usecase "Create group order" as UC11
+    usecase "Join via invite code" as UC12
+    usecase "Pledge items to\nshared cart" as UC13
+    usecase "Choose split method" as UC14
+    usecase "Pay own share" as UC15
+    usecase "Finalise group order" as UC16
+  }
+
+  package "F2 · Scheduled & Recurring Orders" {
+    usecase "Schedule order\nfor a time slot" as UC21
+    usecase "Set recurrence\n(daily / weekly / monthly)" as UC22
+    usecase "Skip or cancel\nnext occurrence" as UC23
+    usecase "Configure delivery\ntime slots" as UC24
+  }
+
+  package "F3 · Meal Subscriptions" {
+    usecase "Subscribe to a plan" as UC31
+    usecase "Redeem subscription meal" as UC32
+    usecase "Pause / resume /\ncancel subscription" as UC33
+    usecase "Manage subscription plans" as UC34
+  }
+
+  package "F4 · Multi-Branch Management" {
+    usecase "Select branch" as UC41
+    usecase "Manage branches" as UC42
+    usecase "Override branch menu\n& prices" as UC43
+  }
+
+  package "F5 · Digital Wallet" {
+    usecase "Top up wallet" as UC51
+    usecase "Pay with wallet" as UC52
+    usecase "Withdraw to Mobile Money" as UC53
+    usecase "View wallet ledger" as UC54
+    usecase "Reconcile ledger" as UC55
+  }
+
+  package "F6 · Loyalty & Rewards" {
+    usecase "Earn points / cashback" as UC61
+    usecase "Redeem points" as UC62
+    usecase "Configure loyalty rules" as UC63
+  }
+
+  package "F7 · Order Fulfilment & Delivery Tracking" {
+    usecase "Track order" as UC71
+    usecase "Update order status" as UC72
+    usecase "Assign rider" as UC73
+    usecase "Accept delivery" as UC74
+    usecase "Share live location" as UC75
+    usecase "Confirm delivery" as UC76
+  }
+
+  package "Localisation Layer (Uganda)" #FFF8DC {
+    usecase "Pay via Mobile Money" as L1
+    usecase "Display prices in UGX\nincl. 18% VAT" as L2
+    usecase "Switch language\n(English / Luganda / local)" as L3
+    usecase "Validate +256\nphone number" as L4
+    usecase "Geocode Ugandan\naddress" as L5
+  }
+}
+
+' ---- Customer ----
+C --> UC11
+C --> UC12
+C --> UC13
+C --> UC15
+C --> UC21
+C --> UC22
+C --> UC23
+C --> UC31
+C --> UC32
+C --> UC33
+C --> UC41
+C --> UC51
+C --> UC52
+C --> UC53
+C --> UC54
+C --> UC62
+C --> UC71
+C --> L3
+
+' ---- Restaurant Manager ----
+UC24 <-- M
+UC43 <-- M
+UC63 <-- M
+UC73 <-- M
+
+' ---- Restaurant Staff ----
+UC72 <-- S
+UC73 <-- S
+
+' ---- Rider ----
+UC74 <-- R
+UC75 <-- R
+UC76 <-- R
+
+' ---- Administrator ----
+UC34 <-- A
+UC42 <-- A
+UC55 <-- A
+UC63 <-- A
+
+' ---- External gateway ----
+L1 --> G
+
+' ---- Feature relationships ----
+UC11 ..> UC14 : <<include>>
+UC16 ..> UC15 : <<include>>
+UC15 ..> L1 : <<include>>
+UC21 ..> UC41 : <<include>>
+UC31 ..> L1 : <<include>>
+UC51 ..> L1 : <<include>>
+UC53 ..> L1 : <<include>>
+UC52 ..> UC61 : <<include>>
+UC62 ..> UC52 : <<extend>>
+UC76 ..> UC61 : <<include>>
+
+' ---- Localisation layer cross-cutting ----
+UC41 ..> L5 : <<include>>
+UC13 ..> L2 : <<include>>
+L1 ..> L4 : <<include>>
+
+@enduml

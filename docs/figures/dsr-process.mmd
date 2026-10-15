@@ -1,0 +1,42 @@
+%% Figure: Design Science Research (DSR) process applied in this study
+%% Based on Peffers et al. (2007) DSRM, applied to the UgaEats online food ordering platform
+%% Render: https://mermaid.live  or  npx -p @mermaid-js/mermaid-cli mmdc -i dsr-process.mmd -o dsr-process.png -w 1600 -b white
+
+flowchart TB
+    classDef phase fill:#004E89,stroke:#00305a,color:#ffffff,font-weight:bold
+    classDef detail fill:#f4f7fb,stroke:#9fb3c8,color:#1a1a1a,text-align:left
+    classDef eval fill:#FF6B35,stroke:#c4471a,color:#ffffff,font-weight:bold
+    classDef out fill:#06D6A0,stroke:#04a57b,color:#0b2e24,font-weight:bold
+
+    P1["1 · Problem Identification<br/>& Motivation"]:::phase
+    D1["• Restaurants in Uganda rely on phone/walk-in orders<br/>• Existing platforms lack Mobile Money, UGX & local addressing<br/>• Literature review, interviews & observation"]:::detail
+
+    P2["2 · Objectives of a Solution"]:::phase
+    D2["• Online menu browsing, ordering & table reservation<br/>• MTN / Airtel Mobile Money, Flutterwave & Cash on Delivery<br/>• UGX pricing, 18% VAT, +256 phone validation, Kampala geocoding<br/>• Group and scheduled orders"]:::detail
+
+    P3["3 · Design & Development"]:::phase
+    D3["• Artefact: UgaEats web platform built on TastyIgniter (Laravel/PHP)<br/>• Payment extensions, localisation, theme & seeders<br/>• Docker containerisation and Railway cloud deployment"]:::detail
+
+    P4["4 · Demonstration"]:::phase
+    D4["• Deployed prototype used with sample restaurants & menus<br/>• Customers place orders and pay via Mobile Money (test mode)<br/>• Admins manage menus, orders and reservations"]:::detail
+
+    P5{"5 · Evaluation<br/>Objectives met?"}:::eval
+    D5["• Functional & usability testing against objectives<br/>• User feedback questionnaires (customers, restaurant staff)<br/>• Performance and payment success measures"]:::detail
+
+    P6["6 · Communication"]:::out
+    D6["• Dissertation report (UTAMU)<br/>• Presentation / defence<br/>• Source code repository & documentation"]:::detail
+
+    P1 --> P2 --> P3 --> P4 --> P5
+    P5 -- "Yes" --> P6
+
+    P1 -.- D1
+    P2 -.- D2
+    P3 -.- D3
+    P4 -.- D4
+    P5 -.- D5
+    P6 -.- D6
+
+    %% Iteration: feedback loop from evaluation back to design
+    P5 == "No – iterate:<br/>refine design using<br/>evaluation feedback" ==> P3
+
+    linkStyle 11 stroke:#D90000,stroke-width:3px,color:#D90000

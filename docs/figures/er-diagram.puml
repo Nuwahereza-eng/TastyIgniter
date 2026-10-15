@@ -1,0 +1,450 @@
+@startuml er-diagram
+' Figure: Entity-Relationship diagram of the UgaEats database
+' Crow's-foot notation. PK = primary key, FK = foreign key (logical FKs where TastyIgniter
+' core does not enforce DB constraints). Grey dashed entities are proposed / not yet migrated.
+' Render: https://www.plantuml.com/plantuml  or  java -jar plantuml.jar -tpng er-diagram.puml
+!pragma layout smetana
+hide circle
+hide empty members
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam linetype polyline
+skinparam entity {
+  BackgroundColor #F4F7FB
+  BorderColor #004E89
+}
+skinparam entity<<core>> {
+  BackgroundColor #FFFFFF
+  BorderColor #555555
+}
+skinparam entity<<locale>> {
+  BackgroundColor #FFF8DC
+  BorderColor #B8860B
+}
+skinparam entity<<proposed>> {
+  BackgroundColor #EEEEEE
+  BorderColor #888888
+  BorderStyle dashed
+  FontColor #555555
+}
+skinparam package {
+  BorderColor #9FB3C8
+  FontColor #004E89
+}
+
+' =====================================================
+package "Core (TastyIgniter)" {
+  entity "customers" as customers <<core>> {
+    * customer_id : int <<PK>>
+    --
+    first_name : varchar
+    last_name : varchar
+    email : varchar <<UQ>>
+    telephone : varchar(32) <<+256>>
+    address_id : int <<FK>>
+  }
+
+  entity "orders" as orders <<core>> {
+    * order_id : int <<PK>>
+    --
+    customer_id : int <<FK>>
+    location_id : int <<FK>>
+    address_id : int <<FK>>
+    status_id : int <<FK>>
+    assignee_id : int <<FK>>
+    order_type : varchar (delivery/collection)
+    order_date : date
+    order_time : time
+    order_time_is_asap : bool
+    order_total : decimal(15,4) <<UGX>>
+    payment : varchar
+  }
+
+  entity "order_menus" as order_menus <<core>> {
+    * order_menu_id : int <<PK>>
+    --
+    order_id : int <<FK>>
+    menu_id : int <<FK>>
+    quantity : int
+    price : decimal
+    subtotal : decimal
+  }
+
+  entity "menus" as menus <<core>> {
+    * menu_id : int <<PK>>
+    --
+    menu_name : varchar
+    menu_price : decimal <<UGX>>
+    menu_status : bool
+  }
+
+  entity "statuses" as statuses <<core>> {
+    * status_id : int <<PK>>
+    --
+    status_name : varchar
+    status_for : varchar (order/reservation)
+  }
+
+  entity "admin_users\n(staff, managers, riders)" as admin_users <<core>> {
+    * user_id : int <<PK>>
+    --
+    name : varchar
+    email : varchar <<UQ>>
+    user_role_id : int <<FK>>
+    is_available : bool
+    current_order_id : int <<FK>>
+  }
+}
+
+' =====================================================
+package "F1 · Group Ordering & Split Payment" {
+  entity "group_orders" as group_orders {
+    * id : bigint <<PK>>
+    --
+    code : varchar(10) <<UQ>>
+    name : varchar
+    host_customer_id : bigint <<FK>>
+    location_id : bigint <<FK>>
+    order_id : bigint <<FK>> [0..1]
+    split_method : enum(equal, individual, host)
+    deadline : datetime
+    status : enum(open, closed, ordered, cancelled)
+    total_amount : decimal(10,2)
+  }
+
+  entity "group_order_participants" as participants {
+    * id : bigint <<PK>>
+    --
+    group_order_id : bigint <<FK>>
+    customer_id : bigint <<FK>> [0..1 guest]
+    guest_name : varchar
+    guest_email : varchar
+    is_host : bool
+    cart_items : json
+    subtotal : decimal(10,2)
+    share_amount : decimal(10,2)
+    has_paid : bool
+    payment_tx_ref : varchar(64) <<FK>>
+    paid_at : timestamp
+  }
+}
+
+' =====================================================
+package "F2 · Scheduled & Recurring Orders" {
+  entity "scheduled_orders" as scheduled_orders {
+    * id : bigint <<PK>>
+    --
+    customer_id : bigint <<FK>>
+    location_id : bigint <<FK>>
+    scheduled_date : datetime
+    scheduled_time : varchar(10)
+    is_recurring : bool
+    recurring_frequency : enum(daily, weekly, biweekly, monthly)
+    next_occurrence : date
+    cart_data : json
+    status : enum(pending, processed, cancelled)
+  }
+}
+
+' =====================================================
+package "F3 · Meal Subscriptions" {
+  entity "subscription_plans" as plans {
+    * id : bigint <<PK>>
+    --
+    name : varchar
+    slug : varchar <<UQ>>
+    price : decimal(10,2) <<UGX>>
+    billing_period : enum(weekly, monthly)
+    meals_per_period : int
+    free_delivery : bool
+    express_delivery : bool
+    family_members : int
+    is_active : bool
+  }
+
+  entity "customer_subscriptions" as subscriptions {
+    * id : bigint <<PK>>
+    --
+    customer_id : bigint <<FK>>
+    plan_id : bigint <<FK>>
+    status : enum(active, paused, cancelled, expired)
+    started_at : datetime
+    expires_at : datetime
+    meals_remaining : int
+    meals_used : int
+    amount_paid : decimal(10,2)
+    payment_reference : varchar
+  }
+
+  entity "subscription_meals" as sub_meals {
+    * id : bigint <<PK>>
+    --
+    subscription_id : bigint <<FK>>
+    order_id : bigint <<FK>> [0..1]
+    used_at : datetime
+  }
+}
+
+' =====================================================
+package "F4 · Multi-Branch Management" {
+  entity "locations\n(branches)" as locations <<core>> {
+    * location_id : int <<PK>>
+    --
+    location_name : varchar
+    location_address_1 : varchar
+    location_city : varchar
+    location_country_id : int <<FK>>
+    location_telephone : varchar
+    location_lat : decimal(10,6)
+    location_lng : decimal(10,6)
+    location_status : bool
+  }
+
+  entity "working_hours\n(time slots)" as working_hours <<core>> {
+    * id : int <<PK>>
+    --
+    location_id : int <<FK>>
+    weekday : int
+    type : varchar (opening/delivery/collection)
+    opening_time : time
+    closing_time : time
+    status : bool
+  }
+
+  entity "location_areas\n(delivery zones)" as location_areas <<core>> {
+    * area_id : int <<PK>>
+    --
+    location_id : int <<FK>>
+    name : varchar
+    type : varchar (polygon/circle)
+    boundaries : json
+    conditions : json (delivery fee)
+  }
+
+  entity "locationables\n(menu ↔ branch)" as locationables <<core>> {
+    * location_id : int <<PK, FK>>
+    * locationable_id : int <<PK, FK>>
+    * locationable_type : varchar <<PK>>
+  }
+
+  entity "menu_overrides" as menu_overrides <<proposed>> {
+    * id : bigint <<PK>>
+    --
+    location_id : int <<FK>>
+    menu_id : int <<FK>>
+    price_override : decimal [0..1]
+    is_available : bool
+    valid_from : date
+    valid_to : date
+  }
+}
+
+' =====================================================
+package "F5 · Digital Wallet" {
+  entity "tasty_wallets" as wallets {
+    * id : bigint <<PK>>
+    --
+    customer_id : int <<FK, UQ>>
+    balance : decimal(15,2) <<UGX>>
+    is_active : bool
+    pin : varchar (hashed)
+  }
+
+  entity "tasty_wallet_transactions\n(ledger)" as wallet_tx {
+    * id : bigint <<PK>>
+    --
+    wallet_id : bigint <<FK>>
+    type : enum(deposit, withdrawal, payment,\n refund, cashback, bonus)
+    amount : decimal(15,2)
+    balance_before : decimal(15,2)
+    balance_after : decimal(15,2)
+    reference : varchar <<UQ>>
+    payment_method : varchar
+    external_reference : varchar
+    status : enum(pending, completed, failed, cancelled)
+    metadata : json
+  }
+}
+
+' =====================================================
+package "F6 · Loyalty & Rewards" {
+  entity "loyalty_accounts" as loyalty_accounts <<proposed>> {
+    * id : bigint <<PK>>
+    --
+    customer_id : int <<FK, UQ>>
+    points_balance : int
+    lifetime_points : int
+    tier : varchar
+  }
+
+  entity "loyalty_transactions" as loyalty_tx <<proposed>> {
+    * id : bigint <<PK>>
+    --
+    loyalty_account_id : bigint <<FK>>
+    order_id : int <<FK>> [0..1]
+    wallet_transaction_id : bigint <<FK>> [0..1]
+    type : enum(earn, redeem, expire)
+    points : int
+  }
+}
+
+' =====================================================
+package "F7 · Order Fulfilment & Delivery Tracking" {
+  entity "order_tracking" as tracking {
+    * id : bigint <<PK>>
+    --
+    order_id : bigint <<FK>>
+    assigned_rider_id : bigint <<FK>>
+    status : enum(placed … delivered, cancelled)
+    message : text
+    rider_name : varchar
+    rider_phone : varchar(32)
+    current_lat : decimal(10,8)
+    current_lng : decimal(11,8)
+    eta_minutes : int
+    rider_accepted_at : datetime
+    rider_rejected_at : datetime
+  }
+}
+
+' =====================================================
+package "Payments" {
+  entity "payment_transactions" as payments {
+    * id : bigint <<PK>>
+    --
+    customer_id : bigint <<FK>>
+    tx_ref : varchar <<UQ>>
+    amount : decimal(12,2)
+    currency : char(3) = 'UGX'
+    payment_method : varchar (mtn, airtel, card)
+    payment_type : varchar (order, group_share,\n subscription, scheduled_order,\n reservation, wallet_deposit)
+    reference_id : bigint <<polymorphic FK>>
+    status : enum(pending, successful,\n failed, cancelled, refunded)
+    provider : varchar (marz, demo)
+    verified_at : timestamp
+  }
+}
+
+' =====================================================
+package "Localisation Layer (Uganda)" {
+  entity "countries" as countries <<locale>> {
+    * country_id : int <<PK>>
+    --
+    country_name : varchar
+    iso_code_2 : char(2) = 'UG'
+    iso_code_3 : char(3) = 'UGA'
+  }
+
+  entity "currencies" as currencies <<locale>> {
+    * currency_id : int <<PK>>
+    --
+    country_id : int <<FK>>
+    currency_code : char(3) = 'UGX'
+    currency_symbol : varchar = 'USh'
+    currency_rate : decimal
+  }
+
+  entity "languages" as languages <<locale>> {
+    * language_id : int <<PK>>
+    --
+    code : varchar(7) (en, lg, …)
+    name : varchar
+  }
+
+  entity "language_translations" as translations <<locale>> {
+    * translation_id : int <<PK>>
+    --
+    locale : varchar <<FK>>
+    namespace : varchar
+    group : varchar
+    item : varchar
+    text : text
+  }
+
+  entity "addresses" as addresses <<locale>> {
+    * address_id : int <<PK>>
+    --
+    customer_id : int <<FK>>
+    address_1 : varchar
+    city : varchar (Kampala …)
+    state : varchar
+    country_id : int <<FK>>
+  }
+
+  entity "order_totals\n(VAT 18%, delivery fee)" as order_totals <<locale>> {
+    * order_total_id : int <<PK>>
+    --
+    order_id : int <<FK>>
+    code : varchar (subtotal, tax, delivery, total)
+    title : varchar
+    value : decimal(15,2) <<UGX>>
+  }
+}
+
+' ================== Relationships ===================
+' Core
+customers ||--o{ orders
+customers |o--o{ addresses
+orders }o--|| locations
+orders }o--o| addresses
+orders }o--|| statuses
+orders }o--o| admin_users : assignee
+orders ||--|{ order_menus
+order_menus }o--|| menus
+orders ||--|{ order_totals
+
+' F1 Group ordering
+customers ||--o{ group_orders : hosts
+group_orders }o--o| locations
+group_orders |o--o| orders : produces
+group_orders ||--|{ participants
+participants }o--o| customers
+participants |o--o| payments : tx_ref
+
+' F2 Scheduled
+customers ||--o{ scheduled_orders
+scheduled_orders }o--|| locations
+
+' F3 Subscriptions
+plans ||--o{ subscriptions
+customers ||--o{ subscriptions
+subscriptions ||--o{ sub_meals
+sub_meals |o--o| orders
+
+' F4 Multi-branch
+locations ||--o{ working_hours
+locations ||--o{ location_areas
+locations ||--o{ locationables
+menus ||--o{ locationables
+locations ||..o{ menu_overrides
+menus ||..o{ menu_overrides
+
+' F5 Wallet
+customers ||--o| wallets
+wallets ||--o{ wallet_tx
+
+' F6 Loyalty (proposed)
+customers ||..o| loyalty_accounts
+loyalty_accounts ||..o{ loyalty_tx
+loyalty_tx }o..o| orders
+loyalty_tx |o..o| wallet_tx : cashback
+
+' F7 Tracking
+orders ||--o| tracking
+tracking }o--o| admin_users : rider
+
+' Payments (polymorphic on payment_type + reference_id)
+customers |o--o{ payments
+payments }o..o| orders : order
+payments }o..o| subscriptions : subscription
+payments }o..o| scheduled_orders : scheduled_order
+payments |o..o| wallet_tx : wallet_deposit
+
+' Localisation
+countries ||--o{ currencies
+countries ||--o{ addresses
+countries ||--o{ locations
+languages ||--o{ translations
+
+@enduml

@@ -1,0 +1,291 @@
+@startuml class-diagram
+' Figure: Class diagram of the principal UgaEats domain classes
+' Render: https://www.plantuml.com/plantuml  or  java -jar plantuml.jar -tpng class-diagram.puml
+!pragma layout smetana
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #F4F7FB
+  BorderColor #004E89
+  ArrowColor #333333
+}
+skinparam package {
+  BorderColor #9FB3C8
+  FontColor #004E89
+}
+hide empty members
+
+package "Core Ordering" {
+  class Customer {
+    - customerId : int
+    - name : string
+    - email : string
+    - phone : string  <<+256>>
+    - preferredLanguage : string
+  }
+
+  class Order {
+    - orderId : int
+    - orderType : OrderType
+    - status : OrderStatus
+    - subtotal : decimal  <<UGX>>
+    - vatAmount : decimal
+    - deliveryFee : decimal
+    - total : decimal
+    - deliveryAddress : string
+    - scheduledFor : datetime [0..1]
+    + place() : void
+    + calculateTotal() : decimal
+    + markPaid(tx : PaymentTransaction) : void
+    + cancel() : void
+  }
+
+  class OrderLine {
+    - quantity : int
+    - unitPrice : decimal
+    - comment : string
+    + lineTotal() : decimal
+  }
+
+  class MenuItem {
+    - menuId : int
+    - name : string
+    - basePrice : decimal
+    - isAvailable : bool
+  }
+
+  enum OrderStatus {
+    PLACED
+    CONFIRMED
+    PREPARING
+    READY
+    OUT_FOR_DELIVERY
+    DELIVERED
+    CANCELLED
+  }
+}
+
+package "Multi-Branch & Scheduling" {
+  class Branch {
+    - branchId : int
+    - name : string
+    - address : string
+    - latitude : decimal
+    - longitude : decimal
+    - deliveryRadiusKm : decimal
+    - openingHours : json
+    + isOpen(at : datetime) : bool
+    + effectivePrice(item : MenuItem) : decimal
+    + availableSlots(date : date) : TimeSlot[*]
+  }
+
+  class MenuOverride {
+    - priceOverride : decimal [0..1]
+    - isAvailable : bool
+    - validFrom : date
+    - validTo : date
+    + appliesOn(date : date) : bool
+  }
+
+  class TimeSlot {
+    - date : date
+    - startTime : time
+    - endTime : time  <<30-min window>>
+    - capacity : int
+    - booked : int
+    + isAvailable() : bool
+    + reserve() : void
+    + release() : void
+  }
+
+  class ScheduledOrder {
+    - frequency : Frequency
+    - nextOccurrence : date
+    - isRecurring : bool
+    + calculateNextOccurrence() : date
+    + skipNext() : void
+  }
+}
+
+package "Group Ordering" {
+  class GroupOrder {
+    - code : string  <<invite>>
+    - splitMethod : SplitMethod
+    - deadline : datetime
+    - status : GroupStatus
+    - totalAmount : decimal
+    + computeShares() : Map<Participant, decimal>
+    + applyShares() : void
+    + isFullyPaid() : bool
+    + finalise() : Order
+  }
+
+  class GroupOrderParticipant {
+    - isHost : bool
+    - cartItems : json
+    - subtotal : decimal
+    - shareAmount : decimal
+    - hasPaid : bool
+    - paidAt : datetime
+    + pledge(item : OrderLine) : void
+    + markReady() : void
+  }
+
+  enum SplitMethod {
+    EQUAL
+    BY_ITEM
+    HOST_PAYS
+  }
+}
+
+package "Subscriptions" {
+  class Plan {
+    - name : string
+    - price : decimal
+    - billingPeriod : Period
+    - mealsPerPeriod : int
+    - freeDelivery : bool
+    - familyMembers : int
+    + pricePerMeal() : decimal
+  }
+
+  class Subscription {
+    - status : SubscriptionStatus
+    - startedAt : datetime
+    - expiresAt : datetime
+    - mealsRemaining : int
+    - autoRenew : bool
+    + useMeal(order : Order) : bool
+    + renew() : void
+    + pause() : void
+    + resume() : void
+    + cancel() : void
+  }
+}
+
+package "Wallet & Loyalty" {
+  class WalletAccount {
+    - balance : decimal  <<UGX>>
+    - currency : string = "UGX"
+    - isActive : bool
+    + deposit(amount, method, ref) : LedgerEntry
+    + withdraw(amount, phone) : LedgerEntry
+    + pay(amount, order : Order) : LedgerEntry
+    + hasSufficientBalance(amount) : bool
+  }
+
+  class LedgerEntry {
+    - reference : string
+    - type : EntryType
+    - amount : decimal
+    - balanceBefore : decimal
+    - balanceAfter : decimal
+    - status : string
+    - createdAt : datetime
+    + isCredit() : bool
+    + isDebit() : bool
+  }
+
+  class LoyaltyAccount {
+    - pointsBalance : int
+    - tier : string
+    - lifetimePoints : int
+    + earn(order : Order) : int
+    + redeem(points : int) : decimal
+    + convertToCashback(wallet : WalletAccount) : LedgerEntry
+  }
+}
+
+package "Payments" {
+  class PaymentTransaction {
+    - txRef : string
+    - amount : decimal
+    - currency : string = "UGX"
+    - method : PaymentMethod  <<MTN | Airtel | Card>>
+    - type : PaymentType
+    - status : PaymentStatus
+    - verifiedAt : datetime
+  }
+
+  interface MobileMoneyGateway <<interface>> {
+    + requestCollection(phone, amount, ref) : CollectionResult
+    + checkStatus(ref : string) : PaymentStatus
+    + sendPayout(phone, amount, ref) : PayoutResult
+    + parseCallback(payload) : PaymentStatus
+  }
+
+  class MarzPayAdapter {
+    - apiKey : string
+    - apiSecret : string
+    - collectionLimit : decimal = 200000
+    - normaliseUgandaPhone(phone) : string
+  }
+
+  class SandboxGatewayAdapter {
+    + simulate(amount) : CollectionResult
+  }
+}
+
+package "Delivery" {
+  class Rider {
+    - name : string
+    - phone : string
+    - vehicle : string
+    - isAvailable : bool
+  }
+
+  class DeliveryTracking {
+    - status : OrderStatus
+    - currentLat : decimal
+    - currentLng : decimal
+    - etaMinutes : int
+    + updateLocation(lat, lng) : void
+    + advanceStatus() : void
+  }
+}
+
+' ---------- Relationships ----------
+Customer "1" -- "0..*" Order : places >
+Order "1" *-- "1..*" OrderLine
+OrderLine "0..*" --> "1" MenuItem
+Order --> OrderStatus
+
+Branch "1" -- "0..*" Order : fulfils >
+Branch "1" *-- "0..*" MenuOverride
+MenuOverride "0..*" --> "1" MenuItem : overrides >
+Branch "1" *-- "0..*" TimeSlot
+Order "0..*" --> "0..1" TimeSlot : booked in >
+ScheduledOrder "1" --> "1" TimeSlot
+ScheduledOrder "1" ..> "0..*" Order : generates >
+Customer "1" -- "0..*" ScheduledOrder
+
+Customer "1" -- "0..*" GroupOrder : hosts >
+GroupOrder "1" *-- "1..*" GroupOrderParticipant
+GroupOrderParticipant "0..*" --> "1" Customer
+GroupOrder --> SplitMethod
+GroupOrder "1" --> "0..1" Order : produces >
+
+Customer "1" -- "0..*" Subscription
+Subscription "0..*" --> "1" Plan
+Subscription "1" -- "0..*" Order : redeems meals for >
+
+Customer "1" -- "1" WalletAccount
+WalletAccount "1" *-- "0..*" LedgerEntry
+Customer "1" -- "1" LoyaltyAccount
+LoyaltyAccount ..> WalletAccount : credits cashback
+Order ..> LoyaltyAccount : awards points
+
+Order "1" -- "0..*" PaymentTransaction
+GroupOrderParticipant "1" -- "0..1" PaymentTransaction : pays share >
+Subscription "1" -- "0..*" PaymentTransaction
+PaymentTransaction ..> MobileMoneyGateway : collected via >
+WalletAccount ..> MobileMoneyGateway : top-up / payout
+MobileMoneyGateway <|.. MarzPayAdapter
+MobileMoneyGateway <|.. SandboxGatewayAdapter
+
+Order "1" -- "0..1" DeliveryTracking
+Rider "0..1" -- "0..*" DeliveryTracking : assigned to >
+
+@enduml
