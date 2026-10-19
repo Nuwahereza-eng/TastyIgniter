@@ -271,6 +271,11 @@ chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2
 find /var/www/html/storage -type d -exec chmod 775 {} \; 2>/dev/null || true
 find /var/www/html/storage -type f -exec chmod 664 {} \; 2>/dev/null || true
 
+# Laravel scheduler (expires unapproved Marz Pay prompts every minute).
+# Runs as www-data so files it writes stay writable by PHP-FPM.
+su -s /bin/sh www-data -c "cd /var/www/html && php artisan schedule:work >> storage/logs/scheduler.log 2>&1" &
+echo "Scheduler started"
+
 echo "=== Initialization complete ==="
 
 # Keep the container running by tailing logs

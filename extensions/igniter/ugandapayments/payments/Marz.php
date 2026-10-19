@@ -102,12 +102,13 @@ class Marz extends BasePaymentGateway
             return Redirect::to($init['link']);
         }
 
-        // Mobile money flow: USSD push sent. Order stays pending; webhook will mark it paid.
+        // Mobile money flow: USSD push sent. The order stays unpaid until the
+        // customer approves, so send them to the waiting page (the success page
+        // only shows paid orders and would bounce them back to checkout).
         if (!empty($init['success']) && $apiMethod === 'mobile_money') {
             $recordPending();
             $order->logPaymentAttempt('Marz mobile money prompt sent to ' . $phone, 1, [], $init);
-            // Returning null lets PayRegister proceed to the success page; order remains unpaid until webhook fires.
-            return;
+            return Redirect::to(url('/checkout/pay/' . $order->hash));
         }
 
         // Demo / simulate fallback (no Marz key configured)

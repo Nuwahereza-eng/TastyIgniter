@@ -691,43 +691,76 @@ class PaymentController extends Controller
      */
     protected function markOrderPaid(Payment $payment): void
     {
-        try {
-            $orderModel = '\\Igniter\\Cart\\Models\\Order';
-            if (!class_exists($orderModel)) {
-                Log::warning('Order model not found while marking paid', ['payment_id' => $payment->id]);
-                return;
-            }
+        app(\App\Services\MarzOrderPayment::class)->markOrderPaid($payment);
+    }
 
-            $order = $orderModel::find($payment->reference_id);
-            if (!$order) {
-                Log::warning('Order not found for Marz payment', [
-                    'payment_id' => $payment->id,
-                    'order_id' => $payment->reference_id,
-                ]);
-                return;
-            }
-
-            if (method_exists($order, 'logPaymentAttempt')) {
-                $order->logPaymentAttempt('Marz payment confirmed via webhook', 1, [], $payment->metadata ?? [], true);
-            }
-            if (method_exists($order, 'markAsPaymentProcessed')) {
-                $order->markAsPaymentProcessed();
-            }
-
-            // Move to configured "paid" status if the gateway record has one
-            $paymentRow = \DB::table('payments')->where('code', 'marz')->first();
-            $orderStatus = $paymentRow && !empty($paymentRow->data)
-                ? (json_decode($paymentRow->data, true)['order_status'] ?? null)
-                : null;
-            if ($orderStatus && method_exists($order, 'updateOrderStatus')) {
-                $order->updateOrderStatus((int) $orderStatus, ['notify' => false]);
-            }
-        } catch (\Throwable $e) {
-            Log::error('Failed to mark order paid from Marz webhook', [
-                'error' => $e->getMessage(),
-                'payment_id' => $payment->id,
-            ]);
+    /**
+     * Payment state for the Marz waiting panel on the checkout success page.
+     * Polled every few seconds; also checks with Marz and expires the prompt.
+     */
+    public function orderPaymentStatus(string $hash): JsonResponse
+    {
+        $order = \Igniter\Cart\Models\Order::where('hash', $hash)->first();
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Order not found'], 404);
         }
+
+        $marz = app(\App\Services\MarzOrderPayment::class);
+        $payment = $marz->latestPayment($order);
+
+        if ($order->isPaymentProcessed()) {
+            $state = $order->payment === 'marz' ? 'paid' : 'cash';
+        } elseif ($marz->isCanceled($order)) {
+            $state = 'canceled';
+        } elseif (!$payment || $order->payment !== 'marz') {
+            $state = 'none';
+        } else {
+            $payment = $marz->refresh($payment);
+            $order->refresh();
+            $state = match (true) {
+                $order->isPaymentProcessed() => 'paid',
+                $payment->status === Payment::STATUS_PENDING => 'waiting',
+                ($payment->metadata['failure_reason'] ?? null) === 'declined' => 'declined',
+                default => 'expired',
+            };
+        }
+
+        $phone = $payment->metadata['phone'] ?? null;
+
+        return response()->json([
+            'success' => true,
+            'state' => $state,
+            'seconds_left' => $state === 'waiting' ? $marz->secondsLeft($payment) : 0,
+            'timeout' => \App\Services\MarzOrderPayment::promptTimeout(),
+            'phone' => $phone ? substr($phone, 0, 4).'•••'.substr($phone, -3) : null,
+            'can_retry' => in_array($state, ['expired', 'declined'], true)
+                && $marz->attempts($order) < \App\Services\MarzOrderPayment::MAX_ATTEMPTS,
+            'can_pay_cash' => in_array($state, ['waiting', 'expired', 'declined'], true),
+        ]);
+    }
+
+    public function retryOrderPayment(string $hash): JsonResponse
+    {
+        $order = \Igniter\Cart\Models\Order::where('hash', $hash)->first();
+        if (!$order || $order->payment !== 'marz') {
+            return response()->json(['success' => false, 'message' => 'Order not found'], 404);
+        }
+
+        $result = app(\App\Services\MarzOrderPayment::class)->retry($order);
+
+        return response()->json(['success' => $result['success'], 'message' => $result['message'] ?? null]);
+    }
+
+    public function payOrderWithCash(string $hash): JsonResponse
+    {
+        $order = \Igniter\Cart\Models\Order::where('hash', $hash)->first();
+        if (!$order || $order->payment !== 'marz') {
+            return response()->json(['success' => false, 'message' => 'Order not found'], 404);
+        }
+
+        $switched = app(\App\Services\MarzOrderPayment::class)->switchToCash($order);
+
+        return response()->json(['success' => $switched, 'message' => $switched ? null : 'This order can no longer be changed.']);
     }
 
     /**

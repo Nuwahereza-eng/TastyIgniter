@@ -107,6 +107,10 @@ Route::prefix('ajax/payments')->middleware(['web'])->group(function () {
     Route::post('/initialize', [PaymentController::class, 'initialize'])->name('payment.initialize');
     Route::get('/verify', [PaymentController::class, 'verify'])->name('payment.verify');
     Route::get('/history', [PaymentController::class, 'history'])->name('payment.history');
+    // Marz Pay mobile money waiting panel on /checkout/success/{hash}
+    Route::get('/order/{hash}/status', [PaymentController::class, 'orderPaymentStatus'])->name('payment.order-status');
+    Route::post('/order/{hash}/retry', [PaymentController::class, 'retryOrderPayment'])->name('payment.order-retry');
+    Route::post('/order/{hash}/cash', [PaymentController::class, 'payOrderWithCash'])->name('payment.order-cash');
 });
 
 // Payment callback and webhook (public routes)
