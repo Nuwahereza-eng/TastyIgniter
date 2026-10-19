@@ -399,6 +399,22 @@ class PaymentService
                 ];
             }
 
+            // Marz only accepts API calls from IP addresses whitelisted on the
+            // merchant account. Tell the customer to pick another method and
+            // tell the admin (in the log) exactly what to fix.
+            if (($body['error_code'] ?? null) === 'IP_NOT_WHITELISTED') {
+                Log::error('MarzPay rejected the request: this server\'s IP address is not whitelisted. Add it in the Marz dashboard (API settings > IP whitelist).', [
+                    'server_ip' => $this->publicIp(),
+                ]);
+
+                return [
+                    'success' => false,
+                    'message' => 'Mobile Money payments are temporarily unavailable. Please choose another payment method or try again later.',
+                    'error_code' => 'IP_NOT_WHITELISTED',
+                    'data' => $body,
+                ];
+            }
+
             return [
                 'success' => false,
                 'message' => $body['message'] ?? 'Marz initialization failed',
@@ -411,6 +427,23 @@ class PaymentService
                 'success' => false,
                 'message' => 'Payment service temporarily unavailable',
             ];
+        }
+    }
+
+    /**
+     * This server's public (outbound) IP address, i.e. the address Marz sees
+     * and must have whitelisted. Cached for an hour; null when unknown.
+     */
+    protected function publicIp(): ?string
+    {
+        try {
+            return cache()->remember('server_public_ip', 3600, function () {
+                $ip = trim((string)Http::timeout(5)->get('https://api.ipify.org')->body());
+
+                return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : null;
+            });
+        } catch (\Throwable) {
+            return null;
         }
     }
 
