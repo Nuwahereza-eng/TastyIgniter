@@ -112,5 +112,27 @@ if [ -f "$PATCHES_DIR/features.css" ]; then
     echo "✓ Copied features CSS"
 fi
 
+# Copy our customised orange theme files over the composer-installed ones.
+# patches/theme-orange mirrors the package layout, e.g. the photo-card menu
+# item (resources/views/includes/menu/item.blade.php) and modal/menus JS.
+ORANGE_DIR="$PROJECT_ROOT/vendor/tastyigniter/ti-theme-orange"
+ORANGE_OVERRIDES="$PATCHES_DIR/theme-orange"
+if [ -d "$ORANGE_OVERRIDES" ] && [ -d "$ORANGE_DIR" ]; then
+    (cd "$ORANGE_OVERRIDES" && find . -type f) | while read -r rel; do
+        mkdir -p "$ORANGE_DIR/$(dirname "$rel")"
+        cp "$ORANGE_OVERRIDES/$rel" "$ORANGE_DIR/$rel"
+        echo "✓ Copied theme override ${rel#./}"
+    done
+fi
+
+# Publish the theme's component scripts. `vendor:publish --tag=igniter-orange-assets`
+# only copies public/ (app.js), but themes/demo/_partials/scripts.blade.php also
+# loads modal.js, cart-item.js, checkout.js, etc. from /vendor/igniter-orange/js.
+if [ -d "$ORANGE_DIR/resources/js" ]; then
+    mkdir -p "$PROJECT_ROOT/public/vendor/igniter-orange/js"
+    cp "$ORANGE_DIR"/resources/js/*.js "$PROJECT_ROOT/public/vendor/igniter-orange/js/"
+    echo "✓ Published theme component scripts"
+fi
+
 echo ""
 echo "Done! All patches applied."
