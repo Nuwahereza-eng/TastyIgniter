@@ -1,3 +1,8 @@
 *
-!igniter/demo/
 !.gitignore
+!igniter/
+igniter/*
+!igniter/demo/
+# Uganda payment gateways (Marz Pay, Tasty Wallet, Mobile Money, Flutterwave)
+!igniter/ugandapayments/
+!igniter/ugandapayments/**

@@ -1,0 +1,23 @@
+{
+    "name": "igniter/ugandapayments",
+    "type": "tastyigniter-extension",
+    "description": "Uganda Payment Methods - Mobile Money (MTN, Airtel) and Flutterwave",
+    "version": "1.0.0",
+    "require": {
+        "php": ">=8.0",
+        "igniter/payregister": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Igniter\\UgandaPayments\\": ""
+        }
+    },
+    "extra": {
+        "tastyigniter-extension": {
+            "code": "igniter.ugandapayments",
+            "name": "Uganda Payment Methods",
+            "icon": "fa-money-bill-wave",
+            "homepage": ""
+        }
+    }
+}
