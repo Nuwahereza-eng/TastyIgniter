@@ -9,6 +9,12 @@ use Illuminate\Support\ServiceProvider;
 class GeocoderServiceProvider extends ServiceProvider
 {
     /**
+     * Greater Kampala bounding box (west, north, east, south) used to bias
+     * OpenStreetMap searches. Results outside it are still returned.
+     */
+    public const KAMPALA_VIEWBOX = '32.40,0.50,32.80,0.15';
+
+    /**
      * Register services.
      */
     public function register(): void
@@ -21,13 +27,19 @@ class GeocoderServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Force the geocoder to use Google Maps with the .env-provided API key.
         // TastyIgniter's System ServiceProvider also writes to this config
         // namespace from the admin settings table, so we re-apply here on
-        // resolve to guarantee the .env values win.
+        // resolve to guarantee these values win.
         $this->app->resolving('geocoder', function ($geocoder, $app) {
-            $provider = env('GEOCODER_PROVIDER', 'google');
-            $apiKey = env('GOOGLE_MAPS_API_KEY');
+            $provider = env('GEOCODER_PROVIDER', 'nominatim');
+            $apiKey = env('GOOGLE_MAPS_API_KEY') ?: setting('maps_api_key');
+
+            // Google is only usable with a key on a billing-enabled project.
+            // Run it through the chain provider so that when Google refuses a
+            // request (e.g. "You must enable Billing") OpenStreetMap answers.
+            if ($provider === 'google') {
+                $provider = $apiKey ? 'chain' : 'nominatim';
+            }
 
             $app['config']->set('igniter-geocoder.default', $provider);
             if ($apiKey) {
@@ -35,6 +47,15 @@ class GeocoderServiceProvider extends ServiceProvider
             }
             $app['config']->set('igniter-geocoder.providers.google.region', 'UG');
             $app['config']->set('igniter-geocoder.providers.google.locale', 'en-UG');
+
+            // Restrict OpenStreetMap results to Uganda and rank results inside
+            // greater Kampala first, otherwise "Kampala Road" resolves to the
+            // street of that name in Mityana.
+            $viewbox = '&countrycodes=ug&viewbox='.self::KAMPALA_VIEWBOX;
+            $app['config']->set('igniter-geocoder.providers.nominatim.endpoints.geocode',
+                'https://nominatim.openstreetmap.org/search?q=%s&format=json&addressdetails=1&limit=%d'.$viewbox);
+            $app['config']->set('igniter-geocoder.providers.nominatim.region', 'UG');
+            $app['config']->set('igniter-geocoder.providers.nominatim.locale', 'en');
 
             // Short cache duration so wrong / stale reverse-geocodes can't
             // linger after the user moves or after we switch providers.

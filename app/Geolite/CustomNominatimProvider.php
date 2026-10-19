@@ -21,9 +21,10 @@ class CustomNominatimProvider extends NominatimProvider
         $endpoint = array_get($this->config, 'endpoints.places');
         
         // Add countrycodes=UG to restrict to Uganda for faster results
-        $url = sprintf($endpoint.'search?q=%s&format=json&addressdetails=1&limit=%d&countrycodes=UG',
+        $url = sprintf($endpoint.'search?q=%s&format=json&addressdetails=1&limit=%d&countrycodes=UG&viewbox=%s',
             rawurlencode($query->getText()),
             $query->getLimit(),
+            \App\Providers\GeocoderServiceProvider::KAMPALA_VIEWBOX,
         );
 
         try {

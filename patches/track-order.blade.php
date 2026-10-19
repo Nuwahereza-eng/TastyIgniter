@@ -5,6 +5,7 @@ permalink: /track-order
 ---
 <!-- Features CSS -->
 <link rel="stylesheet" href="{{ asset('themes/demo/assets/css/features.css') }}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -75,28 +76,10 @@ permalink: /track-order
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-7">
-                                <!-- Map Placeholder -->
-                                <div class="tracking-map-public" id="orderMap">
-                                    <div class="map-placeholder">
-                                        <div class="map-route">
-                                            <div class="map-point restaurant">
-                                                <i class="fa fa-store"></i>
-                                                <span>Restaurant</span>
-                                            </div>
-                                            <div class="map-route-line"></div>
-                                            <div class="map-point rider active">
-                                                <i class="fa fa-motorcycle"></i>
-                                                <span>Rider</span>
-                                            </div>
-                                            <div class="map-route-line pending"></div>
-                                            <div class="map-point destination">
-                                                <i class="fa fa-home"></i>
-                                                <span>You</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
+                                <!-- Live map: restaurant, rider and delivery point -->
+                                <div class="tracking-map-public" id="orderMap"></div>
+                                <div class="small text-muted mt-2"><span id="mapNotice"></span> <span id="routeInfo"></span></div>
+
                                 <!-- ETA Banner -->
                                 <div class="eta-banner mt-3">
                                     <div class="eta-time">
@@ -272,15 +255,28 @@ permalink: /track-order
 
 <style>
 .tracking-map-public {
-    height: 250px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    height: 320px;
+    background: #e9ecef;
     border-radius: 1rem;
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.map-pin {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    overflow: hidden;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 }
+
+.map-pin.restaurant { background: #ff4900; }
+.map-pin.rider { background: #198754; animation: pulse 2s infinite; }
+.map-pin.destination { background: #0d6efd; }
 
 .map-placeholder {
     width: 100%;
@@ -477,11 +473,12 @@ permalink: /track-order
     }
     
     .tracking-map-public {
-        height: 200px;
+        height: 260px;
     }
 }
 </style>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // API configuration
 const API_BASE = '/ajax';
@@ -584,14 +581,17 @@ async function trackOrderPublic() {
     
     try {
         const response = await apiCall('/tracking/track', 'POST', payload);
-        
+
         btn.innerHTML = originalText;
         btn.disabled = false;
-        
+
         if (response.success && response.tracking) {
+            // Polling re-sends the same payload so the hash/phone that proved
+            // ownership keeps the live map visible.
+            lastPayload = payload;
             const displayId = (response.order && response.order.formatted_id)
                 || (payload.order_id ? formatOrderId(payload.order_id) : rawOrderId);
-            showOrderTrackingReal(displayId, response.tracking, response.order, response.location);
+            showOrderTrackingReal(displayId, response.tracking, response.order, response.location, response.map);
         } else if (response.success === false && response.error) {
             showNoOrderFound(response.error);
         } else {
@@ -605,8 +605,9 @@ async function trackOrderPublic() {
     }
 }
 
-function showOrderTrackingReal(orderId, tracking, order, location) {
+function showOrderTrackingReal(orderId, tracking, order, location, mapData) {
     document.getElementById('trackingResult').classList.remove('d-none');
+    updateLiveMap(mapData, tracking, order);
     
     // Update Order ID
     document.getElementById('displayOrderId').textContent = order?.formatted_id || orderId.toUpperCase();
@@ -661,6 +662,10 @@ function showOrderTrackingReal(orderId, tracking, order, location) {
     // Update rider info if available
     if (tracking.rider) {
         document.getElementById('riderName').textContent = tracking.rider.name || 'Rider Assigned';
+        const avatar = document.querySelector('.rider-avatar-lg img');
+        if (avatar) {
+            avatar.src = 'https://ui-avatars.com/api/?background=ff6600&color=fff&size=80&name=' + encodeURIComponent(tracking.rider.name || 'Rider');
+        }
         document.getElementById('riderRating').textContent = tracking.rider.rating || '4.8';
         document.getElementById('riderDeliveries').textContent = '(' + (tracking.rider.total_deliveries || 0) + ' deliveries)';
         
@@ -688,13 +693,24 @@ function showOrderTrackingReal(orderId, tracking, order, location) {
     // Scroll to results
     document.getElementById('trackingResult').scrollIntoView({ behavior: 'smooth' });
     
-    // Start live updates (poll every 30 seconds)
+    // Start live updates
     startLiveUpdates(order?.id);
 }
 
 function updateTimelineFromStatus(status) {
-    const statuses = ['confirmed', 'preparing', 'ready', 'picked_up', 'on_the_way', 'nearby', 'delivered'];
-    const currentIndex = statuses.indexOf(status);
+    // Timeline steps: 0 Placed, 1 Confirmed, 2 Preparing, 3 Out for Delivery, 4 Delivered
+    const stepForStatus = {
+        placed: 0,
+        confirmed: 1,
+        preparing: 2,
+        ready: 2,
+        picked_up: 3,
+        on_the_way: 3,
+        nearby: 3,
+        arriving: 3,
+        delivered: 5, // past the last step: everything completed
+    };
+    const currentIndex = stepForStatus[status] ?? 1;
     
     const timelineItems = document.querySelectorAll('.tracking-timeline-public .timeline-item');
     timelineItems.forEach((item, index) => {
@@ -729,30 +745,176 @@ function resetTracking() {
     document.getElementById('trackingOrderId').value = '';
     document.getElementById('trackingOrderId').focus();
     if (updateInterval) clearInterval(updateInterval);
+    lastPayload = null;
+    mapFitted = false;
+    lastRouteFrom = null;
 }
 
 let updateInterval;
 let currentOrderId = null;
+let lastPayload = null;
+
+// Live map (Leaflet + OpenStreetMap). Shows the restaurant, the rider's last
+// shared GPS position and the delivery point, with the road route from the
+// rider (or the restaurant before pickup) to the customer.
+// Note: never put three dashes in a row in this file; TastyIgniter splits
+// theme pages into sections on that separator.
+const KAMPALA_CENTER = [0.3476, 32.5825];
+const ROUTE_MIN_MOVE_METERS = 75;
+let liveMap = null;
+let mapLayers = null;
+let routeLine = null;
+let lastRouteFrom = null;
+let routeEtaMinutes = null;
+let mapFitted = false;
+
+function pinIcon(type, faIcon) {
+    return L.divIcon({
+        className: '',
+        html: `<div class="map-pin ${type}"><i class="fa ${faIcon}"></i></div>`,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18],
+    });
+}
+
+function ensureMap() {
+    if (liveMap || typeof L === 'undefined') return liveMap;
+    liveMap = L.map('orderMap', {scrollWheelZoom: false}).setView(KAMPALA_CENTER, 13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(liveMap);
+    mapLayers = L.layerGroup().addTo(liveMap);
+    return liveMap;
+}
+
+function setMapNotice(text) {
+    document.getElementById('mapNotice').innerHTML = text || '';
+}
+
+function updateLiveMap(mapData, tracking, order) {
+    const mapEl = document.getElementById('orderMap');
+    if (order && order.order_type && order.order_type !== 'delivery') {
+        mapEl.classList.add('d-none');
+        setMapNotice('<i class="fa fa-store me-1"></i>This is a pickup order — collect it at the restaurant.');
+        return;
+    }
+    mapEl.classList.remove('d-none');
+
+    if (!ensureMap() || !mapData) return;
+    // The container may have been hidden when the map was created.
+    setTimeout(() => liveMap.invalidateSize(), 50);
+
+    mapLayers.clearLayers();
+    const points = [];
+
+    const restaurant = mapData.restaurant ? [mapData.restaurant.lat, mapData.restaurant.lng] : null;
+    const delivery = mapData.delivery ? [mapData.delivery.lat, mapData.delivery.lng] : null;
+    const rider = tracking && tracking.location ? [tracking.location.lat, tracking.location.lng] : null;
+
+    if (restaurant) {
+        L.marker(restaurant, {icon: pinIcon('restaurant', 'fa-store')}).bindPopup('Restaurant').addTo(mapLayers);
+        points.push(restaurant);
+    }
+    if (delivery) {
+        L.marker(delivery, {icon: pinIcon('destination', 'fa-home')}).bindPopup('Delivery point').addTo(mapLayers);
+        points.push(delivery);
+    }
+    const riderActive = rider && tracking && !tracking.is_delivered;
+    if (riderActive) {
+        const seen = tracking.location.updated_at ? new Date(tracking.location.updated_at) : null;
+        const ago = seen ? Math.max(0, Math.round((Date.now() - seen.getTime()) / 60000)) : null;
+        L.marker(rider, {icon: pinIcon('rider', 'fa-motorcycle'), zIndexOffset: 1000})
+            .bindPopup('Your rider' + (ago !== null ? ` · updated ${ago === 0 ? 'just now' : ago + ' min ago'}` : ''))
+            .addTo(mapLayers);
+        points.push(rider);
+    }
+
+    if (!mapData.allowed) {
+        setMapNotice('<i class="fa fa-lock me-1"></i>Log in, or open the tracking link from your order confirmation, to see your rider live on the map.');
+    } else if (!delivery) {
+        setMapNotice('<i class="fa fa-info-circle me-1"></i>We could not place your delivery address on the map.');
+    } else if (!riderActive && !(tracking && tracking.is_delivered)) {
+        setMapNotice('<i class="fa fa-clock me-1"></i>Your rider\'s live position appears here once they set off.');
+    } else if (mapData.delivery_source === 'geocoded') {
+        setMapNotice('<i class="fa fa-info-circle me-1"></i>Delivery pin is approximate (from your address).');
+    } else {
+        setMapNotice('');
+    }
+
+    const from = riderActive ? rider : restaurant;
+    if (from && delivery && !(tracking && tracking.is_delivered)) {
+        drawRoute(from, delivery);
+    } else if (routeLine) {
+        routeLine.remove();
+        routeLine = null;
+        document.getElementById('routeInfo').textContent = '';
+    }
+
+    // Fit once, then keep the customer's zoom/pan while the rider moves.
+    if (!mapFitted && points.length) {
+        if (points.length > 1) liveMap.fitBounds(points, {padding: [40, 40], maxZoom: 16});
+        else liveMap.setView(points[0], 15);
+        mapFitted = true;
+    }
+}
+
+function distanceMeters(a, b) {
+    return liveMap ? liveMap.distance(a, b) : Infinity;
+}
+
+async function drawRoute(from, to) {
+    if (lastRouteFrom && routeLine && distanceMeters(lastRouteFrom, from) < ROUTE_MIN_MOVE_METERS) {
+        if (!liveMap.hasLayer(routeLine)) routeLine.addTo(liveMap);
+        return;
+    }
+    lastRouteFrom = from;
+
+    try {
+        const url = `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const route = data.routes && data.routes[0];
+        if (!route) throw new Error('no route');
+
+        const latLngs = route.geometry.coordinates.map(c => [c[1], c[0]]);
+        if (routeLine) routeLine.remove();
+        routeLine = L.polyline(latLngs, {color: '#ff4900', weight: 5, opacity: 0.8}).addTo(liveMap);
+        // Boda-bodas beat car times in Kampala traffic; keep the car estimate as an upper bound.
+        routeEtaMinutes = Math.max(1, Math.round(route.duration / 60));
+        document.getElementById('routeInfo').textContent = '· ' + (route.distance / 1000).toFixed(1) + ' km by road';
+    } catch (e) {
+        // Routing is optional: fall back to a straight dashed line.
+        if (routeLine) routeLine.remove();
+        routeLine = L.polyline([from, to], {color: '#ff4900', weight: 3, dashArray: '6 8'}).addTo(liveMap);
+        routeEtaMinutes = null;
+        document.getElementById('routeInfo').textContent = '';
+    }
+}
 
 function startLiveUpdates(orderId) {
     // Clear any existing interval
     if (updateInterval) clearInterval(updateInterval);
-    
+
     currentOrderId = orderId;
-    
-    // Poll for updates every 30 seconds
+
+    // Poll every 10 seconds so the rider moves smoothly on the map
     updateInterval = setInterval(async () => {
         if (!currentOrderId) return;
-        
+
         try {
-            const response = await apiCall('/tracking/track', 'POST', {
+            const response = await apiCall('/tracking/track', 'POST', lastPayload || {
                 order_id: currentOrderId,
             });
-            
+
             if (response.success && response.tracking) {
+                updateLiveMap(response.map, response.tracking, response.order);
+
                 // Update ETA
                 if (response.tracking.eta_minutes) {
                     document.getElementById('etaTime').textContent = response.tracking.eta_minutes + ' mins';
+                } else if (routeEtaMinutes && response.tracking.location) {
+                    document.getElementById('etaTime').textContent = 'about ' + routeEtaMinutes + ' mins';
                 }
                 
                 // Update status
@@ -777,7 +939,7 @@ function startLiveUpdates(orderId) {
         } catch (error) {
             console.log('Live update failed, will retry');
         }
-    }, 30000); // Update every 30 seconds
+    }, 10000);
 }
 
 function markAsDelivered() {

@@ -32,6 +32,7 @@ class EventServiceProvider extends ServiceProvider
         // when an admin advances the order status.
         Event::listen('admin.order.paymentProcessed', [\App\Listeners\SyncOrderTracking::class, 'onPaymentProcessed']);
         Event::listen('igniter.cart.orderStatusAdded', [\App\Listeners\SyncOrderTracking::class, 'onStatusAdded']);
+        Event::listen('admin.assignable.assigned', [\App\Listeners\SyncOrderTracking::class, 'onAssigned']);
     }
 
     /**

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\OrderTrackingController;
 use App\Http\Controllers\Api\TranslationController;
 use App\Http\Controllers\Web\GroupOrderWebController;
+use App\Http\Controllers\Web\RiderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,10 +50,19 @@ Route::prefix('ajax/subscriptions')->middleware(['web', 'igniter'])->group(funct
 });
 
 // Order Tracking routes (web routes - mostly public, no auth needed)
-Route::prefix('ajax/tracking')->group(function () {
+// 'igniter' middleware lets the controller see the logged-in customer.
+Route::prefix('ajax/tracking')->middleware(['web', 'igniter'])->group(function () {
     Route::post('/track', [OrderTrackingController::class, 'track']);
     Route::get('/status/{orderId}', [OrderTrackingController::class, 'status']);
     Route::get('/statuses', [OrderTrackingController::class, 'statuses']);
+});
+
+// Rider screen (staff with the "delivery" role, logged in via /admin/login).
+Route::prefix('rider')->middleware(['web', 'igniter'])->group(function () {
+    Route::get('/', [RiderController::class, 'index']);
+    Route::get('/deliveries', [RiderController::class, 'deliveries']);
+    Route::post('/deliveries/{orderId}/location', [RiderController::class, 'updateLocation'])->whereNumber('orderId');
+    Route::post('/deliveries/{orderId}/status', [RiderController::class, 'updateStatus'])->whereNumber('orderId');
 });
 
 // Sunbird AI translation proxy (used by the in-page language switcher).

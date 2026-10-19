@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\OrderTracking;
 use App\Models\Rider;
+use App\Services\DeliveryLocator;
+use Igniter\User\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -43,11 +45,8 @@ class OrderTrackingController extends Controller
                 $orderQuery->where('hash', $request->order_hash);
             }
 
-            // Optional phone verification for security
-            if ($request->phone) {
-                $orderQuery->where('telephone', $request->phone);
-            }
-
+            // The phone number is checked in canSeeLiveMap(), ignoring
+            // formatting differences such as "0772…" vs "+256772…".
             $order = $orderQuery->first();
         } else {
             // Fallback: just find tracking by order_id
@@ -91,6 +90,9 @@ class OrderTrackingController extends Controller
             }
         }
 
+        $locator = app(DeliveryLocator::class);
+        $canSeeMap = $this->canSeeLiveMap($request, $order);
+
         // Get location/restaurant info
         $location = null;
         if ($order->location) {
@@ -98,8 +100,18 @@ class OrderTrackingController extends Controller
                 'name' => $order->location->location_name ?? 'Restaurant',
                 'address' => $order->location->location_address ?? '',
                 'phone' => $order->location->location_telephone ?? '',
+                'coordinates' => $locator->restaurantCoordinates($order),
             ];
         }
+
+        // Exact delivery and rider positions are only shown to the customer
+        // who owns the order: order numbers are sequential and guessable.
+        $map = [
+            'allowed' => $canSeeMap,
+            'restaurant' => $location['coordinates'] ?? null,
+            'delivery' => $canSeeMap ? $locator->deliveryCoordinates($order, $tracking) : null,
+            'delivery_source' => $canSeeMap ? $tracking->delivery_source : null,
+        ];
 
         // Format delivery address
         $deliveryAddress = '';
@@ -121,9 +133,9 @@ class OrderTrackingController extends Controller
                 'created_at' => $order->created_at,
                 'order_time' => $order->order_datetime ? $order->order_datetime->format('g:i A') : null,
                 'order_date' => $order->order_datetime ? $order->order_datetime->format('M d, Y') : null,
-                'delivery_address' => $deliveryAddress,
-                'customer_name' => trim(($order->first_name ?? '') . ' ' . ($order->last_name ?? '')),
-                'customer_phone' => $order->telephone ?? '',
+                'delivery_address' => $canSeeMap ? $deliveryAddress : null,
+                'customer_name' => $canSeeMap ? trim(($order->first_name ?? '') . ' ' . ($order->last_name ?? '')) : null,
+                'customer_phone' => $canSeeMap ? ($order->telephone ?? '') : null,
                 'order_type' => $order->order_type ?? 'delivery',
                 'payment_method' => $order->payment ?? 'N/A',
                 'status_name' => $order->status ? $order->status->status_name : 'Pending',
@@ -131,8 +143,34 @@ class OrderTrackingController extends Controller
                 'items_summary' => $this->formatItemsSummary($orderItems),
             ],
             'location' => $location,
-            'tracking' => $this->formatTrackingResponse($tracking),
+            'map' => $map,
+            'tracking' => $this->formatTrackingResponse($tracking, false, $canSeeMap),
         ]);
+    }
+
+    /**
+     * The live map is shown when the caller proves they own the order: the
+     * order hash from the confirmation link, the order's phone number, or
+     * being logged in as the customer who placed it.
+     */
+    private function canSeeLiveMap(Request $request, $order): bool
+    {
+        if ($request->order_hash && hash_equals((string)$order->hash, (string)$request->order_hash)) {
+            return true;
+        }
+
+        if ($request->phone && $order->telephone
+            && preg_replace('/\D/', '', $request->phone) === preg_replace('/\D/', '', $order->telephone)) {
+            return true;
+        }
+
+        try {
+            $customer = Auth::customer();
+        } catch (\Throwable) {
+            $customer = null;
+        }
+
+        return $customer && $order->customer_id && (int)$customer->getKey() === (int)$order->customer_id;
     }
 
     /**
@@ -443,7 +481,7 @@ class OrderTrackingController extends Controller
     /**
      * Format tracking response
      */
-    private function formatTrackingResponse(OrderTracking $tracking, bool $includeOrder = false): array
+    private function formatTrackingResponse(OrderTracking $tracking, bool $includeOrder = false, bool $includeRiderPosition = true): array
     {
         $response = [
             'id' => $tracking->id,
@@ -460,9 +498,10 @@ class OrderTrackingController extends Controller
                 'phone' => $tracking->rider_phone,
                 'photo' => $tracking->rider_photo,
             ] : null,
-            'location' => ($tracking->current_lat && $tracking->current_lng) ? [
+            'location' => ($includeRiderPosition && $tracking->current_lat && $tracking->current_lng) ? [
                 'lat' => (float) $tracking->current_lat,
                 'lng' => (float) $tracking->current_lng,
+                'updated_at' => $tracking->location_updated_at,
             ] : null,
             'updated_at' => $tracking->updated_at,
         ];

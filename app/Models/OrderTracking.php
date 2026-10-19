@@ -24,12 +24,19 @@ class OrderTracking extends Model
         'rider_rejected_at',
         'current_lat',
         'current_lng',
+        'delivery_lat',
+        'delivery_lng',
+        'delivery_source',
+        'location_updated_at',
         'eta_minutes',
     ];
 
     protected $casts = [
         'current_lat' => 'decimal:8',
         'current_lng' => 'decimal:8',
+        'delivery_lat' => 'decimal:8',
+        'delivery_lng' => 'decimal:8',
+        'location_updated_at' => 'datetime',
         'eta_minutes' => 'integer',
         'assigned_rider_id' => 'integer',
         'rider_accepted_at' => 'datetime',
@@ -177,7 +184,8 @@ class OrderTracking extends Model
     {
         $this->current_lat = $lat;
         $this->current_lng = $lng;
-        
+        $this->location_updated_at = now();
+
         if ($eta !== null) {
             $this->eta_minutes = $eta;
         }

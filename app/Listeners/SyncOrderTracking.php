@@ -4,7 +4,10 @@ namespace App\Listeners;
 
 use App\Models\OrderTracking;
 use App\Models\Subscription;
+use App\Services\DeliveryLocator;
 use Igniter\Cart\Models\Order;
+use Igniter\Local\Facades\Location;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -31,10 +34,12 @@ class SyncOrderTracking
         }
 
         try {
-            OrderTracking::firstOrCreate(
+            $tracking = OrderTracking::firstOrCreate(
                 ['order_id' => $order->order_id],
                 ['status' => OrderTracking::STATUS_CONFIRMED]
             );
+
+            $this->rememberCustomerPosition($order, $tracking);
         } catch (\Throwable $e) {
             Log::warning('SyncOrderTracking@onPaymentProcessed failed', [
                 'order_id' => $order->order_id ?? null,
@@ -88,6 +93,86 @@ class SyncOrderTracking
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * When staff assign an order to a user with the "delivery" role in the
+     * admin panel, make that user the order's rider so they see it on the
+     * rider screen and the customer sees their name on the tracking page.
+     *
+     * Event payload: [Order $order, AssignableLog $log]
+     */
+    public function onAssigned(...$args): void
+    {
+        $order = $args[0] ?? null;
+        if (!$order instanceof Order) {
+            return;
+        }
+
+        try {
+            $rider = $order->assignee()->first();
+            if (!$rider || ($rider->role?->code ?? null) !== 'delivery') {
+                return;
+            }
+
+            $tracking = OrderTracking::firstOrCreate(
+                ['order_id' => $order->order_id],
+                ['status' => OrderTracking::STATUS_CONFIRMED]
+            );
+
+            if ((int)$tracking->assigned_rider_id === (int)$rider->getKey()) {
+                return;
+            }
+
+            // Free the previously assigned rider, if any.
+            if ($tracking->assigned_rider_id) {
+                DB::table('admin_users')
+                    ->where('user_id', $tracking->assigned_rider_id)
+                    ->where('current_order_id', $order->order_id)
+                    ->update(['current_order_id' => null, 'is_available' => 1]);
+            }
+
+            $tracking->update([
+                'assigned_rider_id' => $rider->getKey(),
+                'rider_name' => $rider->name,
+                'rider_phone' => $rider->telephone ?? null,
+                'rider_accepted_at' => null,
+                'rider_rejected_at' => null,
+            ]);
+
+            DB::table('admin_users')
+                ->where('user_id', $rider->getKey())
+                ->update(['current_order_id' => $order->order_id, 'is_available' => 0]);
+        } catch (\Throwable $e) {
+            Log::warning('SyncOrderTracking@onAssigned failed', [
+                'order_id' => $order->order_id ?? null,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Save the position the customer shared with "Use my location" as the
+     * delivery point. Only available while handling the customer's own
+     * checkout request (a payment webhook has no customer session).
+     */
+    protected function rememberCustomerPosition(Order $order, OrderTracking $tracking): void
+    {
+        if ($order->order_type !== 'delivery' || $tracking->delivery_lat || !app()->bound('location')) {
+            return;
+        }
+
+        $position = Location::userPosition();
+        if (!$position || !$position->hasCoordinates()) {
+            return;
+        }
+
+        $coordinates = $position->getCoordinates();
+        app(DeliveryLocator::class)->rememberCustomerPosition(
+            $tracking,
+            (float)$coordinates->getLatitude(),
+            (float)$coordinates->getLongitude()
+        );
     }
 
     /**
