@@ -39,6 +39,23 @@ class AppServiceProvider extends ServiceProvider
             });
         }
         
+        // Checkout pre-fills "Address 1" as "<street number> <street name>"
+        // from the customer's detected location. Many Kampala locations have
+        // neither, which saved " " and then blocked every admin edit of that
+        // customer ("The Address 1 field is required."). Fall back to the area.
+        if (class_exists(\Igniter\User\Models\Address::class)) {
+            \Igniter\User\Models\Address::saving(function ($address) {
+                if (strlen(trim((string)$address->address_1)) >= 3) {
+                    $address->address_1 = trim($address->address_1);
+                    return;
+                }
+
+                $address->address_1 = collect([$address->address_2, $address->city, $address->state])
+                    ->map(fn ($part) => trim((string)$part))
+                    ->first(fn ($part) => strlen($part) >= 3) ?? 'Pinned location';
+            });
+        }
+
         // Also try to set via ThemeManager after app boots
         $this->app->booted(function () {
             try {
