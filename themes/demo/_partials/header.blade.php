@@ -60,6 +60,7 @@
                             <li><a class="dropdown-item" href="{{ page_url('account.orders') }}"><i class="fa fa-list me-2"></i>My Orders</a></li>
                             <li><a class="dropdown-item" href="{{ page_url('account.address') }}"><i class="fa fa-map-marker me-2"></i>Address Book</a></li>
                             <li><a class="dropdown-item" href="/account/wallet"><i class="fa fa-wallet me-2 text-warning"></i>Tasty Wallet</a></li>
+                            <li><a class="dropdown-item" href="/account/wallet#loyalty"><i class="fa fa-star me-2 text-warning"></i>Loyalty Points</a></li>
                             <li><a class="dropdown-item" href="/account/features"><i class="fa fa-star me-2 text-success"></i>Subscriptions</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/logout"><i class="fa fa-sign-out me-2"></i>Logout</a></li>

@@ -129,6 +129,12 @@ Route::prefix('ajax/wallet')->middleware(['web'])->group(function () {
     Route::post('/withdraw', [WalletController::class, 'withdraw'])->name('wallet.withdraw');
 });
 
+// Loyalty points (earned on completed orders, redeemed as wallet credit)
+Route::prefix('ajax/loyalty')->middleware(['web', 'igniter'])->group(function () {
+    Route::get('/', [\App\Http\Controllers\LoyaltyController::class, 'summary'])->name('loyalty.summary');
+    Route::post('/redeem', [\App\Http\Controllers\LoyaltyController::class, 'redeem'])->name('loyalty.redeem');
+});
+
 // Reservation routes with commitment fee
 Route::prefix('ajax/reservation')->middleware(['web'])->group(function () {
     Route::post('/create', [\App\Http\Controllers\ReservationController::class, 'create'])->name('reservation.create');

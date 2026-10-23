@@ -13,9 +13,12 @@ security: customer
     $wallet = null;
     $transactions = collect();
     
+    $loyalty = null;
+
     if ($customer) {
         $wallet = \App\Models\TastyWallet::getOrCreateForCustomer($customer->customer_id);
         $transactions = $wallet->transactions()->orderBy('created_at', 'desc')->take(20)->get();
+        $loyalty = app(\App\Services\LoyaltyService::class)->summary((int)$customer->customer_id, 5);
     }
 @endphp
 
@@ -57,6 +60,97 @@ security: customer
                     </div>
                 </div>
             </div>
+
+            @if ($loyalty)
+            <!-- Loyalty Points -->
+            <div class="card border-0 shadow-sm mb-4" id="loyalty">
+                <div class="card-body p-4">
+                    <div class="row align-items-center g-3">
+                        <div class="col-md-7">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle d-inline-flex p-3 me-3" style="background: rgba(252, 220, 4, 0.25);">
+                                    <i class="fa fa-star fa-2x" style="color: #e0a800;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 text-muted">Loyalty Points</h6>
+                                    <h2 class="mb-0 fw-bold"><span data-loyalty-points>{{ number_format($loyalty['points']) }}</span> <small class="fs-6 text-muted">pts</small></h2>
+                                    <div class="small text-muted">Worth <strong data-loyalty-value>UGX {{ number_format($loyalty['value_ugx']) }}</strong> in wallet credit</div>
+                                </div>
+                            </div>
+                            <p class="small text-muted mb-0 mt-3">
+                                <i class="fa fa-circle-info me-1"></i>
+                                Earn <strong>1 point for every UGX {{ number_format($loyalty['ugx_per_point']) }}</strong> on completed orders.
+                                Each point is worth UGX {{ number_format($loyalty['point_value_ugx']) }}; redeem from {{ number_format($loyalty['min_redeem']) }} points and spend the credit on food with Tasty Wallet.
+                            </p>
+                        </div>
+                        <div class="col-md-5">
+                            <form id="loyaltyRedeemForm" class="d-flex flex-column gap-2">
+                                <label class="form-label small fw-bold mb-0" for="loyaltyPoints">Points to redeem</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="loyaltyPoints" name="points"
+                                           min="{{ $loyalty['min_redeem'] }}" max="{{ $loyalty['points'] }}" step="1"
+                                           value="{{ $loyalty['points'] >= $loyalty['min_redeem'] ? $loyalty['points'] : '' }}"
+                                           placeholder="{{ $loyalty['min_redeem'] }}+">
+                                    <span class="input-group-text">pts</span>
+                                </div>
+                                <button type="submit" class="btn btn-warning fw-bold" @disabled($loyalty['points'] < $loyalty['min_redeem'])>
+                                    <i class="fa fa-wallet me-1"></i> Redeem to wallet
+                                </button>
+                                <div class="small" data-loyalty-message>
+                                    @if ($loyalty['points'] < $loyalty['min_redeem'])
+                                        <span class="text-muted">{{ number_format($loyalty['min_redeem'] - $loyalty['points']) }} more points until you can redeem.</span>
+                                    @endif
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    @if (count($loyalty['history']))
+                        <hr>
+                        <div class="small">
+                            @foreach ($loyalty['history'] as $entry)
+                                <div class="d-flex justify-content-between py-1">
+                                    <span class="text-muted">{{ $entry['date'] }} · {{ $entry['description'] }}</span>
+                                    <strong class="{{ $entry['points'] >= 0 ? 'text-success' : 'text-danger' }}">{{ $entry['points'] >= 0 ? '+' : '' }}{{ number_format($entry['points']) }}</strong>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+            <script>
+            document.getElementById('loyaltyRedeemForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                var form = this, btn = form.querySelector('button'), msg = form.querySelector('[data-loyalty-message]');
+                var points = parseInt(form.points.value, 10);
+                if (!points) return;
+                btn.disabled = true;
+                msg.innerHTML = '<span class="text-muted">Redeeming…</span>';
+                fetch('/ajax/loyalty/redeem', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') || {}).content || '',
+                    },
+                    body: JSON.stringify({points: points}),
+                }).then(function (r) { return r.json(); }).then(function (res) {
+                    if (!res.success) {
+                        msg.innerHTML = '<span class="text-danger"></span>';
+                        msg.firstChild.textContent = res.message || 'Could not redeem points.';
+                        btn.disabled = false;
+                        return;
+                    }
+                    msg.innerHTML = '<span class="text-success"></span>';
+                    msg.firstChild.textContent = res.message;
+                    setTimeout(function () { window.location.reload(); }, 1200);
+                }).catch(function () {
+                    msg.innerHTML = '<span class="text-danger">Network error. Please try again.</span>';
+                    btn.disabled = false;
+                });
+            });
+            </script>
+            @endif
 
             <!-- Quick Stats -->
             <div class="row mb-4">

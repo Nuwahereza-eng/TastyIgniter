@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Models\OrderTracking;
 use App\Models\Subscription;
 use App\Services\DeliveryLocator;
+use App\Services\LoyaltyService;
 use Igniter\Cart\Models\Order;
 use Igniter\Local\Facades\Location;
 use Illuminate\Support\Facades\DB;
@@ -86,6 +87,11 @@ class SyncOrderTracking
             // subscription (if any) so meals_remaining reflects reality.
             if ($mapped === OrderTracking::STATUS_DELIVERED) {
                 $this->maybeDeductSubscriptionMeal($order);
+                app(LoyaltyService::class)->earnForOrder($order);
+            }
+
+            if ($mapped === OrderTracking::STATUS_CANCELLED) {
+                app(LoyaltyService::class)->reverseForOrder($order);
             }
         } catch (\Throwable $e) {
             Log::warning('SyncOrderTracking@onStatusAdded failed', [

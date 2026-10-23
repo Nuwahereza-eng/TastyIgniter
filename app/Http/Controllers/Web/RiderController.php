@@ -117,6 +117,10 @@ class RiderController extends Controller
             DB::table('admin_users')
                 ->where('user_id', $tracking->assigned_rider_id)
                 ->update(['current_order_id' => null, 'is_available' => 1]);
+
+            if ($order = Order::find($tracking->order_id)) {
+                rescue(fn () => app(\App\Services\LoyaltyService::class)->earnForOrder($order));
+            }
         }
 
         return response()->json(['success' => true, 'status' => $tracking->status, 'status_label' => $tracking->getStatusLabel()]);

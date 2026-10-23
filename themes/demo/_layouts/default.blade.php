@@ -184,6 +184,11 @@ description: Default layout
                                     </a>
                                 </li>
                                 <li>
+                                    <a class="dropdown-item" href="/account/wallet#loyalty">
+                                        <i class="fa fa-star me-2"></i>Loyalty Points
+                                    </a>
+                                </li>
+                                <li>
                                     <a class="dropdown-item" href="{{ page_url('account.orders') }}">
                                         <i class="fa fa-receipt me-2"></i>My Orders
                                     </a>
