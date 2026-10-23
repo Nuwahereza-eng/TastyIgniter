@@ -628,92 +628,9 @@ class GroupOrderWebController extends Controller
      */
     public function syncCart(): JsonResponse
     {
-        $groupOrderId = session('active_group_order_id');
-        
-        if (!$groupOrderId) {
-            return response()->json([
-                'success' => false,
-                'error' => 'No active group order',
-            ], 400);
-        }
+        $result = app(\App\Services\GroupOrderCartSync::class)->syncActive();
 
-        $customerId = $this->getCustomerId();
-        if (!$customerId) {
-            return response()->json([
-                'success' => false,
-                'error' => 'You must be logged in',
-            ], 401);
-        }
-
-        $groupOrder = GroupOrder::find($groupOrderId);
-        if (!$groupOrder) {
-            session()->forget('active_group_order_id');
-            return response()->json([
-                'success' => false,
-                'error' => 'Group order not found',
-            ], 404);
-        }
-
-        $participant = $groupOrder->participants()->where('customer_id', $customerId)->first();
-        if (!$participant) {
-            return response()->json([
-                'success' => false,
-                'error' => 'You are not a participant',
-            ], 403);
-        }
-
-        // Get cart from TastyIgniter Cart facade
-        try {
-            $cart = \Igniter\Cart\Facades\Cart::content();
-            $items = [];
-            $subtotal = 0;
-            
-            foreach ($cart as $item) {
-                $itemData = [
-                    'row_id' => $item->rowId,
-                    'menu_item_id' => $item->id,
-                    'name' => $item->name,
-                    'price' => (float) $item->price,
-                    'quantity' => $item->qty,
-                    'options' => [],
-                    'comment' => $item->comment ?? null,
-                ];
-                
-                // Get options if available
-                if ($item->options && count($item->options) > 0) {
-                    foreach ($item->options as $option) {
-                        $itemData['options'][] = [
-                            'name' => $option->name ?? '',
-                            'price' => (float) ($option->price ?? 0),
-                        ];
-                    }
-                }
-                
-                $items[] = $itemData;
-                $subtotal += $item->price * $item->qty;
-            }
-            
-            $participant->cart_items = $items;
-            $participant->subtotal = $subtotal;
-            $participant->save();
-
-            // Update group order total
-            $groupOrder->total_amount = $groupOrder->calculateTotal();
-            $groupOrder->save();
-
-            return response()->json([
-                'success' => true,
-                'items_count' => count($items),
-                'subtotal' => $subtotal,
-                'group_total' => $groupOrder->total_amount,
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Group order cart sync error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'error' => 'Failed to sync cart',
-            ], 500);
-        }
+        return response()->json(array_diff_key($result, ['status' => true]), $result['success'] ? 200 : ($result['status'] ?? 400));
     }
 
     /**

@@ -78,38 +78,28 @@ for patch_file in "$PROJECT_ROOT/patches"/*.patch; do
     fi
 done
 
-# Copy custom feature pages
+# Copy custom feature pages into the parent (vendor) orange theme.
+# The active demo theme's own copies (themes/demo/_pages, public/themes/demo)
+# are tracked in git and are the source of truth: never overwrite them here.
+# Doing so once replaced the full group-orders page with an older copy.
 THEME_PAGES="$PROJECT_ROOT/vendor/tastyigniter/ti-theme-orange/resources/views/_pages"
-DEMO_THEME_PAGES="$PROJECT_ROOT/themes/demo/_pages"
 PATCHES_DIR="$PROJECT_ROOT/patches"
 
 if [ -f "$PATCHES_DIR/features.blade.php" ]; then
     mkdir -p "$THEME_PAGES/account"
-    mkdir -p "$DEMO_THEME_PAGES/account"
     cp "$PATCHES_DIR/features.blade.php" "$THEME_PAGES/account/features.blade.php"
-    cp "$PATCHES_DIR/features.blade.php" "$DEMO_THEME_PAGES/account/features.blade.php"
     echo "✓ Copied features page"
 fi
 
 if [ -f "$PATCHES_DIR/track-order.blade.php" ]; then
     cp "$PATCHES_DIR/track-order.blade.php" "$THEME_PAGES/track-order.blade.php"
-    cp "$PATCHES_DIR/track-order.blade.php" "$DEMO_THEME_PAGES/track-order.blade.php"
     echo "✓ Copied track-order page"
 fi
 
 if [ -f "$PATCHES_DIR/menus.blade.php" ]; then
     mkdir -p "$THEME_PAGES/local"
-    mkdir -p "$DEMO_THEME_PAGES/local"
     cp "$PATCHES_DIR/menus.blade.php" "$THEME_PAGES/local/menus.blade.php"
-    cp "$PATCHES_DIR/menus.blade.php" "$DEMO_THEME_PAGES/local/menus.blade.php"
     echo "✓ Copied menus page"
-fi
-
-# Copy features CSS to public
-if [ -f "$PATCHES_DIR/features.css" ]; then
-    mkdir -p "$PROJECT_ROOT/public/themes/demo/assets/css"
-    cp "$PATCHES_DIR/features.css" "$PROJECT_ROOT/public/themes/demo/assets/css/features.css"
-    echo "✓ Copied features CSS"
 fi
 
 # Copy our customised orange theme files over the composer-installed ones.

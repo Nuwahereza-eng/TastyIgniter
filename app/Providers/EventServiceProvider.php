@@ -33,6 +33,15 @@ class EventServiceProvider extends ServiceProvider
         Event::listen('admin.order.paymentProcessed', [\App\Listeners\SyncOrderTracking::class, 'onPaymentProcessed']);
         Event::listen('igniter.cart.orderStatusAdded', [\App\Listeners\SyncOrderTracking::class, 'onStatusAdded']);
         Event::listen('admin.assignable.assigned', [\App\Listeners\SyncOrderTracking::class, 'onAssigned']);
+
+        // While a group order is active ("Add items" on the group order page),
+        // every cart change is copied to the participant's items right away,
+        // so nothing is lost if they skip the "Done Adding" button.
+        Event::listen(['cart.added', 'cart.updated', 'cart.removed'], function () {
+            if (session()->has('active_group_order_id')) {
+                rescue(fn () => app(\App\Services\GroupOrderCartSync::class)->syncActive(), null, false);
+            }
+        });
     }
 
     /**
