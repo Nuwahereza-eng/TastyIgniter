@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>UgaEats Rider</title>
+    <title>TastyIgniter Rider</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -21,7 +21,7 @@
 <header class="rider-header py-3 mb-3">
     <div class="container d-flex justify-content-between align-items-center">
         <div>
-            <div class="fw-bold"><i class="fa fa-motorcycle me-2"></i>UgaEats Rider</div>
+            <div class="fw-bold"><i class="fa fa-motorcycle me-2"></i>TastyIgniter Rider</div>
             <small>{{ $rider->name }}</small>
         </div>
         <button id="shareBtn" class="btn btn-light btn-sm fw-bold" type="button">

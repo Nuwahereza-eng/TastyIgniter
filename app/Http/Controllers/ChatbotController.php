@@ -91,10 +91,13 @@ class ChatbotController extends Controller
      */
     private function getSystemPrompt(): string
     {
-        return <<<PROMPT
-You are UgaEats AI Assistant, a friendly and helpful customer support chatbot for UgaEats - Uganda's premier food ordering and delivery platform.
+        $name = $this->appName();
+        $email = $this->supportEmail();
 
-About UgaEats:
+        return <<<PROMPT
+You are the {$name} AI Assistant, a friendly and helpful customer support chatbot for {$name}, a food ordering and delivery platform in Uganda.
+
+About {$name}:
 - We connect customers with local restaurants across Uganda
 - We offer delivery and pickup options
 - Operating hours vary by restaurant
@@ -116,7 +119,7 @@ Guidelines:
 - For order issues, apologize and assure them we'll help resolve it
 - Never make up specific order details or restaurant information
 
-Support contact: support@ugaeats.com or call +256 700 000 000
+Support contact: {$email} or call +256 700 000 000
 PROMPT;
     }
 
@@ -126,19 +129,21 @@ PROMPT;
     private function getFallbackResponse(string $message): string
     {
         $message = strtolower($message);
-        
+        $name = $this->appName();
+        $email = $this->supportEmail();
+
         $responses = [
-            'hello' => "Hello! 👋 Welcome to UgaEats! How can I help you today?",
-            'hi' => "Hi there! 👋 Welcome to UgaEats! What can I help you with?",
+            'hello' => "Hello! 👋 Welcome to {$name}! How can I help you today?",
+            'hi' => "Hi there! 👋 Welcome to {$name}! What can I help you with?",
             'hey' => "Hey! 👋 Great to have you here! How can I assist you?",
             'order' => "To place an order:\n1. Search for a restaurant or dish\n2. Add items to your cart\n3. Proceed to checkout\n4. Choose delivery or pickup\n5. Pay and track your order!",
             'track' => "To track your order, go to 'My Account' → 'Recent Orders' and click on your order to see real-time status updates.",
             'delivery' => "Our delivery typically takes 30-60 minutes depending on your location and the restaurant. You'll receive updates via SMS and email.",
             'payment' => "We accept:\n• Mobile Money (MTN & Airtel)\n• Visa/Mastercard\n• Cash on Delivery",
-            'contact' => "You can reach us at:\n📧 support@ugaeats.com\n📞 +256 700 000 000",
+            'contact' => "You can reach us at:\n📧 {$email}\n📞 +256 700 000 000",
             'help' => "I can help you with:\n• Placing orders\n• Tracking deliveries\n• Payment questions\n• Restaurant info\n• Complaints & feedback\n\nWhat do you need help with?",
             'menu' => "You can browse our menu by visiting the 'Menu' section or searching for specific dishes. We have a variety of restaurants offering local Ugandan cuisine and international dishes!",
-            'complaint' => "I'm sorry to hear you're having an issue. Please email support@ugaeats.com with your order number and we'll resolve it as quickly as possible. Webale for your patience!",
+            'complaint' => "I'm sorry to hear you're having an issue. Please email {$email} with your order number and we'll resolve it as quickly as possible. Webale for your patience!",
             'thank' => "You're welcome! 😊 Webale nyo! Is there anything else I can help you with?",
         ];
 
@@ -148,6 +153,16 @@ PROMPT;
             }
         }
 
-        return "Thanks for your message! 😊 I'm here to help with orders, deliveries, payments, or any questions about UgaEats. What would you like to know?";
+        return "Thanks for your message! 😊 I'm here to help with orders, deliveries, payments, or any questions about {$name}. What would you like to know?";
+    }
+
+    private function appName(): string
+    {
+        return setting('site_name') ?: 'TastyIgniter';
+    }
+
+    private function supportEmail(): string
+    {
+        return setting('site_email') ?: (string)config('mail.from.address');
     }
 }

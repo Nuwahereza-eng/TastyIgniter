@@ -233,12 +233,12 @@ class PaymentController extends Controller
     protected function paymentDescription(string $type): string
     {
         return match ($type) {
-            Payment::TYPE_SUBSCRIPTION => 'UgaEats subscription',
-            Payment::TYPE_GROUP_SHARE => 'UgaEats group order share',
-            Payment::TYPE_RESERVATION => 'UgaEats reservation deposit',
-            Payment::TYPE_SCHEDULED_ORDER => 'UgaEats scheduled order',
+            Payment::TYPE_SUBSCRIPTION => 'TastyIgniter subscription',
+            Payment::TYPE_GROUP_SHARE => 'TastyIgniter group order share',
+            Payment::TYPE_RESERVATION => 'TastyIgniter reservation deposit',
+            Payment::TYPE_SCHEDULED_ORDER => 'TastyIgniter scheduled order',
             Payment::TYPE_WALLET_DEPOSIT => 'Tasty Wallet top-up',
-            default => 'UgaEats payment',
+            default => 'TastyIgniter payment',
         };
     }
 

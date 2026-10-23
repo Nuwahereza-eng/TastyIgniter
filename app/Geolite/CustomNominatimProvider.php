@@ -63,7 +63,7 @@ class CustomNominatimProvider extends NominatimProvider
         
         $options = [
             'headers' => [
-                'User-Agent' => 'UgaEats-TastyIgniter/1.0 (contact@ugaeats.com)',
+                'User-Agent' => 'TastyIgniter/1.0 (+'.config('app.url').')',
                 'Referer' => config('app.url', 'http://127.0.0.1:8000'),
                 'Accept-Language' => 'en-UG,en;q=0.9',
             ],

@@ -91,7 +91,7 @@ bodyClass: home-page
         <div class="carousel-item active" style="max-height: 60vh;">
             <div class="hero-slide" style="background: linear-gradient(135deg, #FF4900 0%, #ff6b35 100%); min-height: 400px; display: flex; align-items: center; justify-content: center;">
                 <div class="text-center text-white p-4">
-                    <h1 class="display-4 fw-bold mb-3">Welcome to UgaEats</h1>
+                    <h1 class="display-4 fw-bold mb-3">Welcome to TastyIgniter</h1>
                     <p class="lead mb-4">Delicious food delivered to your doorstep</p>
                     <a href="{{ page_url('locations') }}" class="btn btn-light btn-lg px-5">Order Now</a>
                 </div>

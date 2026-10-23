@@ -57,7 +57,7 @@ class PaymentService
                 'name' => $data['name'] ?? 'Customer',
             ],
             'customizations' => [
-                'title' => $data['title'] ?? 'UgaEats Payment',
+                'title' => $data['title'] ?? 'TastyIgniter Payment',
                 'description' => $data['description'] ?? 'Payment for food order',
                 'logo' => asset('themes/demo/assets/images/logo.png'),
             ],
@@ -514,7 +514,7 @@ class PaymentService
             'country' => $data['country'] ?? 'UG',
             'reference' => $reference,
             'method' => 'mobile_money',
-            'description' => $data['description'] ?? 'UgaEats wallet withdrawal',
+            'description' => $data['description'] ?? 'TastyIgniter wallet withdrawal',
             'phone_number' => $this->normalizeUgandaPhone($data['phone']),
         ];
 
@@ -613,7 +613,7 @@ class PaymentService
                 'name' => $data['name'] ?? 'Customer',
             ],
             'customizations' => [
-                'title' => 'UgaEats Subscription',
+                'title' => 'TastyIgniter Subscription',
                 'description' => $data['description'] ?? 'Meal Plan Subscription',
                 'logo' => asset('themes/demo/assets/images/logo.png'),
             ],

@@ -37,13 +37,13 @@
                 <div class="social-bottom">
                     <h6 class="footer-title">FOLLOW US ON</h6>
                     <div class="d-flex gap-2 mt-3">
-                        <a href="https://facebook.com/ugaeats" target="_blank" class="social-icon-link">
+                        <a href="https://facebook.com/tastyigniter" target="_blank" class="social-icon-link">
                             <img src="{{ asset('themes/demo/assets/images/social/icons8-facebook-logo.svg') }}" alt="Facebook" width="40" height="40">
                         </a>
-                        <a href="https://x.com/ugaeats" target="_blank" class="social-icon-link">
+                        <a href="https://x.com/tastyigniter" target="_blank" class="social-icon-link">
                             <img src="{{ asset('themes/demo/assets/images/social/icons8-x-logo-100.svg') }}" alt="X" width="40" height="40">
                         </a>
-                        <a href="https://tiktok.com/@ugaeats" target="_blank" class="social-icon-link">
+                        <a href="https://tiktok.com/@tastyigniter" target="_blank" class="social-icon-link">
                             <img src="{{ asset('themes/demo/assets/images/social/icons8-tiktok-logo.svg') }}" alt="TikTok" width="40" height="40">
                         </a>
                     </div>
@@ -70,7 +70,7 @@
     <div class="container">
         <div class="row">
             <div class="col p-2">
-                &copy; {{ date('Y') }} UgaEats
+                &copy; {{ date('Y') }} TastyIgniter
             </div>
         </div>
     </div>
@@ -78,7 +78,7 @@
 
 <!-- WhatsApp Floating Button -->
 <div class="whatsapp-float">
-    <a href="https://wa.me/256779081600?text=Hi%20UgaEats!%20I%20would%20like%20to%20order%20food." 
+    <a href="https://wa.me/256779081600?text=Hi%20TastyIgniter!%20I%20would%20like%20to%20order%20food." 
        class="whatsapp-btn" 
        target="_blank" 
        title="Order via WhatsApp">
@@ -91,7 +91,7 @@
 
 <!-- AI Chatbot -->
 <div class="chatbot-container" id="chatbotContainer">
-    <button class="chatbot-toggle" id="chatbotToggle" title="Chat with UgaEats AI">
+    <button class="chatbot-toggle" id="chatbotToggle" title="Chat with TastyIgniter AI">
         <i class="fa fa-comments"></i>
     </button>
 </div>

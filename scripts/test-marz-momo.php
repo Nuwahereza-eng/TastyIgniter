@@ -12,7 +12,7 @@ $result = $svc->initializeMarzPayment([
     'country' => 'UG',
     'method' => 'mobile_money',
     'phone' => $phone,
-    'description' => 'UgaEats mobile money test',
+    'description' => 'TastyIgniter mobile money test',
 ]);
 
 echo "--- initializeMarzPayment (mobile_money to $phone) ---\n";

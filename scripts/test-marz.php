@@ -7,7 +7,7 @@ $result = $svc->initializeMarzPayment([
     'amount' => 1000,
     'country' => 'UG',
     'method' => 'card',
-    'description' => 'Test card collection from UgaEats',
+    'description' => 'Test card collection from TastyIgniter',
     'redirect_url' => 'https://example.com/payment/callback',
 ]);
 

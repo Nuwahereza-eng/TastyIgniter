@@ -24,7 +24,7 @@ $events = [
 
 foreach ($events as $event) {
     $payload = [
-        'name' => 'UgaEats - ' . $event,
+        'name' => 'TastyIgniter - ' . $event,
         'url' => $url,
         'event_type' => $event,
         'environment' => $env,

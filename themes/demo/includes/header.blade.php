@@ -113,7 +113,7 @@
 
 <script>
 function getLoyaltyPoints() {
-    return parseInt(localStorage.getItem('ugaeats_loyalty_points') || '0');
+    return parseInt(localStorage.getItem('tastyigniter_loyalty_points') || '0');
 }
 
 function updateLoyaltyDisplay() {

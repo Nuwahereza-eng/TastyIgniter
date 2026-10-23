@@ -1,8 +1,8 @@
 {
     "code": "demo",
-    "name": "UgaEats Demo Theme",
+    "name": "TastyIgniter Demo Theme",
     "description": "Uganda-customized theme extending igniter-orange with local enhancements",
-    "author": "UgaEats",
+    "author": "TastyIgniter",
     "version": "1.0.0",
     "parent": "igniter-orange"
 }

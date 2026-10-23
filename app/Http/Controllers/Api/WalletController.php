@@ -218,7 +218,7 @@ class WalletController extends Controller
             'amount' => $amount,
             'phone' => $phone,
             'reference' => $reference,
-            'description' => 'UgaEats wallet withdrawal to ' . strtoupper($provider),
+            'description' => 'TastyIgniter wallet withdrawal to ' . strtoupper($provider),
         ]);
 
         if (empty($payout['configured'])) {

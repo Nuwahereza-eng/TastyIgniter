@@ -1,7 +1,7 @@
 @props(['id', 'label', 'number', 'field', 'readOnly'])
 <div @class(['form-control py-0', 'is-invalid' => has_form_error($field)])>
     <label for="{{$id}}">{{$label}}</label>
-    {{-- UgaEats: the theme bundles intl-tel-input 18.3.3 but its JS loads the
+    {{-- TastyIgniter: the theme bundles intl-tel-input 18.3.3 but its JS loads the
          11.0.4 validation utils, so every number was reported "Invalid number"
          and an empty phone reached the server. data-* attributes override the
          picker options: load the matching utils and default to Uganda so

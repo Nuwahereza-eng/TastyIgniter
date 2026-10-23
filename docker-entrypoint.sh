@@ -115,7 +115,7 @@ fi
 pgrep -x php-fpm >/dev/null 2>&1 && pkill -x php-fpm || true
 
 # Create a simple health file that nginx can serve immediately
-echo '{"status":"ok","service":"ugaeats"}' > /var/www/html/public/health.json
+echo '{"status":"ok","service":"tastyigniter"}' > /var/www/html/public/health.json
 chmod 644 /var/www/html/public/health.json
 
 # Start PHP-FPM in background first
@@ -214,7 +214,7 @@ if (\$theme) {
 } else {
     echo 'Demo theme not found, creating...';
     \$themeData = [
-        'name' => 'UgaEats Demo Theme',
+        'name' => 'TastyIgniter Demo Theme',
         'code' => 'demo',
         'description' => 'Uganda customizations theme',
     ];

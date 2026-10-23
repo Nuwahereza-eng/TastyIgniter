@@ -16,6 +16,6 @@ header('Cache-Control: no-cache, no-store, must-revalidate');
 echo json_encode([
     'status' => 'ok',
     'timestamp' => date('Y-m-d H:i:s'),
-    'service' => 'ugaeats'
+    'service' => 'tastyigniter'
 ]);
 exit;

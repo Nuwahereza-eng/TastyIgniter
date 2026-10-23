@@ -1,6 +1,6 @@
-# UgaEats Premium Features
+# TastyIgniter Premium Features
 
-This document describes the advanced features implemented for UgaEats food delivery platform.
+This document describes the advanced features implemented for TastyIgniter food delivery platform.
 
 ## Features Overview
 
@@ -232,4 +232,4 @@ This will copy the feature pages from `patches/` to the theme directory.
 ---
 
 *Last Updated: January 2026*
-*UgaEats - Bringing Uganda's Flavors to Your Door* 🇺🇬
+*TastyIgniter - Bringing Uganda's Flavors to Your Door* 🇺🇬

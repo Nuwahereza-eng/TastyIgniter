@@ -864,10 +864,10 @@ function closeSubscriptionModal() {
         $customer = \Igniter\User\Facades\Auth::customer();
     }
 @endphp
-window.ugaeatsCustomerEmail = '{{ $customer ? $customer->email : "" }}';
-window.ugaeatsCustomerName = '{{ $customer ? $customer->first_name . " " . $customer->last_name : "" }}';
-window.ugaeatsCustomerId = {{ $customer ? (int) $customer->customer_id : 0 }};
-window.ugaeatsCustomerPhone = '{{ $customer && isset($customer->telephone) ? $customer->telephone : "" }}';
+window.tastyigniterCustomerEmail = '{{ $customer ? $customer->email : "" }}';
+window.tastyigniterCustomerName = '{{ $customer ? $customer->first_name . " " . $customer->last_name : "" }}';
+window.tastyigniterCustomerId = {{ $customer ? (int) $customer->customer_id : 0 }};
+window.tastyigniterCustomerPhone = '{{ $customer && isset($customer->telephone) ? $customer->telephone : "" }}';
 </script>
 
 <script>
@@ -1103,7 +1103,7 @@ async function proceedToMenuWithSchedule() {
             is_asap: false,
             set_at: new Date().toISOString()
         };
-        localStorage.setItem('ugaeats_scheduled_order', JSON.stringify(scheduleData));
+        localStorage.setItem('tastyigniter_scheduled_order', JSON.stringify(scheduleData));
         
         // Call AJAX endpoint to set schedule in TastyIgniter session
         const response = await fetch('/ajax/location-schedule/set', {
@@ -1128,7 +1128,7 @@ async function proceedToMenuWithSchedule() {
             scheduleData.confirmed = true;
             scheduleData.location_id = result.data?.location_id;
             scheduleData.location_name = result.data?.location_name;
-            localStorage.setItem('ugaeats_scheduled_order', JSON.stringify(scheduleData));
+            localStorage.setItem('tastyigniter_scheduled_order', JSON.stringify(scheduleData));
             
             // Redirect to menu page
             window.location.href = '{{ page_url("local.menus") }}';
@@ -1267,7 +1267,7 @@ function showGroupCreatedAlert(code) {
                 <button class="btn btn-sm btn-outline-success" onclick="copyGroupCode('${code}')">
                     <i class="fa fa-copy"></i> Copy
                 </button>
-                <a href="https://wa.me/?text=Join%20my%20UgaEats%20group%20order!%20Code:%20${code}" 
+                <a href="https://wa.me/?text=Join%20my%20TastyIgniter%20group%20order!%20Code:%20${code}" 
                    class="btn btn-sm btn-success" target="_blank">
                     <i class="fab fa-whatsapp"></i> Share
                 </a>
@@ -1421,7 +1421,7 @@ function renderGroupCard(group, isHost) {
     const shareCount = participants.filter(p => Number(p.share_amount || 0) > 0).length;
     const paidCount  = participants.filter(p => p.has_paid).length;
     const allPaid    = shareCount > 0 && paidCount >= shareCount;
-    const me         = participants.find(p => Number(p.customer_id) === Number(window.ugaeatsCustomerId || 0));
+    const me         = participants.find(p => Number(p.customer_id) === Number(window.tastyigniterCustomerId || 0));
     const myShare    = Number(me?.share_amount || 0);
     const myPaid     = !!(me && me.has_paid);
     const showPayBtn = !!me && !myPaid && myShare > 0 && ['open', 'closed'].includes(group.status);
@@ -1472,7 +1472,7 @@ function renderGroupCard(group, isHost) {
                                 <button class="btn btn-outline-primary btn-sm" onclick="copyGroupCode('${group.invite_code}')" title="Copy code">
                                     <i class="fa fa-copy"></i>
                                 </button>
-                                <a href="https://wa.me/?text=Join%20my%20UgaEats%20group%20order!%20Use%20code:%20${group.invite_code}" 
+                                <a href="https://wa.me/?text=Join%20my%20TastyIgniter%20group%20order!%20Use%20code:%20${group.invite_code}" 
                                    class="btn btn-success btn-sm" target="_blank" title="Share on WhatsApp">
                                     <i class="fab fa-whatsapp"></i>
                                 </a>
@@ -1615,7 +1615,7 @@ async function setActiveGroupOrder(groupOrderId) {
     try {
         await groupOrderCall('/set-active', 'POST', { group_order_id: groupOrderId });
         // Store in localStorage for menu page to know about group order
-        localStorage.setItem('ugaeats_active_group_order', JSON.stringify({
+        localStorage.setItem('tastyigniter_active_group_order', JSON.stringify({
             id: groupOrderId,
             return_url: window.location.href + '#group-orders',
             timestamp: Date.now()
@@ -1870,7 +1870,7 @@ async function payMyShareModal(groupOrderId) {
           </div>
           <div id="sharePhoneWrap" style="display:none" class="mb-3">
             <label class="form-label">Mobile Money number</label>
-            <input id="sharePhone" type="tel" class="form-control" placeholder="07XX XXX XXX" value="${(window.ugaeatsCustomerPhone||'').replace(/^\\+?256/, '0')}">
+            <input id="sharePhone" type="tel" class="form-control" placeholder="07XX XXX XXX" value="${(window.tastyigniterCustomerPhone||'').replace(/^\\+?256/, '0')}">
           </div>
           <div class="d-flex gap-2">
             <button type="button" id="sharePay" class="btn btn-primary flex-grow-1" disabled>
@@ -2067,7 +2067,7 @@ async function proceedToGroupCheckout(groupOrderId) {
             return;
         }
         alert(data.message || 'Order placed!');
-        try { localStorage.removeItem('ugaeats_active_group_order'); } catch (e) {}
+        try { localStorage.removeItem('tastyigniter_active_group_order'); } catch (e) {}
         loadGroupOrders();
     } catch (e) {
         alert('Network error placing order. Please retry.');
@@ -2076,7 +2076,7 @@ async function proceedToGroupCheckout(groupOrderId) {
 
 // Sync cart items to group order when on menu page
 async function syncCartToGroupOrder() {
-    const activeGroup = localStorage.getItem('ugaeats_active_group_order');
+    const activeGroup = localStorage.getItem('tastyigniter_active_group_order');
     if (!activeGroup) return false;
     
     try {
@@ -2084,7 +2084,7 @@ async function syncCartToGroupOrder() {
         
         // Check if still valid (within 4 hours)
         if (Date.now() - groupData.timestamp > 4 * 60 * 60 * 1000) {
-            localStorage.removeItem('ugaeats_active_group_order');
+            localStorage.removeItem('tastyigniter_active_group_order');
             return false;
         }
         
@@ -2099,7 +2099,7 @@ async function syncCartToGroupOrder() {
 
 // Check for active group order and show notification
 function checkActiveGroupOrder() {
-    const activeGroup = localStorage.getItem('ugaeats_active_group_order');
+    const activeGroup = localStorage.getItem('tastyigniter_active_group_order');
     if (!activeGroup) return;
     
     try {
@@ -2107,7 +2107,7 @@ function checkActiveGroupOrder() {
         
         // Check if still valid
         if (Date.now() - groupData.timestamp > 4 * 60 * 60 * 1000) {
-            localStorage.removeItem('ugaeats_active_group_order');
+            localStorage.removeItem('tastyigniter_active_group_order');
             return;
         }
         
@@ -2138,7 +2138,7 @@ function showGroupOrderNotification(groupData) {
 }
 
 function exitGroupOrderMode() {
-    localStorage.removeItem('ugaeats_active_group_order');
+    localStorage.removeItem('tastyigniter_active_group_order');
     document.querySelector('.group-order-notification')?.remove();
     
     // Clear active group order on server
@@ -2338,8 +2338,8 @@ async function confirmSubscription() {
     
     try {
         // Get customer email from session or use default
-        const customerEmail = window.ugaeatsCustomerEmail || 'customer@ugaeats.com';
-        const customerName = window.ugaeatsCustomerName || 'Customer';
+        const customerEmail = window.tastyigniterCustomerEmail || '{{ setting('site_email') }}';
+        const customerName = window.tastyigniterCustomerName || 'Customer';
         
         // Try to create the subscription record (may fail if already subscribed)
         let subscriptionId = null;
@@ -2641,7 +2641,7 @@ async function updateSubscriptionStatus() {
         }
     } catch (error) {
         // Fallback to localStorage
-        const sub = JSON.parse(localStorage.getItem('ugaeats_subscription'));
+        const sub = JSON.parse(localStorage.getItem('tastyigniter_subscription'));
         
         if (sub && sub.status === 'active') {
             container.innerHTML = `
@@ -2714,7 +2714,7 @@ async function cancelSubscription() {
         loadSubscriptionHistory();
     } catch (error) {
         // Fallback
-        localStorage.removeItem('ugaeats_subscription');
+        localStorage.removeItem('tastyigniter_subscription');
         location.reload();
     }
 }
@@ -2729,7 +2729,7 @@ async function loadSubscriptionHistory() {
     }
     
     // Check if user is logged in
-    if (!window.ugaeatsCustomerEmail) {
+    if (!window.tastyigniterCustomerEmail) {
         console.log('[Subscriptions] User not logged in');
         container.innerHTML = `
             <div class="text-center py-4" style="background: #f8f9fa;">
@@ -3007,7 +3007,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <style>
 /* ============================================================
-   UGAEATS UNIFIED PALETTE
+   TASTYIGNITER UNIFIED PALETTE
    Use these tokens for any new styles. Existing inline styles
    have been normalized to the same hex values below.
    ============================================================ */

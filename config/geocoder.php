@@ -45,7 +45,7 @@ return [
             ],
             'locale' => 'en-UG',
             'region' => 'UG', // Uganda country code
-            'userAgent' => 'UgaEats-TastyIgniter/1.0 (contact@ugaeats.com)',
+            'userAgent' => 'TastyIgniter/1.0 (+'.env('APP_URL', 'http://localhost').')',
             'referer' => env('APP_URL', 'http://127.0.0.1:8000'),
             // Increase timeout for slower connections
             'timeout' => 30,

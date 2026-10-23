@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
     checkGroupOrder();
     
     // Check for scheduled order in localStorage
-    const scheduledOrder = localStorage.getItem('ugaeats_scheduled_order');
+    const scheduledOrder = localStorage.getItem('tastyigniter_scheduled_order');
     if (scheduledOrder) {
         try {
             const data = JSON.parse(scheduledOrder);
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('scheduledOrderBanner').classList.remove('d-none');
             } else {
                 // Expired, remove it
-                localStorage.removeItem('ugaeats_scheduled_order');
+                localStorage.removeItem('tastyigniter_scheduled_order');
             }
         } catch (e) {
             console.error('Error parsing scheduled order:', e);
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function clearScheduledOrder() {
     // Clear localStorage
-    localStorage.removeItem('ugaeats_scheduled_order');
+    localStorage.removeItem('tastyigniter_scheduled_order');
     
     // Call API to clear session schedule
     fetch('/ajax/location-schedule/clear', {
@@ -128,7 +128,7 @@ function clearScheduledOrder() {
 
 // ============ GROUP ORDER FUNCTIONS ============
 function checkGroupOrder() {
-    const activeGroup = localStorage.getItem('ugaeats_active_group_order');
+    const activeGroup = localStorage.getItem('tastyigniter_active_group_order');
     if (!activeGroup) return;
     
     try {
@@ -136,7 +136,7 @@ function checkGroupOrder() {
         
         // Check if still valid (within 4 hours)
         if (Date.now() - groupData.timestamp > 4 * 60 * 60 * 1000) {
-            localStorage.removeItem('ugaeats_active_group_order');
+            localStorage.removeItem('tastyigniter_active_group_order');
             return;
         }
         
@@ -149,7 +149,7 @@ function checkGroupOrder() {
         if (urlParams.has('group_order')) {
             // Store in localStorage if not already there
             if (!activeGroup) {
-                localStorage.setItem('ugaeats_active_group_order', JSON.stringify({
+                localStorage.setItem('tastyigniter_active_group_order', JSON.stringify({
                     id: urlParams.get('group_order'),
                     return_url: '/account/features#group-orders',
                     timestamp: Date.now()
@@ -162,7 +162,7 @@ function checkGroupOrder() {
 }
 
 async function finishAddingItems() {
-    const activeGroup = localStorage.getItem('ugaeats_active_group_order');
+    const activeGroup = localStorage.getItem('tastyigniter_active_group_order');
     if (!activeGroup) {
         alert('No active group order found');
         return;
@@ -195,7 +195,7 @@ async function finishAddingItems() {
             const returnUrl = groupData.return_url || '/account/features#group-orders';
             
             // Clear local storage
-            localStorage.removeItem('ugaeats_active_group_order');
+            localStorage.removeItem('tastyigniter_active_group_order');
             
             window.location.href = returnUrl;
         } else {
@@ -215,7 +215,7 @@ function exitGroupOrder() {
     }
     
     // Clear localStorage
-    localStorage.removeItem('ugaeats_active_group_order');
+    localStorage.removeItem('tastyigniter_active_group_order');
     
     // Call API to clear active group order
     fetch('/ajax/group-orders/clear-active', {

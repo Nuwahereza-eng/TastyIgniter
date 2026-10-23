@@ -43,13 +43,13 @@
             <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
                 <h6 class="footer-title text-uppercase fw-bold mb-3">Follow Us</h6>
                 <div class="d-flex gap-3">
-                    <a href="https://facebook.com/ugaeats" target="_blank" class="text-muted">
+                    <a href="https://facebook.com/tastyigniter" target="_blank" class="text-muted">
                         <img src="/themes/demo/assets/images/social/icons8-facebook-logo.svg" alt="Facebook" width="32" height="32">
                     </a>
-                    <a href="https://x.com/ugaeats" target="_blank" class="text-muted">
+                    <a href="https://x.com/tastyigniter" target="_blank" class="text-muted">
                         <img src="/themes/demo/assets/images/social/icons8-x-logo-100.svg" alt="X" width="32" height="32">
                     </a>
-                    <a href="https://tiktok.com/@ugaeats" target="_blank" class="text-muted">
+                    <a href="https://tiktok.com/@tastyigniter" target="_blank" class="text-muted">
                         <img src="/themes/demo/assets/images/social/icons8-tiktok-logo.svg" alt="TikTok" width="32" height="32">
                     </a>
                 </div>
@@ -68,7 +68,7 @@
         <hr class="my-3">
         <div class="row align-items-center">
             <div class="col-md-6 text-center text-md-start">
-                <p class="mb-0 text-muted small">&copy; {{ date('Y') }} UgaEats. All rights reserved.</p>
+                <p class="mb-0 text-muted small">&copy; {{ date('Y') }} TastyIgniter. All rights reserved.</p>
             </div>
             <div class="col-md-6 text-center text-md-end">
                 <p class="mb-0 text-muted small">Powered by TastyIgniter</p>
@@ -84,7 +84,7 @@
         <i class="fa fa-times fab-icon-close"></i>
     </button>
     <div class="fab-options">
-        <a href="https://wa.me/256779081600?text=Hi%20UgaEats!%20I%20would%20like%20to%20order%20food." 
+        <a href="https://wa.me/256779081600?text=Hi%20TastyIgniter!%20I%20would%20like%20to%20order%20food." 
            class="fab-option whatsapp" target="_blank" title="Order via WhatsApp">
             <i class="fab fa-whatsapp"></i>
             <span>WhatsApp</span>

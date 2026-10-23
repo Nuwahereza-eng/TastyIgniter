@@ -111,7 +111,7 @@ class WalletController extends Controller
 
         // Get customer details
         $customer = \Igniter\User\Facades\Auth::customer();
-        $email = $customer ? $customer->email : 'customer@ugaeats.com';
+        $email = $customer ? $customer->email : (setting('site_email') ?: config('mail.from.address'));
         $name = $customer ? $customer->full_name : 'Customer';
 
         try {
@@ -320,7 +320,7 @@ class WalletController extends Controller
 
             $customer = class_exists(\Igniter\User\Facades\Auth::class)
                 ? \Igniter\User\Facades\Auth::customer() : null;
-            $email = $customer ? $customer->email : 'customer@ugaeats.com';
+            $email = $customer ? $customer->email : (setting('site_email') ?: config('mail.from.address'));
             $name = $customer ? trim($customer->full_name ?? $customer->first_name ?? 'Customer') : 'Customer';
 
             $description = in_array($method, ['mtn', 'airtel'], true)
@@ -453,7 +453,7 @@ class WalletController extends Controller
                 'amount' => $amount,
                 'phone' => $phone,
                 'reference' => $reference,
-                'description' => 'UgaEats wallet withdrawal to ' . strtoupper($provider),
+                'description' => 'TastyIgniter wallet withdrawal to ' . strtoupper($provider),
             ]);
 
             // No Marz credentials → keep the debit as pending for manual

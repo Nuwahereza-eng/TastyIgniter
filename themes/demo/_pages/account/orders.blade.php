@@ -39,7 +39,7 @@ security: customer
                     <h4 class="mb-4"><i class="fa fa-receipt me-2 text-warning"></i>My Orders</h4>
 
                     @if (count($orders))
-                        <div class="list-group list-group-flush ugaeats-orders">
+                        <div class="list-group list-group-flush tastyigniter-orders">
                             @foreach ($orders as $order)
                                 @php
                                     $formattedId = 'UGA-'.str_pad((string) $order->order_id, 5, '0', STR_PAD_LEFT);
@@ -108,8 +108,8 @@ security: customer
 </div>
 
 <style>
-.ugaeats-orders .list-group-item + .list-group-item { border-top: 1px solid #f0f0f0; }
-.ugaeats-orders .order-num-pill {
+.tastyigniter-orders .list-group-item + .list-group-item { border-top: 1px solid #f0f0f0; }
+.tastyigniter-orders .order-num-pill {
     width: 40px; height: 40px; border-radius: 10px;
     background: linear-gradient(135deg, #ff4900 0%, #ff6b35 100%);
     color: #fff; display: flex; align-items: center; justify-content: center;

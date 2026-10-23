@@ -1,5 +1,5 @@
 /**
- * UgaEats AI Chatbot
+ * TastyIgniter AI Chatbot
  * Powered by Google Gemini
  */
 
@@ -8,7 +8,7 @@
 
     // Create chatbot HTML
     const chatbotHTML = `
-        <div id="ugaeats-chatbot" class="chatbot-container">
+        <div id="tastyigniter-chatbot" class="chatbot-container">
             <!-- Chat Toggle Button -->
             <button id="chatbot-toggle" class="chatbot-toggle" aria-label="Open chat">
                 <svg class="chat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -31,7 +31,7 @@
                             </svg>
                         </div>
                         <div>
-                            <h4>UgaEats Assistant</h4>
+                            <h4>TastyIgniter Assistant</h4>
                             <span class="status-indicator">🟢 Online</span>
                         </div>
                     </div>
@@ -46,7 +46,7 @@
                 <div id="chatbot-messages" class="chatbot-messages">
                     <div class="message bot-message">
                         <div class="message-content">
-                            <p>Hello! 👋 Welcome to UgaEats! I'm your AI assistant. How can I help you today?</p>
+                            <p>Hello! 👋 Welcome to TastyIgniter! I'm your AI assistant. How can I help you today?</p>
                         </div>
                         <span class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                     </div>
@@ -83,7 +83,7 @@
     document.body.insertAdjacentHTML('beforeend', chatbotHTML);
 
     // Elements
-    const chatbot = document.getElementById('ugaeats-chatbot');
+    const chatbot = document.getElementById('tastyigniter-chatbot');
     const toggleBtn = document.getElementById('chatbot-toggle');
     const closeBtn = document.getElementById('chatbot-close');
     const chatWindow = document.getElementById('chatbot-window');
@@ -267,5 +267,5 @@
         }
     });
 
-    console.log('🤖 UgaEats AI Chatbot loaded');
+    console.log('🤖 TastyIgniter AI Chatbot loaded');
 })();

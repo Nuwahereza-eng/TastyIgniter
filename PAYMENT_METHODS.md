@@ -1,6 +1,6 @@
 # Payment Methods Implementation
 
-This document describes the payment methods available for orders in TastyIgniter UgaEats.
+This document describes the payment methods available for orders in TastyIgniter.
 
 ## Available Payment Methods
 
